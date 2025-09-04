@@ -83,36 +83,6 @@ namespace GameFramework.Config
         }
 
         /// <summary>
-        /// 读取全局配置更新事件。
-        /// </summary>
-        public event EventHandler<ReadDataUpdateEventArgs> ReadDataUpdate
-        {
-            add
-            {
-                m_DataProvider.ReadDataUpdate += value;
-            }
-            remove
-            {
-                m_DataProvider.ReadDataUpdate -= value;
-            }
-        }
-
-        /// <summary>
-        /// 读取全局配置时加载依赖资源事件。
-        /// </summary>
-        public event EventHandler<ReadDataDependencyAssetEventArgs> ReadDataDependencyAsset
-        {
-            add
-            {
-                m_DataProvider.ReadDataDependencyAsset += value;
-            }
-            remove
-            {
-                m_DataProvider.ReadDataDependencyAsset -= value;
-            }
-        }
-
-        /// <summary>
         /// 全局配置管理器轮询。
         /// </summary>
         /// <param name="elapseSeconds">逻辑流逝时间，以秒为单位。</param>
