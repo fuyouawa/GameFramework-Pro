@@ -25,12 +25,6 @@ namespace UnityGameFramework.Runtime
         private EventComponent m_EventComponent = null;
 
         [SerializeField]
-        private bool m_EnableLoadConfigUpdateEvent = false;
-
-        [SerializeField]
-        private bool m_EnableLoadConfigDependencyAssetEvent = false;
-
-        [SerializeField]
         private string m_ConfigHelperTypeName = "UnityGameFramework.Runtime.DefaultConfigHelper";
 
         [SerializeField]
@@ -77,16 +71,6 @@ namespace UnityGameFramework.Runtime
 
             m_ConfigManager.ReadDataSuccess += OnReadDataSuccess;
             m_ConfigManager.ReadDataFailure += OnReadDataFailure;
-
-            if (m_EnableLoadConfigUpdateEvent)
-            {
-                m_ConfigManager.ReadDataUpdate += OnReadDataUpdate;
-            }
-
-            if (m_EnableLoadConfigDependencyAssetEvent)
-            {
-                m_ConfigManager.ReadDataDependencyAsset += OnReadDataDependencyAsset;
-            }
         }
 
         private void Start()
@@ -393,16 +377,6 @@ namespace UnityGameFramework.Runtime
         {
             Log.Warning("Load config failure, asset name '{0}', error message '{1}'.", e.DataAssetName, e.ErrorMessage);
             m_EventComponent.Fire(this, LoadConfigFailureEventArgs.Create(e));
-        }
-
-        private void OnReadDataUpdate(object sender, ReadDataUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadConfigUpdateEventArgs.Create(e));
-        }
-
-        private void OnReadDataDependencyAsset(object sender, ReadDataDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadConfigDependencyAssetEventArgs.Create(e));
         }
     }
 }

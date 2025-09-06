@@ -77,18 +77,17 @@ namespace GameFramework.Resource
             /// <summary>
             /// 异步卸载场景。
             /// </summary>
-            /// <param name="packageName">资源包名称</param>
             /// <param name="sceneAssetName">要卸载场景资源的名称。</param>
             /// <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
             /// <param name="userData">用户自定义数据。</param>
-            public void UnloadScene(string packageName, string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
+            public void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
             {
                 if (m_ResourceManager.m_ResourceHelper == null)
                 {
                     throw new GameFrameworkException("You must set resource helper first.");
                 }
 
-                m_ResourceManager.m_ResourceHelper.UnloadScene(packageName, sceneAssetName, unloadSceneCallbacks, userData);
+                m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
             }
         }
     }

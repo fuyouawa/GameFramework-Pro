@@ -361,6 +361,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11497722, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
+      propertyPath: m_ResourceHelper
+      value: 
+      objectReference: {fileID: 1171335652}
+    - target: {fileID: 11497722, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
       propertyPath: m_CustomResourceHelper
       value: 
       objectReference: {fileID: 1171335652}
@@ -369,6 +373,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 11497722, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
+      propertyPath: m_LoadResourceAgentHelper
+      value: 
+      objectReference: {fileID: 1171335651}
+    - target: {fileID: 11497722, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
       propertyPath: m_CustomLoadResourceAgentHelper
       value: 
       objectReference: {fileID: 1171335651}
@@ -376,7 +384,8 @@ PrefabInstance:
       propertyPath: m_LoadResourceAgentHelperTypeName
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11463816, guid: adb3eb1c35fcff14f89fba7b05c9d71c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

@@ -15485,12 +15485,12 @@
             加载资源代理辅助器接口。
             </summary>
         </member>
-        <member name="E:GameFramework.Resource.ILoadResourceAgentHelper.LoadResourceAgentHelperLoadComplete">
+        <member name="E:GameFramework.Resource.ILoadResourceAgentHelper.LoadComplete">
             <summary>
             加载资源代理辅助器异步加载资源完成事件。
             </summary>
         </member>
-        <member name="E:GameFramework.Resource.ILoadResourceAgentHelper.LoadResourceAgentHelperError">
+        <member name="E:GameFramework.Resource.ILoadResourceAgentHelper.Error">
             <summary>
             加载资源代理辅助器错误事件。
             </summary>
@@ -15509,16 +15509,10 @@
             重置加载资源代理辅助器。
             </summary>
         </member>
-        <member name="T:GameFramework.Resource.InitPackageCompleteCallback">
-            <summary>
-            使用单机模式并初始化资源完成时的回调函数。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.IResourceHelper.UnloadScene(System.String,System.String,GameFramework.Resource.UnloadSceneCallbacks,System.Object)">
+        <member name="M:GameFramework.Resource.IResourceHelper.UnloadScene(System.String,GameFramework.Resource.UnloadSceneCallbacks,System.Object)">
             <summary>
             卸载场景。
             </summary>
-            <param name="packageName"></param>
             <param name="sceneAssetName">场景资源名称。</param>
             <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
             <param name="userData">用户自定义数据。</param>
@@ -15661,12 +15655,11 @@
             初始化接口。
             </summary>
         </member>
-        <member name="M:GameFramework.Resource.IResourceManager.InitPackage(System.String,GameFramework.Resource.InitPackageCompleteCallback)">
+        <member name="M:GameFramework.Resource.IResourceManager.InitPackage(System.String,GameFramework.Resource.InitPackageCallbacks)">
             <summary>
             初始化操作。
             </summary>
             <param name="packageName">资源包名称。</param>
-            <param name="initPackageCompleteCallback">初始化完成的回调</param>
         </member>
         <member name="M:GameFramework.Resource.IResourceManager.HasAsset(System.String)">
             <summary>
@@ -16058,11 +16051,10 @@
             <param name="loadSceneCallbacks">加载场景回调函数集。</param>
             <param name="userData">用户自定义数据。</param>
         </member>
-        <member name="M:GameFramework.Resource.ResourceManager.ResourceLoader.UnloadScene(System.String,System.String,GameFramework.Resource.UnloadSceneCallbacks,System.Object)">
+        <member name="M:GameFramework.Resource.ResourceManager.ResourceLoader.UnloadScene(System.String,GameFramework.Resource.UnloadSceneCallbacks,System.Object)">
             <summary>
             异步卸载场景。
             </summary>
-            <param name="packageName">资源包名称</param>
             <param name="sceneAssetName">要卸载场景资源的名称。</param>
             <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
             <param name="userData">用户自定义数据。</param>

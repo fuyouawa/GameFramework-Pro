@@ -30,12 +30,6 @@ namespace UnityGameFramework.Runtime
         private readonly List<IEntity> m_InternalEntityResults = new List<IEntity>();
 
         [SerializeField]
-        private bool m_EnableShowEntityUpdateEvent = false;
-
-        [SerializeField]
-        private bool m_EnableShowEntityDependencyAssetEvent = false;
-
-        [SerializeField]
         private Transform m_InstanceRoot = null;
 
         [SerializeField]
@@ -91,16 +85,6 @@ namespace UnityGameFramework.Runtime
 
             m_EntityManager.ShowEntitySuccess += OnShowEntitySuccess;
             m_EntityManager.ShowEntityFailure += OnShowEntityFailure;
-
-            if (m_EnableShowEntityUpdateEvent)
-            {
-                m_EntityManager.ShowEntityUpdate += OnShowEntityUpdate;
-            }
-
-            if (m_EnableShowEntityDependencyAssetEvent)
-            {
-                m_EntityManager.ShowEntityDependencyAsset += OnShowEntityDependencyAsset;
-            }
 
             m_EntityManager.HideEntityComplete += OnHideEntityComplete;
         }
@@ -1126,16 +1110,6 @@ namespace UnityGameFramework.Runtime
         {
             Log.Warning("Show entity failure, entity id '{0}', asset name '{1}', entity group name '{2}', error message '{3}'.", e.EntityId, e.EntityAssetName, e.EntityGroupName, e.ErrorMessage);
             m_EventComponent.Fire(this, ShowEntityFailureEventArgs.Create(e));
-        }
-
-        private void OnShowEntityUpdate(object sender, GameFramework.Entity.ShowEntityUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, ShowEntityUpdateEventArgs.Create(e));
-        }
-
-        private void OnShowEntityDependencyAsset(object sender, GameFramework.Entity.ShowEntityDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, ShowEntityDependencyAssetEventArgs.Create(e));
         }
 
         private void OnHideEntityComplete(object sender, GameFramework.Entity.HideEntityCompleteEventArgs e)

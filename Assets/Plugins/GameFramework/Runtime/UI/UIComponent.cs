@@ -35,12 +35,6 @@ namespace UnityGameFramework.Runtime
         private bool m_EnableOpenUIFormFailureEvent = true;
 
         [SerializeField]
-        private bool m_EnableOpenUIFormUpdateEvent = false;
-
-        [SerializeField]
-        private bool m_EnableOpenUIFormDependencyAssetEvent = false;
-
-        [SerializeField]
         private bool m_EnableCloseUIFormCompleteEvent = true;
 
         [SerializeField]
@@ -164,16 +158,6 @@ namespace UnityGameFramework.Runtime
             }
 
             m_UIManager.OpenUIFormFailure += OnOpenUIFormFailure;
-
-            if (m_EnableOpenUIFormUpdateEvent)
-            {
-                m_UIManager.OpenUIFormUpdate += OnOpenUIFormUpdate;
-            }
-
-            if (m_EnableOpenUIFormDependencyAssetEvent)
-            {
-                m_UIManager.OpenUIFormDependencyAsset += OnOpenUIFormDependencyAsset;
-            }
 
             if (m_EnableCloseUIFormCompleteEvent)
             {
@@ -710,16 +694,6 @@ namespace UnityGameFramework.Runtime
             {
                 m_EventComponent.Fire(this, OpenUIFormFailureEventArgs.Create(e));
             }
-        }
-
-        private void OnOpenUIFormUpdate(object sender, GameFramework.UI.OpenUIFormUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, OpenUIFormUpdateEventArgs.Create(e));
-        }
-
-        private void OnOpenUIFormDependencyAsset(object sender, GameFramework.UI.OpenUIFormDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, OpenUIFormDependencyAssetEventArgs.Create(e));
         }
 
         private void OnCloseUIFormComplete(object sender, GameFramework.UI.CloseUIFormCompleteEventArgs e)

@@ -166,6 +166,7 @@ namespace GameFramework.Resource
         /// <param name="loadResourceAgentHelper">要添加的加载资源代理辅助器。</param>
         void AddLoadResourceAgentHelper(ILoadResourceAgentHelper loadResourceAgentHelper);
 
+
         void SetResourceHelper(IResourceHelper resourceHelper);
 
         /// <summary>
@@ -177,8 +178,7 @@ namespace GameFramework.Resource
         /// 初始化操作。
         /// </summary>
         /// <param name="packageName">资源包名称。</param>
-        /// <param name="initPackageCompleteCallback">初始化完成的回调</param>
-        void InitPackage(string packageName, InitPackageCompleteCallback initPackageCompleteCallback);
+        void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks);
 
         /// <summary>
         /// 检查资源是否存在。

@@ -18,14 +18,12 @@ namespace GameFramework.Resource
         /// <summary>
         /// 加载资源代理辅助器异步加载资源完成事件。
         /// </summary>
-        event EventHandler<LoadResourceAgentHelperLoadCompleteEventArgs> LoadResourceAgentHelperLoadComplete;
+        event EventHandler<LoadResourceAgentHelperLoadCompleteEventArgs> LoadComplete;
 
         /// <summary>
         /// 加载资源代理辅助器错误事件。
         /// </summary>
-        event EventHandler<LoadResourceAgentHelperErrorEventArgs> LoadResourceAgentHelperError;
-
-        HasAssetResult HasAsset(string packageName, string assetName);
+        event EventHandler<LoadResourceAgentHelperErrorEventArgs> Error;
 
         /// <summary>
         /// 通过加载资源代理辅助器开始异步加载资源。

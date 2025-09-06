@@ -32,12 +32,6 @@ namespace UnityGameFramework.Runtime
         private AudioListener m_AudioListener = null;
 
         [SerializeField]
-        private bool m_EnablePlaySoundUpdateEvent = false;
-
-        [SerializeField]
-        private bool m_EnablePlaySoundDependencyAssetEvent = false;
-
-        [SerializeField]
         private Transform m_InstanceRoot = null;
 
         [SerializeField]
@@ -102,16 +96,6 @@ namespace UnityGameFramework.Runtime
 
             m_SoundManager.PlaySoundSuccess += OnPlaySoundSuccess;
             m_SoundManager.PlaySoundFailure += OnPlaySoundFailure;
-
-            if (m_EnablePlaySoundUpdateEvent)
-            {
-                m_SoundManager.PlaySoundUpdate += OnPlaySoundUpdate;
-            }
-
-            if (m_EnablePlaySoundDependencyAssetEvent)
-            {
-                m_SoundManager.PlaySoundDependencyAsset += OnPlaySoundDependencyAsset;
-            }
 
             m_AudioListener = gameObject.GetOrAddComponent<AudioListener>();
 
@@ -642,16 +626,6 @@ namespace UnityGameFramework.Runtime
             }
 
             m_EventComponent.Fire(this, PlaySoundFailureEventArgs.Create(e));
-        }
-
-        private void OnPlaySoundUpdate(object sender, GameFramework.Sound.PlaySoundUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, PlaySoundUpdateEventArgs.Create(e));
-        }
-
-        private void OnPlaySoundDependencyAsset(object sender, GameFramework.Sound.PlaySoundDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, PlaySoundDependencyAssetEventArgs.Create(e));
         }
 
         private void OnLoadSceneSuccess(object sender, GameFramework.Scene.LoadSceneSuccessEventArgs e)

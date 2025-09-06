@@ -177,9 +177,9 @@ namespace GameFramework.Resource
             m_ResourceHelper.Initialize();
         }
 
-        public void InitPackage(string packageName, InitPackageCompleteCallback initPackageCompleteCallback)
+        public void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
         {
-            m_ResourceHelper.InitPackage(packageName, initPackageCompleteCallback);
+            m_ResourceHelper.InitPackage(packageName, initPackageCallbacks);
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Unload scene callbacks is invalid.");
             }
 
-            m_ResourceLoader.UnloadScene(CurrentPackageName, sceneAssetName, unloadSceneCallbacks, userData);
+            m_ResourceLoader.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
         }
     }
 }

@@ -418,7 +418,7 @@ namespace UnityGameFramework.Runtime
             ResourceComponent resourceCompoent = GameEntry.GetComponent<ResourceComponent>();
             if (resourceCompoent != null)
             {
-                resourceCompoent.ForceUnloadUnusedAssets(true);
+                //TODO resourceCompoent.ForceUnloadUnusedAssets(true);
             }
         }
     }

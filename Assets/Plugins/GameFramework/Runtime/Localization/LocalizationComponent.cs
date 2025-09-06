@@ -103,16 +103,6 @@ namespace UnityGameFramework.Runtime
 
             m_LocalizationManager.ReadDataSuccess += OnReadDataSuccess;
             m_LocalizationManager.ReadDataFailure += OnReadDataFailure;
-
-            if (m_EnableLoadDictionaryUpdateEvent)
-            {
-                m_LocalizationManager.ReadDataUpdate += OnReadDataUpdate;
-            }
-
-            if (m_EnableLoadDictionaryDependencyAssetEvent)
-            {
-                m_LocalizationManager.ReadDataDependencyAsset += OnReadDataDependencyAsset;
-            }
         }
 
         private void Start()
@@ -774,16 +764,6 @@ namespace UnityGameFramework.Runtime
         {
             Log.Warning("Load dictionary failure, asset name '{0}', error message '{1}'.", e.DataAssetName, e.ErrorMessage);
             m_EventComponent.Fire(this, LoadDictionaryFailureEventArgs.Create(e));
-        }
-
-        private void OnReadDataUpdate(object sender, ReadDataUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadDictionaryUpdateEventArgs.Create(e));
-        }
-
-        private void OnReadDataDependencyAsset(object sender, ReadDataDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadDictionaryDependencyAssetEventArgs.Create(e));
         }
     }
 }

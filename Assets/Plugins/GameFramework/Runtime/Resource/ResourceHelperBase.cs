@@ -15,26 +15,16 @@ namespace UnityGameFramework.Runtime
     /// </summary>
     public abstract class ResourceHelperBase : MonoBehaviour, IResourceHelper
     {
-        /// <summary>
-        /// 直接从指定文件路径加载数据流。
-        /// </summary>
-        /// <param name="fileUri">文件路径。</param>
-        /// <param name="loadBytesCallbacks">加载数据流回调函数集。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public abstract void LoadBytes(string fileUri, LoadBytesCallbacks loadBytesCallbacks, object userData);
+        public abstract void Initialize();
+        public abstract void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks);
 
-        /// <summary>
-        /// 卸载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public abstract void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData);
+        public abstract bool CheckAssetNameValid(string packageName, string assetName);
 
-        /// <summary>
-        /// 释放资源。
-        /// </summary>
-        /// <param name="objectToRelease">要释放的资源。</param>
-        public abstract void Release(object objectToRelease);
+        public abstract bool IsNeedDownloadFromRemote(AssetInfo assetInfo);
+
+        public abstract AssetInfo GetAssetInfo(string packageName, string assetName);
+
+        public abstract void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks,
+            object userData);
     }
 }

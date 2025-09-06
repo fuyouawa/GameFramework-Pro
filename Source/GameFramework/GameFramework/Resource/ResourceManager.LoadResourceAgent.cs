@@ -27,8 +27,8 @@ namespace GameFramework.Resource
 
             public void Initialize()
             {
-                m_LoadResourceAgentHelper.LoadResourceAgentHelperLoadComplete += OnLoadResourceAgentHelperLoadComplete;
-                m_LoadResourceAgentHelper.LoadResourceAgentHelperError += OnLoadResourceAgentHelperError;
+                m_LoadResourceAgentHelper.LoadComplete += OnLoadResourceAgentHelperLoadComplete;
+                m_LoadResourceAgentHelper.Error += OnLoadResourceAgentHelperError;
             }
 
             public void Update(float elapseSeconds, float realElapseSeconds)
@@ -37,8 +37,8 @@ namespace GameFramework.Resource
 
             public void Shutdown()
             {
-                m_LoadResourceAgentHelper.LoadResourceAgentHelperLoadComplete -= OnLoadResourceAgentHelperLoadComplete;
-                m_LoadResourceAgentHelper.LoadResourceAgentHelperError -= OnLoadResourceAgentHelperError;
+                m_LoadResourceAgentHelper.LoadComplete -= OnLoadResourceAgentHelperLoadComplete;
+                m_LoadResourceAgentHelper.Error -= OnLoadResourceAgentHelperError;
             }
 
             public StartTaskStatus Start(LoadResourceTaskBase task)

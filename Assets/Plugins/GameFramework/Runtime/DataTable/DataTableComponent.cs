@@ -27,12 +27,6 @@ namespace UnityGameFramework.Runtime
         private EventComponent m_EventComponent = null;
 
         [SerializeField]
-        private bool m_EnableLoadDataTableUpdateEvent = false;
-
-        [SerializeField]
-        private bool m_EnableLoadDataTableDependencyAssetEvent = false;
-
-        [SerializeField]
         private string m_DataTableHelperTypeName = "UnityGameFramework.Runtime.DefaultDataTableHelper";
 
         [SerializeField]
@@ -274,16 +268,6 @@ namespace UnityGameFramework.Runtime
             dataTableBase.ReadDataSuccess += OnReadDataSuccess;
             dataTableBase.ReadDataFailure += OnReadDataFailure;
 
-            if (m_EnableLoadDataTableUpdateEvent)
-            {
-                dataTableBase.ReadDataUpdate += OnReadDataUpdate;
-            }
-
-            if (m_EnableLoadDataTableDependencyAssetEvent)
-            {
-                dataTableBase.ReadDataDependencyAsset += OnReadDataDependencyAsset;
-            }
-
             return dataTable;
         }
 
@@ -298,16 +282,6 @@ namespace UnityGameFramework.Runtime
             DataTableBase dataTable = m_DataTableManager.CreateDataTable(dataRowType, name);
             dataTable.ReadDataSuccess += OnReadDataSuccess;
             dataTable.ReadDataFailure += OnReadDataFailure;
-
-            if (m_EnableLoadDataTableUpdateEvent)
-            {
-                dataTable.ReadDataUpdate += OnReadDataUpdate;
-            }
-
-            if (m_EnableLoadDataTableDependencyAssetEvent)
-            {
-                dataTable.ReadDataDependencyAsset += OnReadDataDependencyAsset;
-            }
 
             return dataTable;
         }
@@ -384,16 +358,6 @@ namespace UnityGameFramework.Runtime
         {
             Log.Warning("Load data table failure, asset name '{0}', error message '{1}'.", e.DataAssetName, e.ErrorMessage);
             m_EventComponent.Fire(this, LoadDataTableFailureEventArgs.Create(e));
-        }
-
-        private void OnReadDataUpdate(object sender, ReadDataUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadDataTableUpdateEventArgs.Create(e));
-        }
-
-        private void OnReadDataDependencyAsset(object sender, ReadDataDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadDataTableDependencyAssetEventArgs.Create(e));
         }
     }
 }

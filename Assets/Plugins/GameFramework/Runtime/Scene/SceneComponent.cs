@@ -30,12 +30,6 @@ namespace UnityGameFramework.Runtime
         private Camera m_MainCamera = null;
         private Scene m_GameFrameworkScene = default(Scene);
 
-        [SerializeField]
-        private bool m_EnableLoadSceneUpdateEvent = true;
-
-        [SerializeField]
-        private bool m_EnableLoadSceneDependencyAssetEvent = true;
-
         /// <summary>
         /// 获取当前场景主摄像机。
         /// </summary>
@@ -63,16 +57,6 @@ namespace UnityGameFramework.Runtime
 
             m_SceneManager.LoadSceneSuccess += OnLoadSceneSuccess;
             m_SceneManager.LoadSceneFailure += OnLoadSceneFailure;
-
-            if (m_EnableLoadSceneUpdateEvent)
-            {
-                m_SceneManager.LoadSceneUpdate += OnLoadSceneUpdate;
-            }
-
-            if (m_EnableLoadSceneDependencyAssetEvent)
-            {
-                m_SceneManager.LoadSceneDependencyAsset += OnLoadSceneDependencyAsset;
-            }
 
             m_SceneManager.UnloadSceneSuccess += OnUnloadSceneSuccess;
             m_SceneManager.UnloadSceneFailure += OnUnloadSceneFailure;
@@ -449,16 +433,6 @@ namespace UnityGameFramework.Runtime
         {
             Log.Warning("Load scene failure, scene asset name '{0}', error message '{1}'.", e.SceneAssetName, e.ErrorMessage);
             m_EventComponent.Fire(this, LoadSceneFailureEventArgs.Create(e));
-        }
-
-        private void OnLoadSceneUpdate(object sender, GameFramework.Scene.LoadSceneUpdateEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadSceneUpdateEventArgs.Create(e));
-        }
-
-        private void OnLoadSceneDependencyAsset(object sender, GameFramework.Scene.LoadSceneDependencyAssetEventArgs e)
-        {
-            m_EventComponent.Fire(this, LoadSceneDependencyAssetEventArgs.Create(e));
         }
 
         private void OnUnloadSceneSuccess(object sender, GameFramework.Scene.UnloadSceneSuccessEventArgs e)
