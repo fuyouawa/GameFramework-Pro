@@ -1,4 +1,4 @@
-﻿namespace GameMain
+﻿namespace GameMain.Runtime
 {
     public class ResourceLogger : YooAsset.ILogger
     {

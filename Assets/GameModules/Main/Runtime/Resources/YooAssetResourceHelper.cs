@@ -4,7 +4,7 @@ using UnityGameFramework.Runtime;
 using YooAsset;
 using AssetInfo = GameFramework.Resource.AssetInfo;
 
-namespace GameMain
+namespace GameMain.Runtime
 {
     /// <summary>
     /// 远端资源地址查询服务类
@@ -35,10 +35,18 @@ namespace GameMain
     {
         private ResourceComponent _resourceComponent = null;
 
+        private void Start()
+        {
+            _resourceComponent = GameEntry.GetComponent<ResourceComponent>();
+            if (_resourceComponent == null)
+            {
+                Log.Fatal("Resource component is invalid.");
+                return;
+            }
+        }
+
         public override void Initialize()
         {
-            _resourceComponent ??= GameEntry.GetComponent<ResourceComponent>();
-
             // 初始化资源系统
             if (!YooAssets.Initialized)
             {
@@ -58,8 +66,6 @@ namespace GameMain
 
         public override void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
         {
-            _resourceComponent ??= GameEntry.GetComponent<ResourceComponent>();
-
             // 创建资源包裹类
             var package = YooAssets.TryGetPackage(packageName);
             if (package == null)

@@ -1,0 +1,17 @@
+{
+    "name": "GameProto.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:363c5eb08ff8e6a439b85e37b8c20d96",
+        "GUID:2a81c6962524d424a8ef5072bd3b0fa0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
