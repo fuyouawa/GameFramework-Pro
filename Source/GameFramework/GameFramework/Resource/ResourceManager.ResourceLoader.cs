@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GameFramework.Resource
 {
@@ -8,11 +9,13 @@ namespace GameFramework.Resource
         {
             private readonly ResourceManager m_ResourceManager;
             private readonly TaskPool<LoadResourceTaskBase> m_TaskPool;
+            private readonly Dictionary<string, object> m_SceneNameToAssetMap;
 
             public ResourceLoader(ResourceManager resourceManager)
             {
                 m_ResourceManager = resourceManager;
                 m_TaskPool = new TaskPool<LoadResourceTaskBase>();
+                m_SceneNameToAssetMap = new Dictionary<string, object>();
             }
 
             public void Update(float elapseSeconds, float realElapseSeconds)
@@ -32,9 +35,11 @@ namespace GameFramework.Resource
             /// <param name="loadResourceAgentHelper">要增加的加载资源代理辅助器。</param>
             /// <param name="readOnlyPath">资源只读区路径。</param>
             /// <param name="readWritePath">资源读写区路径。</param>
-            public void AddLoadResourceAgentHelper(ILoadResourceAgentHelper loadResourceAgentHelper, string readOnlyPath, string readWritePath)
+            public void AddLoadResourceAgentHelper(ILoadResourceAgentHelper loadResourceAgentHelper,
+                string readOnlyPath, string readWritePath)
             {
-                LoadResourceAgent agent = new LoadResourceAgent(loadResourceAgentHelper, this, readOnlyPath, readWritePath);
+                LoadResourceAgent agent =
+                    new LoadResourceAgent(loadResourceAgentHelper, this, readOnlyPath, readWritePath);
                 m_TaskPool.AddAgent(agent);
             }
 
@@ -47,10 +52,12 @@ namespace GameFramework.Resource
             /// <param name="priority">加载资源的优先级。</param>
             /// <param name="loadAssetCallbacks">加载资源回调函数集。</param>
             /// <param name="userData">用户自定义数据。</param>
-            public void LoadAsset(string packageName, string assetName, Type assetType, int priority, LoadAssetCallbacks loadAssetCallbacks,
+            public void LoadAsset(string packageName, string assetName, Type assetType, int priority,
+                LoadAssetCallbacks loadAssetCallbacks,
                 object userData)
             {
-                LoadAssetTask loadAssetTask = LoadAssetTask.Create(packageName, assetName, assetType, priority, loadAssetCallbacks, userData);
+                LoadAssetTask loadAssetTask = LoadAssetTask.Create(packageName, assetName, assetType, priority,
+                    loadAssetCallbacks, userData);
                 m_TaskPool.AddTask(loadAssetTask);
             }
 
@@ -67,10 +74,18 @@ namespace GameFramework.Resource
             /// <param name="priority">加载场景的优先级。</param>
             /// <param name="loadSceneCallbacks">加载场景回调函数集。</param>
             /// <param name="userData">用户自定义数据。</param>
-            public void LoadScene(string packageName, string sceneAssetName, int priority, LoadSceneCallbacks loadSceneCallbacks,
+            public void LoadScene(string packageName, string sceneAssetName, int priority,
+                LoadSceneCallbacks loadSceneCallbacks,
                 object userData)
             {
-                LoadSceneTask loadSceneTask = LoadSceneTask.Create(packageName, sceneAssetName, priority, loadSceneCallbacks, userData);
+                var callbacks = new LoadSceneCallbacks(
+                    (name, asset, duration, data) =>
+                    {
+                        m_SceneNameToAssetMap[name] = asset;
+                        loadSceneCallbacks.LoadSceneSuccessCallback?.Invoke(sceneAssetName, asset, duration, data);
+                    }, loadSceneCallbacks.LoadSceneFailureCallback);
+
+                LoadSceneTask loadSceneTask = LoadSceneTask.Create(packageName, sceneAssetName, priority, callbacks, userData);
                 m_TaskPool.AddTask(loadSceneTask);
             }
 
@@ -87,7 +102,14 @@ namespace GameFramework.Resource
                     throw new GameFrameworkException("You must set resource helper first.");
                 }
 
-                m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
+                if (m_SceneNameToAssetMap.TryGetValue(sceneAssetName, out object asset))
+                {
+                    m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, asset, unloadSceneCallbacks, userData);
+                }
+                else
+                {
+                    throw new GameFrameworkException($"The scene asset '{sceneAssetName}' is not loaded.");
+                }
             }
         }
     }

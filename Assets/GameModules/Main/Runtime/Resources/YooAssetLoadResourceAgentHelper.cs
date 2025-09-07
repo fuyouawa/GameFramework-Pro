@@ -17,12 +17,26 @@ namespace GameMain
 
         public override void LoadAsset(string packageName, string assetName, Type assetType, bool isScene)
         {
-            throw new NotImplementedException();
+            var package = YooAssets.GetPackage(packageName);
+            var assetHandle = assetType == null
+                ? package.LoadAssetAsync(assetName)
+                : package.LoadAssetAsync(assetName, assetType);
+
+            assetHandle.Completed += op =>
+            {
+                if (op.Status == EOperationStatus.Succeed)
+                {
+                    LoadComplete?.Invoke(this, LoadResourceAgentHelperLoadCompleteEventArgs.Create(op.AssetObject));
+                }
+                else
+                {
+                    Error?.Invoke(this, LoadResourceAgentHelperErrorEventArgs.Create(LoadResourceStatus.AssetError, op.LastError));
+                }
+            };
         }
 
         public override void Reset()
         {
-            throw new NotImplementedException();
         }
     }
 }

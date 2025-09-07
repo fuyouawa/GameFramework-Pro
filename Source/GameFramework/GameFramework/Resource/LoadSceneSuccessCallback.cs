@@ -13,5 +13,5 @@ namespace GameFramework.Resource
     /// <param name="sceneAssetName">要加载的场景资源名称。</param>
     /// <param name="duration">加载持续时间。</param>
     /// <param name="userData">用户自定义数据。</param>
-    public delegate void LoadSceneSuccessCallback(string sceneAssetName, float duration, object userData);
+    public delegate void LoadSceneSuccessCallback(string sceneAssetName, object sceneAsset, float duration, object userData);
 }

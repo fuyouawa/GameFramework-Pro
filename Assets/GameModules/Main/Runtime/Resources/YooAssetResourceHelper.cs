@@ -1,25 +1,53 @@
-﻿using GameFramework.Resource;
+﻿using System;
+using GameFramework.Resource;
 using UnityGameFramework.Runtime;
 using YooAsset;
 using AssetInfo = GameFramework.Resource.AssetInfo;
 
 namespace GameMain
 {
+    /// <summary>
+    /// 远端资源地址查询服务类
+    /// </summary>
+    class RemoteServices : IRemoteServices
+    {
+        private readonly string _defaultHostServer;
+        private readonly string _fallbackHostServer;
+
+        public RemoteServices(string defaultHostServer, string fallbackHostServer)
+        {
+            _defaultHostServer = defaultHostServer;
+            _fallbackHostServer = fallbackHostServer;
+        }
+
+        string IRemoteServices.GetRemoteMainURL(string fileName)
+        {
+            return $"{_defaultHostServer}/{fileName}";
+        }
+
+        string IRemoteServices.GetRemoteFallbackURL(string fileName)
+        {
+            return $"{_fallbackHostServer}/{fileName}";
+        }
+    }
+
     public class YooAssetResourceHelper : ResourceHelperBase
     {
+        private ResourceComponent _resourceComponent = null;
+
         public override void Initialize()
         {
-            var manager = GameEntry.GetComponent<ResourceComponent>();
+            _resourceComponent ??= GameEntry.GetComponent<ResourceComponent>();
 
             // 初始化资源系统
             if (!YooAssets.Initialized)
             {
                 YooAssets.Initialize(new ResourceLogger());
             }
-            YooAssets.SetOperationSystemMaxTimeSlice(manager.Milliseconds);
+            YooAssets.SetOperationSystemMaxTimeSlice(_resourceComponent.Milliseconds);
 
             // 创建默认的资源包
-            string packageName = manager.DefaultPackageName;
+            string packageName = _resourceComponent.DefaultPackageName;
             var defaultPackage = YooAssets.TryGetPackage(packageName);
             if (defaultPackage == null)
             {
@@ -30,27 +58,114 @@ namespace GameMain
 
         public override void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
         {
-            throw new System.NotImplementedException();
+            _resourceComponent ??= GameEntry.GetComponent<ResourceComponent>();
+
+            // 创建资源包裹类
+            var package = YooAssets.TryGetPackage(packageName);
+            if (package == null)
+            {
+                package = YooAssets.CreatePackage(packageName);
+            }
+
+            // 编辑器下的模拟模式
+            InitializationOperation initializationOperation = null;
+            if (_resourceComponent.PlayMode == PlayMode.EditorSimulateMode)
+            {
+                var buildResult = EditorSimulateModeHelper.SimulateBuild(packageName);
+                var packageRoot = buildResult.PackageRootDirectory;
+                var editorFileSystemParams = FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);
+                var initParameters = new EditorSimulateModeParameters();
+                initParameters.EditorFileSystemParameters = editorFileSystemParams;
+                initializationOperation = package.InitializeAsync(initParameters);
+            }
+            // 单机运行模式
+            else if (_resourceComponent.PlayMode == PlayMode.OfflinePlayMode)
+            {
+                var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+                var initParameters = new OfflinePlayModeParameters();
+                initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
+                initializationOperation = package.InitializeAsync(initParameters);
+            }
+            // 联机运行模式
+            else if (_resourceComponent.PlayMode == PlayMode.HostPlayMode)
+            {
+                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL, _resourceComponent.FallbackHostServerURL);
+                var cacheFileSystemParams = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
+                var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+
+                var initParameters = new HostPlayModeParameters();
+                initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
+                initParameters.CacheFileSystemParameters = cacheFileSystemParams;
+                initializationOperation = package.InitializeAsync(initParameters);
+            }
+            // WebGL运行模式
+            else if (_resourceComponent.PlayMode == PlayMode.WebPlayMode)
+            {
+                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL, _resourceComponent.FallbackHostServerURL);
+                var webServerFileSystemParams = FileSystemParameters.CreateDefaultWebServerFileSystemParameters();
+                var webRemoteFileSystemParams = FileSystemParameters.CreateDefaultWebRemoteFileSystemParameters(remoteServices); //支持跨域下载
+
+                var initParameters = new WebPlayModeParameters();
+                initParameters.WebServerFileSystemParameters = webServerFileSystemParams;
+                initParameters.WebRemoteFileSystemParameters = webRemoteFileSystemParams;
+                initializationOperation = package.InitializeAsync(initParameters);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
+            initializationOperation.Completed += op =>
+            {
+                if (op.Status == EOperationStatus.Succeed)
+                {
+                    Log.Info($"Initialize package '{packageName}' succeed.");
+                    initPackageCallbacks.InitPackageComplete?.Invoke(packageName);
+                }
+                else
+                {
+                    Log.Error($"Initialize package '{packageName}' failure: {op.Error}.");
+                    initPackageCallbacks.InitPackageFailure?.Invoke(packageName, op.Error);
+                }
+            };
         }
 
         public override bool CheckAssetNameValid(string packageName, string assetName)
         {
-            throw new System.NotImplementedException();
+            var package = YooAssets.GetPackage(packageName);
+            return package.CheckLocationValid(assetName);
         }
 
         public override bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
         {
-            throw new System.NotImplementedException();
+            var package = YooAssets.GetPackage(assetInfo.PackageName);
+            return package.IsNeedDownloadFromRemote(assetInfo.Reference as YooAsset.AssetInfo);
         }
 
         public override AssetInfo GetAssetInfo(string packageName, string assetName)
         {
-            throw new System.NotImplementedException();
+            var package = YooAssets.GetPackage(packageName);
+            var assetInfo = package.GetAssetInfo(assetName);
+            return new AssetInfo(assetInfo.PackageName, assetInfo.AssetType, assetName, assetInfo.AssetPath, assetInfo.Error, assetInfo);
         }
 
-        public override void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
+        public override void UnloadScene(string sceneAssetName, object sceneAsset, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
         {
-            throw new System.NotImplementedException();
+            var sceneHandle = sceneAsset as YooAsset.SceneHandle;
+            var unloadOperation = sceneHandle.UnloadAsync();
+            unloadOperation.Completed += op =>
+            {
+                if (op.Status == EOperationStatus.Succeed)
+                {
+                    Log.Info($"Unload scene '{sceneAssetName}' succeed.");
+                    unloadSceneCallbacks.UnloadSceneSuccessCallback?.Invoke(sceneAssetName, userData);
+                }
+                else
+                {
+                    Log.Error($"Unload scene '{sceneAssetName}' failure: {op.Error}.");
+                    unloadSceneCallbacks.UnloadSceneFailureCallback?.Invoke(sceneAssetName, op.Error);
+                }
+            };
         }
     }
 }

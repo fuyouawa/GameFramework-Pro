@@ -26,7 +26,7 @@
             {
                 if (m_LoadSceneCallbacks.LoadSceneSuccessCallback != null)
                 {
-                    m_LoadSceneCallbacks.LoadSceneSuccessCallback(AssetName, duration, UserData);
+                    m_LoadSceneCallbacks.LoadSceneSuccessCallback(AssetName, asset, duration, UserData);
                 }
             }
 

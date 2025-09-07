@@ -121,6 +121,13 @@ namespace UnityGameFramework.Runtime
         }
 
         /// <summary>
+        /// 资源服务器地址。
+        /// </summary>
+        public string HostServerURL { get; set; }
+
+        public string FallbackHostServerURL { get; set; }
+
+        /// <summary>
         /// 获取或设置资源对象池的容量。
         /// </summary>
         public int AssetCapacity

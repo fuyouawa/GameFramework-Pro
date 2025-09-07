@@ -15509,7 +15509,7 @@
             重置加载资源代理辅助器。
             </summary>
         </member>
-        <member name="M:GameFramework.Resource.IResourceHelper.UnloadScene(System.String,GameFramework.Resource.UnloadSceneCallbacks,System.Object)">
+        <member name="M:GameFramework.Resource.IResourceHelper.UnloadScene(System.String,System.Object,GameFramework.Resource.UnloadSceneCallbacks,System.Object)">
             <summary>
             卸载场景。
             </summary>
