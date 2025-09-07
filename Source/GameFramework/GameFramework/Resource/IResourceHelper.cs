@@ -1,7 +1,7 @@
 ﻿namespace GameFramework.Resource
 {
     public delegate void InitPackageCompleteCallback(string packageName);
-    public delegate void InitPackageFailureCallback(string packageName, object userData);
+    public delegate void InitPackageFailureCallback(string packageName, string errorMessage, object userData);
 
     public class InitPackageCallbacks
     {
@@ -27,6 +27,8 @@
         bool CheckAssetNameValid(string packageName, string assetName);
         bool IsNeedDownloadFromRemote(AssetInfo assetInfo);
         AssetInfo GetAssetInfo(string packageName, string assetName);
+
+        IResourcePackageDownloader CreatePackageDownloader(string packageName);
 
         /// <summary>
         /// 卸载场景。

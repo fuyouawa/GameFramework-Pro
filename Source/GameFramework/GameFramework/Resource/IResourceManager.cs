@@ -166,6 +166,8 @@ namespace GameFramework.Resource
         /// <param name="loadResourceAgentHelper">要添加的加载资源代理辅助器。</param>
         void AddLoadResourceAgentHelper(ILoadResourceAgentHelper loadResourceAgentHelper);
 
+        IResourcePackageDownloader CreatePackageDownloader(string packageName);
+        IResourcePackageDownloader GetPackageDownloader(string packageName);
 
         void SetResourceHelper(IResourceHelper resourceHelper);
 

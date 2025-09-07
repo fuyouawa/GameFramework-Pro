@@ -15708,6 +15708,26 @@
             <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
             <param name="userData">用户自定义数据。</param>
         </member>
+        <member name="P:GameFramework.Resource.IResourcePackageDownloader.TotalDownloadCount">
+            <summary>
+            统计的下载文件总数量
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.IResourcePackageDownloader.TotalDownloadBytes">
+            <summary>
+            统计的下载文件的总大小
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.IResourcePackageDownloader.CurrentDownloadCount">
+            <summary>
+            当前已经完成的下载总数量
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.IResourcePackageDownloader.CurrentDownloadBytes">
+            <summary>
+            当前已经完成的下载总大小
+            </summary>
+        </member>
         <member name="T:GameFramework.Resource.LoadAssetCallbacks">
             <summary>
             加载资源回调函数集。
@@ -16058,6 +16078,56 @@
             <param name="sceneAssetName">要卸载场景资源的名称。</param>
             <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
             <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.PackageName">
+            <summary>
+            所属包裹名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.FileName">
+            <summary>
+            下载失败的文件名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.ErrorMessage">
+            <summary>
+            错误信息
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadSuccessEventArgs.PackageName">
+            <summary>
+            所属包裹名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.PackageName">
+            <summary>
+            所属包裹名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.Progress">
+            <summary>
+            下载进度 (0-1f)
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.TotalDownloadCount">
+            <summary>
+            下载文件总数
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.CurrentDownloadCount">
+            <summary>
+            当前完成的下载文件数量
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.TotalDownloadBytes">
+            <summary>
+            下载数据总大小（单位：字节）
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.CurrentDownloadBytes">
+            <summary>
+            当前完成的下载数据大小（单位：字节）
+            </summary>
         </member>
         <member name="T:GameFramework.Resource.UnloadSceneCallbacks">
             <summary>

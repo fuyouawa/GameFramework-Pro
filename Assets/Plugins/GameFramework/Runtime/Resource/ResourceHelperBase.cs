@@ -24,6 +24,8 @@ namespace UnityGameFramework.Runtime
 
         public abstract AssetInfo GetAssetInfo(string packageName, string assetName);
 
+        public abstract IResourcePackageDownloader CreatePackageDownloader(string packageName);
+
         public abstract void UnloadScene(string sceneAssetName, object sceneAsset, UnloadSceneCallbacks unloadSceneCallbacks,
             object userData);
     }

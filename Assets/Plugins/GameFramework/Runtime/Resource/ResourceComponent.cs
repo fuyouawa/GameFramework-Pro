@@ -85,6 +85,10 @@ namespace UnityGameFramework.Runtime
 
         public float MaxUnloadUnusedAssetsInterval => m_MaxUnloadUnusedAssetsInterval;
 
+        public int DownloadingMaxNum => m_DownloadingMaxNum;
+
+        public int FailedTryAgain => m_FailedTryAgain;
+
         /// <summary>
         /// 获取当前资源适用的游戏版本号。
         /// </summary>
@@ -110,14 +114,8 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public float AssetAutoReleaseInterval
         {
-            get
-            {
-                return m_ResourceManager.AssetAutoReleaseInterval;
-            }
-            set
-            {
-                m_ResourceManager.AssetAutoReleaseInterval = m_AssetAutoReleaseInterval = value;
-            }
+            get { return m_ResourceManager.AssetAutoReleaseInterval; }
+            set { m_ResourceManager.AssetAutoReleaseInterval = m_AssetAutoReleaseInterval = value; }
         }
 
         /// <summary>
@@ -132,14 +130,8 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public int AssetCapacity
         {
-            get
-            {
-                return m_ResourceManager.AssetCapacity;
-            }
-            set
-            {
-                m_ResourceManager.AssetCapacity = m_AssetCapacity = value;
-            }
+            get { return m_ResourceManager.AssetCapacity; }
+            set { m_ResourceManager.AssetCapacity = m_AssetCapacity = value; }
         }
 
         /// <summary>
@@ -147,14 +139,8 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public float AssetExpireTime
         {
-            get
-            {
-                return m_ResourceManager.AssetExpireTime;
-            }
-            set
-            {
-                m_ResourceManager.AssetExpireTime = m_AssetExpireTime = value;
-            }
+            get { return m_ResourceManager.AssetExpireTime; }
+            set { m_ResourceManager.AssetExpireTime = m_AssetExpireTime = value; }
         }
 
         /// <summary>
@@ -162,14 +148,8 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public int AssetPriority
         {
-            get
-            {
-                return m_ResourceManager.AssetPriority;
-            }
-            set
-            {
-                m_ResourceManager.AssetPriority = m_AssetPriority = value;
-            }
+            get { return m_ResourceManager.AssetPriority; }
+            set { m_ResourceManager.AssetPriority = m_AssetPriority = value; }
         }
 
         private void Start()
@@ -190,7 +170,8 @@ namespace UnityGameFramework.Runtime
 
             if (m_PlayMode == PlayMode.EditorSimulateMode)
             {
-                Log.Info("During this run, Game Framework will use editor resource files, which you should validate first.");
+                Log.Info(
+                    "During this run, Game Framework will use editor resource files, which you should validate first.");
 #if !UNITY_EDITOR
                 PlayMode = EPlayMode.OfflinePlayMode;
 #endif
@@ -229,15 +210,18 @@ namespace UnityGameFramework.Runtime
         /// <summary>
         /// 初始化操作。
         /// </summary>
-        /// <param name="packageName">资源包名称。</param>
-        public void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
+        public void InitPackage(InitPackageCallbacks initPackageCallbacks, string customPackageName = "")
         {
             if (m_ResourceManager == null)
             {
                 Log.Fatal("Resource component is invalid.");
                 return;
             }
-            m_ResourceManager.InitPackage(packageName, initPackageCallbacks);
+
+            m_ResourceManager.InitPackage(string.IsNullOrEmpty(customPackageName)
+                    ? m_DefaultPackageName
+                    : customPackageName,
+                initPackageCallbacks);
         }
 
         /// <summary>
@@ -252,6 +236,20 @@ namespace UnityGameFramework.Runtime
                 : m_DefaultPackageName;
 
             return m_ResourceManager.HasAsset(assetName);
+        }
+
+        public IResourcePackageDownloader CreatePackageDownloader(string customPackageName = "")
+        {
+            return m_ResourceManager.CreatePackageDownloader(string.IsNullOrEmpty(customPackageName)
+                ? m_DefaultPackageName
+                : customPackageName);
+        }
+
+        public IResourcePackageDownloader GetPackageDownloader(string customPackageName = "")
+        {
+            return m_ResourceManager.GetPackageDownloader(string.IsNullOrEmpty(customPackageName)
+                ? m_DefaultPackageName
+                : customPackageName);
         }
 
         /// <summary>
@@ -301,6 +299,7 @@ namespace UnityGameFramework.Runtime
             {
                 return;
             }
+
             m_ResourceManager.UnloadAsset(asset);
         }
 
@@ -331,7 +330,8 @@ namespace UnityGameFramework.Runtime
         /// <param name="sceneAssetName">要卸载场景资源的名称。</param>
         /// <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData = null)
+        public void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks,
+            object userData = null)
         {
             m_ResourceManager.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
         }

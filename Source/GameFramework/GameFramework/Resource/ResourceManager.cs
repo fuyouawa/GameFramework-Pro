@@ -23,11 +23,11 @@ namespace GameFramework.Resource
         private string m_ReadWritePath;
         private string m_ApplicableGameVersion;
         private int m_InternalResourceVersion;
-        private InitPackageCompleteCallback m_InitPackageCompleteCallback;
-        private ResourceLoader m_ResourceLoader;
         private IResourceHelper m_ResourceHelper;
 
-        private Dictionary<string, AssetInfo> m_AssetInfosCache;
+        private readonly ResourceLoader m_ResourceLoader;
+        private readonly Dictionary<string, AssetInfo> m_AssetInfosCache;
+        private readonly Dictionary<string, IResourcePackageDownloader> m_PackageDownloaders;
 
         /// <summary>
         /// 初始化资源管理器的新实例。
@@ -38,8 +38,9 @@ namespace GameFramework.Resource
             m_ReadWritePath = null;
             m_ApplicableGameVersion = null;
             m_InternalResourceVersion = 0;
-            m_InitPackageCompleteCallback = null;
             m_ResourceLoader = new ResourceLoader(this);
+            m_AssetInfosCache = new Dictionary<string, AssetInfo>();
+            m_PackageDownloaders = new Dictionary<string, IResourcePackageDownloader>();
         }
 
         /// <summary>
@@ -165,6 +166,18 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Read-write path is invalid.");
             }
             m_ResourceLoader.AddLoadResourceAgentHelper(loadResourceAgentHelper, m_ReadOnlyPath, m_ReadWritePath);
+        }
+
+        public IResourcePackageDownloader CreatePackageDownloader(string packageName)
+        {
+            var downloader = m_ResourceHelper.CreatePackageDownloader(packageName);
+            m_PackageDownloaders[packageName] = downloader;
+            return downloader;
+        }
+
+        public IResourcePackageDownloader GetPackageDownloader(string packageName)
+        {
+            return m_PackageDownloaders.GetValueOrDefault(packageName);
         }
 
         public void SetResourceHelper(IResourceHelper resourceHelper)

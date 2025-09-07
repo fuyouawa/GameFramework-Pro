@@ -37,7 +37,7 @@ namespace GameMain.Runtime
 
         private void Start()
         {
-            _resourceComponent = GameEntry.GetComponent<ResourceComponent>();
+            _resourceComponent = UnityGameFramework.Runtime.GameEntry.GetComponent<ResourceComponent>();
             if (_resourceComponent == null)
             {
                 Log.Fatal("Resource component is invalid.");
@@ -131,7 +131,7 @@ namespace GameMain.Runtime
                 else
                 {
                     Log.Error($"Initialize package '{packageName}' failure: {op.Error}.");
-                    initPackageCallbacks.InitPackageFailure?.Invoke(packageName, op.Error);
+                    initPackageCallbacks.InitPackageFailure?.Invoke(packageName, op.Error, op);
                 }
             };
         }
@@ -153,6 +153,13 @@ namespace GameMain.Runtime
             var package = YooAssets.GetPackage(packageName);
             var assetInfo = package.GetAssetInfo(assetName);
             return new AssetInfo(assetInfo.PackageName, assetInfo.AssetType, assetName, assetInfo.AssetPath, assetInfo.Error, assetInfo);
+        }
+
+        public override IResourcePackageDownloader CreatePackageDownloader(string packageName)
+        {
+            var package = YooAssets.GetPackage(packageName);
+            var downloader = package.CreateResourceDownloader(_resourceComponent.DownloadingMaxNum, _resourceComponent.FailedTryAgain);
+            return new YooAssetResourcePackageDownloader(downloader);
         }
 
         public override void UnloadScene(string sceneAssetName, object sceneAsset, UnloadSceneCallbacks unloadSceneCallbacks, object userData)

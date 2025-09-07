@@ -13,7 +13,7 @@ namespace GameMain.Runtime
 
         private void Start()
         {
-            _resourceComponent = GameEntry.GetComponent<ResourceComponent>();
+            _resourceComponent = UnityGameFramework.Runtime.GameEntry.GetComponent<ResourceComponent>();
             if (_resourceComponent == null)
             {
                 Log.Fatal("Resource component is invalid.");
