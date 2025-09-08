@@ -110,38 +110,22 @@ namespace GameFramework.Resource
         /// <summary>
         /// 获取或设置资源对象池自动释放可释放对象的间隔秒数。
         /// </summary>
-        float AssetAutoReleaseInterval
-        {
-            get;
-            set;
-        }
+        float AssetAutoReleaseInterval { get; set; }
 
         /// <summary>
         /// 获取或设置资源对象池的容量。
         /// </summary>
-        int AssetCapacity
-        {
-            get;
-            set;
-        }
+        int AssetCapacity { get; set; }
 
         /// <summary>
         /// 获取或设置资源对象池对象过期秒数。
         /// </summary>
-        float AssetExpireTime
-        {
-            get;
-            set;
-        }
+        float AssetExpireTime { get; set; }
 
         /// <summary>
         /// 获取或设置资源对象池的优先级。
         /// </summary>
-        int AssetPriority
-        {
-            get;
-            set;
-        }
+        int AssetPriority { get; set; }
 
         /// <summary>
         /// 当前资源包名称。
@@ -198,8 +182,11 @@ namespace GameFramework.Resource
 
         AssetInfo[] GetAssetInfos(string[] tags);
 
-        void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData = null);
-        void UpdatePackageManifest(string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null);
+        void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
+            object userData = null);
+
+        void UpdatePackageManifest(string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
+            object userData = null);
 
         /// <summary>
         /// 异步加载资源。
@@ -242,5 +229,16 @@ namespace GameFramework.Resource
         /// <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
         /// <param name="userData">用户自定义数据。</param>
         void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData = null);
+
+        void ClearAllCacheFiles(
+            FileClearMode fileClearMode,
+            ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
+            object userData = null);
+
+        void ClearPackageCacheFiles(
+            string packageName,
+            FileClearMode fileClearMode,
+            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+            object userData = null);
     }
 }

@@ -29,6 +29,7 @@ namespace GameFramework.Resource
         private readonly Dictionary<string, AssetInfo> m_AssetInfosCache;
         private readonly Dictionary<(string packageName, string[] tags), AssetInfo[]> m_AssetInfosCacheByTags;
         private readonly Dictionary<string, IResourcePackageDownloader> m_PackageDownloaders;
+        private readonly List<string> m_InitializedPackageNames;
 
         /// <summary>
         /// 初始化资源管理器的新实例。
@@ -43,6 +44,7 @@ namespace GameFramework.Resource
             m_AssetInfosCache = new Dictionary<string, AssetInfo>();
             m_AssetInfosCacheByTags = new Dictionary<(string packageName, string[] tags), AssetInfo[]>();
             m_PackageDownloaders = new Dictionary<string, IResourcePackageDownloader>();
+            m_InitializedPackageNames = new List<string>();
         }
 
         /// <summary>
@@ -51,10 +53,7 @@ namespace GameFramework.Resource
         /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
         internal override int Priority
         {
-            get
-            {
-                return 3;
-            }
+            get { return 3; }
         }
 
         public string ApplicableGameVersion => m_ApplicableGameVersion;
@@ -69,10 +68,7 @@ namespace GameFramework.Resource
         /// </summary>
         public string ReadOnlyPath
         {
-            get
-            {
-                return m_ReadOnlyPath;
-            }
+            get { return m_ReadOnlyPath; }
         }
 
         /// <summary>
@@ -80,10 +76,7 @@ namespace GameFramework.Resource
         /// </summary>
         public string ReadWritePath
         {
-            get
-            {
-                return m_ReadWritePath;
-            }
+            get { return m_ReadWritePath; }
         }
 
         public long Milliseconds { get; set; }
@@ -149,7 +142,6 @@ namespace GameFramework.Resource
             {
                 throw new GameFrameworkException("Object pool manager is invalid.");
             }
-
         }
 
         /// <summary>
@@ -167,6 +159,7 @@ namespace GameFramework.Resource
             {
                 throw new GameFrameworkException("Read-write path is invalid.");
             }
+
             m_ResourceLoader.AddLoadResourceAgentHelper(loadResourceAgentHelper, m_ReadOnlyPath, m_ReadWritePath);
         }
 
@@ -194,7 +187,11 @@ namespace GameFramework.Resource
 
         public void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
         {
-            m_ResourceHelper.InitPackage(packageName, initPackageCallbacks);
+            m_ResourceHelper.InitPackage(packageName, new InitPackageCallbacks(name =>
+            {
+                m_InitializedPackageNames.Add(packageName);
+                initPackageCallbacks.InitPackageSuccess?.Invoke(packageName);
+            }, initPackageCallbacks.InitPackageFailure));
         }
 
         /// <summary>
@@ -240,6 +237,7 @@ namespace GameFramework.Resource
             {
                 return assetInfo;
             }
+
             assetInfo = m_ResourceHelper.GetAssetInfo(CurrentPackageName, assetName);
             m_AssetInfosCache[key] = assetInfo;
             return assetInfo;
@@ -263,14 +261,17 @@ namespace GameFramework.Resource
             return assetInfos;
         }
 
-        public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData = null)
+        public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
+            object userData = null)
         {
             m_ResourceHelper.RequestPackageVersion(CurrentPackageName, requestPackageVersionCallbacks, userData);
         }
 
-        public void UpdatePackageManifest(string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null)
+        public void UpdatePackageManifest(string packageVersion,
+            UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null)
         {
-            m_ResourceHelper.UpdatePackageManifest(CurrentPackageName, packageVersion, updatePackageManifestCallbacks, userData);
+            m_ResourceHelper.UpdatePackageManifest(CurrentPackageName, packageVersion, updatePackageManifestCallbacks,
+                userData);
         }
 
         public void LoadAsset(
@@ -290,7 +291,8 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Load asset callbacks is invalid.");
             }
 
-            m_ResourceLoader.LoadAsset(CurrentPackageName, assetName, assetType, priority ?? Constant.DefaultPriority, loadAssetCallbacks, userData);
+            m_ResourceLoader.LoadAsset(CurrentPackageName, assetName, assetType, priority ?? Constant.DefaultPriority,
+                loadAssetCallbacks, userData);
         }
 
         /// <summary>
@@ -320,7 +322,8 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Load scene callbacks is invalid.");
             }
 
-            m_ResourceLoader.LoadScene(CurrentPackageName, sceneAssetName, priority ?? Constant.DefaultPriority, loadSceneCallbacks, userData);
+            m_ResourceLoader.LoadScene(CurrentPackageName, sceneAssetName, priority ?? Constant.DefaultPriority,
+                loadSceneCallbacks, userData);
         }
 
         /// <summary>
@@ -329,7 +332,8 @@ namespace GameFramework.Resource
         /// <param name="sceneAssetName">要卸载场景资源的名称。</param>
         /// <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData = null)
+        public void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks,
+            object userData = null)
         {
             if (string.IsNullOrEmpty(sceneAssetName))
             {
@@ -342,6 +346,60 @@ namespace GameFramework.Resource
             }
 
             m_ResourceLoader.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
+        }
+
+        public void ClearAllCacheFiles(
+            FileClearMode fileClearMode,
+            ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
+            object userData = null)
+        {
+            int clearingPackageCount = m_InitializedPackageNames.Count;
+            bool hasError = false;
+            var clearPackageCacheFilesCallbacks = new ClearPackageCacheFilesCallbacks(
+                OnClearPackageCacheFilesSuccess,
+                OnClearPackageCacheFilesFailure);
+
+            foreach (var packageName in m_InitializedPackageNames)
+            {
+                ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
+            }
+
+            void OnClearPackageCacheFilesSuccess(string packageName)
+            {
+                if (clearingPackageCount <= 0)
+                {
+                    throw new GameFrameworkException();
+                }
+                clearingPackageCount--;
+                clearAllCacheFilesCallbacks.ClearPackageUnusedCacheFilesSuccess?.Invoke(packageName);
+                if (clearingPackageCount == 0)
+                {
+                    clearAllCacheFilesCallbacks.ClearAllUnusedCacheFilesComplete?.Invoke(hasError);
+                }
+            }
+
+            void OnClearPackageCacheFilesFailure(string packageName, string errorMessage)
+            {
+                if (clearingPackageCount <= 0)
+                {
+                    throw new GameFrameworkException();
+                }
+                clearingPackageCount--;
+                hasError = true;
+                clearAllCacheFilesCallbacks.ClearPackageUnusedCacheFilesFailure?.Invoke(packageName, errorMessage);
+                if (clearingPackageCount == 0)
+                {
+                    clearAllCacheFilesCallbacks.ClearAllUnusedCacheFilesComplete?.Invoke(hasError);
+                }
+            }
+        }
+
+        public void ClearPackageCacheFiles(string packageName,
+            FileClearMode fileClearMode,
+            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+            object userData = null)
+        {
+            m_ResourceHelper.ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
         }
     }
 }

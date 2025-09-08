@@ -131,7 +131,7 @@ namespace GameMain.Runtime
                 if (op.Status == EOperationStatus.Succeed)
                 {
                     Log.Info($"Initialize package '{packageName}' succeed.");
-                    initPackageCallbacks.InitPackageComplete?.Invoke(packageName);
+                    initPackageCallbacks.InitPackageSuccess?.Invoke(packageName);
                 }
                 else
                 {
@@ -177,12 +177,12 @@ namespace GameMain.Runtime
             {
                 if (operation.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Request package version of '{packageName}' succeed.");
+                    Log.Info($"Request package '{packageName}' version '{operation.PackageVersion}' succeed.");
                     requestPackageVersionCallbacks.RequestPackageVersionSuccessCallback?.Invoke(packageName, operation.PackageVersion);
                 }
                 else
                 {
-                    Log.Error($"Request package version of '{packageName}' failure: {operation.Error}.");
+                    Log.Error($"Request package '{packageName}' version failure: {operation.Error}.");
                     requestPackageVersionCallbacks.RequestPackageVersionFailureCallback?.Invoke(packageName, operation.Error);
                 }
             };
@@ -197,12 +197,12 @@ namespace GameMain.Runtime
             {
                 if (operation.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Request package version of '{packageName}' succeed.");
+                    Log.Info($"Update package '{packageName}' manifest succeed.");
                     updatePackageManifestCallbacks.UpdatePackageManifestSuccessCallback?.Invoke(packageName);
                 }
                 else
                 {
-                    Log.Error($"Request package version of '{packageName}' failure: {operation.Error}.");
+                    Log.Error($"Update package '{packageName}' manifest failure: {operation.Error}.");
                     updatePackageManifestCallbacks.UpdatePackageManifestFailureCallback?.Invoke(packageName, operation.Error);
                 }
             };
@@ -214,6 +214,35 @@ namespace GameMain.Runtime
             var downloader = package.CreateResourceDownloader(_resourceComponent.DownloadingMaxNum,
                 _resourceComponent.FailedTryAgain);
             return new YooAssetResourcePackageDownloader(downloader);
+        }
+
+        public override void ClearPackageCacheFiles(string packageName, FileClearMode fileClearMode,
+            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks, object userData = null)
+        {
+            var package = YooAssets.GetPackage(packageName);
+            var operation = package.ClearCacheFilesAsync(fileClearMode switch
+            {
+                FileClearMode.ClearAllBundleFiles => EFileClearMode.ClearAllBundleFiles,
+                FileClearMode.ClearUnusedBundleFiles => EFileClearMode.ClearUnusedBundleFiles,
+                FileClearMode.ClearBundleFilesByTags => EFileClearMode.ClearBundleFilesByTags,
+                FileClearMode.ClearAllManifestFiles => EFileClearMode.ClearAllManifestFiles,
+                FileClearMode.ClearUnusedManifestFiles => EFileClearMode.ClearUnusedManifestFiles,
+                _ => throw new ArgumentOutOfRangeException(nameof(fileClearMode), fileClearMode, null)
+            }, userData);
+
+            operation.Completed += op =>
+            {
+                if (operation.Status == EOperationStatus.Succeed)
+                {
+                    Log.Info($"Clear package '{packageName}' cache files by mode '{fileClearMode}' succeed.");
+                    clearPackageCacheFilesCallbacks.ClearPackageUnusedCacheFilesSuccess?.Invoke(packageName);
+                }
+                else
+                {
+                    Log.Error($"Clear package '{packageName}' cache files by mode '{fileClearMode}' failure: {operation.Error}.");
+                    clearPackageCacheFilesCallbacks.ClearPackageUnusedCacheFilesFailure?.Invoke(packageName, operation.Error);
+                }
+            };
         }
 
         public override void UnloadScene(string sceneAssetName, object sceneAsset,

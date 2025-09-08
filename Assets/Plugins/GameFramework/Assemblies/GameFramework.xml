@@ -15440,6 +15440,154 @@
             引用对象
             </summary>
         </member>
+        <member name="T:GameFramework.Resource.LoadAssetCallbacks">
+            <summary>
+            加载资源回调函数集。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.LoadAssetCallbacks.#ctor(GameFramework.Resource.LoadAssetSuccessCallback)">
+            <summary>
+            初始化加载资源回调函数集的新实例。
+            </summary>
+            <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
+        </member>
+        <member name="M:GameFramework.Resource.LoadAssetCallbacks.#ctor(GameFramework.Resource.LoadAssetSuccessCallback,GameFramework.Resource.LoadAssetFailureCallback)">
+            <summary>
+            初始化加载资源回调函数集的新实例。
+            </summary>
+            <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
+            <param name="loadAssetFailureCallback">加载资源失败回调函数。</param>
+        </member>
+        <member name="M:GameFramework.Resource.LoadAssetCallbacks.#ctor(GameFramework.Resource.LoadAssetSuccessCallback,GameFramework.Resource.LoadAssetFailureCallback,GameFramework.Resource.LoadAssetUpdateCallback)">
+            <summary>
+            初始化加载资源回调函数集的新实例。
+            </summary>
+            <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
+            <param name="loadAssetFailureCallback">加载资源失败回调函数。</param>
+            <param name="loadAssetUpdateCallback">加载资源更新回调函数。</param>
+        </member>
+        <member name="P:GameFramework.Resource.LoadAssetCallbacks.LoadAssetSuccessCallback">
+            <summary>
+            获取加载资源成功回调函数。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.LoadAssetCallbacks.LoadAssetFailureCallback">
+            <summary>
+            获取加载资源失败回调函数。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.LoadAssetCallbacks.LoadAssetUpdateCallback">
+            <summary>
+            获取加载资源更新回调函数。
+            </summary>
+        </member>
+        <member name="T:GameFramework.Resource.LoadAssetFailureCallback">
+            <summary>
+            加载资源失败回调函数。
+            </summary>
+            <param name="assetName">要加载的资源名称。</param>
+            <param name="status">加载资源状态。</param>
+            <param name="errorMessage">错误信息。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="T:GameFramework.Resource.LoadAssetSuccessCallback">
+            <summary>
+            加载资源成功回调函数。
+            </summary>
+            <param name="assetName">要加载的资源名称。</param>
+            <param name="asset">已加载的资源。</param>
+            <param name="duration">加载持续时间。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="T:GameFramework.Resource.LoadAssetUpdateCallback">
+            <summary>
+            加载资源更新回调函数。
+            </summary>
+            <param name="assetName">要加载的资源名称。</param>
+            <param name="progress">加载资源进度。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="T:GameFramework.Resource.LoadSceneCallbacks">
+            <summary>
+            加载场景回调函数集。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.LoadSceneCallbacks.#ctor(GameFramework.Resource.LoadSceneSuccessCallback,GameFramework.Resource.LoadSceneFailureCallback)">
+            <summary>
+            初始化加载场景回调函数集的新实例。
+            </summary>
+            <param name="loadSceneSuccessCallback">加载场景成功回调函数。</param>
+            <param name="loadSceneFailureCallback">加载场景失败回调函数。</param>
+        </member>
+        <member name="P:GameFramework.Resource.LoadSceneCallbacks.LoadSceneSuccessCallback">
+            <summary>
+            获取加载场景成功回调函数。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.LoadSceneCallbacks.LoadSceneFailureCallback">
+            <summary>
+            获取加载场景失败回调函数。
+            </summary>
+        </member>
+        <member name="T:GameFramework.Resource.LoadSceneFailureCallback">
+            <summary>
+            加载场景失败回调函数。
+            </summary>
+            <param name="sceneAssetName">要加载的场景资源名称。</param>
+            <param name="status">加载场景状态。</param>
+            <param name="errorMessage">错误信息。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="T:GameFramework.Resource.LoadSceneSuccessCallback">
+            <summary>
+            加载场景成功回调函数。
+            </summary>
+            <param name="sceneAssetName">要加载的场景资源名称。</param>
+            <param name="duration">加载持续时间。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="T:GameFramework.Resource.UnloadSceneCallbacks">
+            <summary>
+            卸载场景回调函数集。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.UnloadSceneCallbacks.#ctor(GameFramework.Resource.UnloadSceneSuccessCallback)">
+            <summary>
+            初始化卸载场景回调函数集的新实例。
+            </summary>
+            <param name="unloadSceneSuccessCallback">卸载场景成功回调函数。</param>
+        </member>
+        <member name="M:GameFramework.Resource.UnloadSceneCallbacks.#ctor(GameFramework.Resource.UnloadSceneSuccessCallback,GameFramework.Resource.UnloadSceneFailureCallback)">
+            <summary>
+            初始化卸载场景回调函数集的新实例。
+            </summary>
+            <param name="unloadSceneSuccessCallback">卸载场景成功回调函数。</param>
+            <param name="unloadSceneFailureCallback">卸载场景失败回调函数。</param>
+        </member>
+        <member name="P:GameFramework.Resource.UnloadSceneCallbacks.UnloadSceneSuccessCallback">
+            <summary>
+            获取卸载场景成功回调函数。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.UnloadSceneCallbacks.UnloadSceneFailureCallback">
+            <summary>
+            获取卸载场景失败回调函数。
+            </summary>
+        </member>
+        <member name="T:GameFramework.Resource.UnloadSceneFailureCallback">
+            <summary>
+            卸载场景失败回调函数。
+            </summary>
+            <param name="sceneAssetName">要卸载的场景资源名称。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
+        <member name="T:GameFramework.Resource.UnloadSceneSuccessCallback">
+            <summary>
+            卸载场景成功回调函数。
+            </summary>
+            <param name="sceneAssetName">要卸载的场景资源名称。</param>
+            <param name="userData">用户自定义数据。</param>
+        </member>
         <member name="T:GameFramework.Resource.Constant">
             <summary>
             资源相关常量。
@@ -15448,6 +15596,142 @@
         <member name="F:GameFramework.Resource.Constant.DefaultPriority">
             <summary>
             默认资源加载优先级。
+            </summary>
+        </member>
+        <member name="T:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs">
+            <summary>
+            加载资源代理辅助器错误事件。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.#ctor">
+            <summary>
+            初始化加载资源代理辅助器错误事件的新实例。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.Status">
+            <summary>
+            获取加载资源状态。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.ErrorMessage">
+            <summary>
+            获取错误信息。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.Create(GameFramework.Resource.LoadResourceStatus,System.String)">
+            <summary>
+            创建加载资源代理辅助器错误事件。
+            </summary>
+            <param name="status">加载资源状态。</param>
+            <param name="errorMessage">错误信息。</param>
+            <returns>创建的加载资源代理辅助器错误事件。</returns>
+        </member>
+        <member name="M:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.Clear">
+            <summary>
+            清理加载资源代理辅助器错误事件。
+            </summary>
+        </member>
+        <member name="T:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs">
+            <summary>
+            加载资源代理辅助器异步加载资源完成事件。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.#ctor">
+            <summary>
+            初始化加载资源代理辅助器异步加载资源完成事件的新实例。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.Asset">
+            <summary>
+            获取加载的资源。
+            </summary>
+        </member>
+        <member name="M:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.Create(System.Object)">
+            <summary>
+            创建加载资源代理辅助器异步加载资源完成事件。
+            </summary>
+            <param name="asset">加载的资源。</param>
+            <returns>创建的加载资源代理辅助器异步加载资源完成事件。</returns>
+        </member>
+        <member name="M:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.Clear">
+            <summary>
+            清理加载资源代理辅助器异步加载资源完成事件。
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.PackageName">
+            <summary>
+            所属包裹名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.FileName">
+            <summary>
+            下载失败的文件名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.ErrorMessage">
+            <summary>
+            错误信息
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadSuccessEventArgs.PackageName">
+            <summary>
+            所属包裹名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.PackageName">
+            <summary>
+            所属包裹名称
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.Progress">
+            <summary>
+            下载进度 (0-1f)
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.TotalDownloadCount">
+            <summary>
+            下载文件总数
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.CurrentDownloadCount">
+            <summary>
+            当前完成的下载文件数量
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.TotalDownloadBytes">
+            <summary>
+            下载数据总大小（单位：字节）
+            </summary>
+        </member>
+        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.CurrentDownloadBytes">
+            <summary>
+            当前完成的下载数据大小（单位：字节）
+            </summary>
+        </member>
+        <member name="F:GameFramework.Resource.FileClearMode.ClearAllBundleFiles">
+            <summary>
+            清理所有文件
+            </summary>
+        </member>
+        <member name="F:GameFramework.Resource.FileClearMode.ClearUnusedBundleFiles">
+            <summary>
+            清理未在使用的文件
+            </summary>
+        </member>
+        <member name="F:GameFramework.Resource.FileClearMode.ClearBundleFilesByTags">
+            <summary>
+            清理指定标签的文件
+            说明：需要指定参数，可选：string, string[], List$1string
+            </summary>
+        </member>
+        <member name="F:GameFramework.Resource.FileClearMode.ClearAllManifestFiles">
+            <summary>
+            清理所有清单
+            </summary>
+        </member>
+        <member name="F:GameFramework.Resource.FileClearMode.ClearUnusedManifestFiles">
+            <summary>
+            清理未在使用的清单
             </summary>
         </member>
         <member name="T:GameFramework.Resource.HasAssetResult">
@@ -15723,133 +16007,6 @@
             当前已经完成的下载总大小
             </summary>
         </member>
-        <member name="T:GameFramework.Resource.LoadAssetCallbacks">
-            <summary>
-            加载资源回调函数集。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.LoadAssetCallbacks.#ctor(GameFramework.Resource.LoadAssetSuccessCallback)">
-            <summary>
-            初始化加载资源回调函数集的新实例。
-            </summary>
-            <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
-        </member>
-        <member name="M:GameFramework.Resource.LoadAssetCallbacks.#ctor(GameFramework.Resource.LoadAssetSuccessCallback,GameFramework.Resource.LoadAssetFailureCallback)">
-            <summary>
-            初始化加载资源回调函数集的新实例。
-            </summary>
-            <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
-            <param name="loadAssetFailureCallback">加载资源失败回调函数。</param>
-        </member>
-        <member name="M:GameFramework.Resource.LoadAssetCallbacks.#ctor(GameFramework.Resource.LoadAssetSuccessCallback,GameFramework.Resource.LoadAssetFailureCallback,GameFramework.Resource.LoadAssetUpdateCallback)">
-            <summary>
-            初始化加载资源回调函数集的新实例。
-            </summary>
-            <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
-            <param name="loadAssetFailureCallback">加载资源失败回调函数。</param>
-            <param name="loadAssetUpdateCallback">加载资源更新回调函数。</param>
-        </member>
-        <member name="P:GameFramework.Resource.LoadAssetCallbacks.LoadAssetSuccessCallback">
-            <summary>
-            获取加载资源成功回调函数。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.LoadAssetCallbacks.LoadAssetFailureCallback">
-            <summary>
-            获取加载资源失败回调函数。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.LoadAssetCallbacks.LoadAssetUpdateCallback">
-            <summary>
-            获取加载资源更新回调函数。
-            </summary>
-        </member>
-        <member name="T:GameFramework.Resource.LoadAssetFailureCallback">
-            <summary>
-            加载资源失败回调函数。
-            </summary>
-            <param name="assetName">要加载的资源名称。</param>
-            <param name="status">加载资源状态。</param>
-            <param name="errorMessage">错误信息。</param>
-            <param name="userData">用户自定义数据。</param>
-        </member>
-        <member name="T:GameFramework.Resource.LoadAssetSuccessCallback">
-            <summary>
-            加载资源成功回调函数。
-            </summary>
-            <param name="assetName">要加载的资源名称。</param>
-            <param name="asset">已加载的资源。</param>
-            <param name="duration">加载持续时间。</param>
-            <param name="userData">用户自定义数据。</param>
-        </member>
-        <member name="T:GameFramework.Resource.LoadAssetUpdateCallback">
-            <summary>
-            加载资源更新回调函数。
-            </summary>
-            <param name="assetName">要加载的资源名称。</param>
-            <param name="progress">加载资源进度。</param>
-            <param name="userData">用户自定义数据。</param>
-        </member>
-        <member name="T:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs">
-            <summary>
-            加载资源代理辅助器错误事件。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.#ctor">
-            <summary>
-            初始化加载资源代理辅助器错误事件的新实例。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.Status">
-            <summary>
-            获取加载资源状态。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.ErrorMessage">
-            <summary>
-            获取错误信息。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.Create(GameFramework.Resource.LoadResourceStatus,System.String)">
-            <summary>
-            创建加载资源代理辅助器错误事件。
-            </summary>
-            <param name="status">加载资源状态。</param>
-            <param name="errorMessage">错误信息。</param>
-            <returns>创建的加载资源代理辅助器错误事件。</returns>
-        </member>
-        <member name="M:GameFramework.Resource.LoadResourceAgentHelperErrorEventArgs.Clear">
-            <summary>
-            清理加载资源代理辅助器错误事件。
-            </summary>
-        </member>
-        <member name="T:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs">
-            <summary>
-            加载资源代理辅助器异步加载资源完成事件。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.#ctor">
-            <summary>
-            初始化加载资源代理辅助器异步加载资源完成事件的新实例。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.Asset">
-            <summary>
-            获取加载的资源。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.Create(System.Object)">
-            <summary>
-            创建加载资源代理辅助器异步加载资源完成事件。
-            </summary>
-            <param name="asset">加载的资源。</param>
-            <returns>创建的加载资源代理辅助器异步加载资源完成事件。</returns>
-        </member>
-        <member name="M:GameFramework.Resource.LoadResourceAgentHelperLoadCompleteEventArgs.Clear">
-            <summary>
-            清理加载资源代理辅助器异步加载资源完成事件。
-            </summary>
-        </member>
         <member name="T:GameFramework.Resource.LoadResourceProgress">
             <summary>
             加载资源进度类型。
@@ -15914,45 +16071,6 @@
             <summary>
             加载资源错误。
             </summary>
-        </member>
-        <member name="T:GameFramework.Resource.LoadSceneCallbacks">
-            <summary>
-            加载场景回调函数集。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.LoadSceneCallbacks.#ctor(GameFramework.Resource.LoadSceneSuccessCallback,GameFramework.Resource.LoadSceneFailureCallback)">
-            <summary>
-            初始化加载场景回调函数集的新实例。
-            </summary>
-            <param name="loadSceneSuccessCallback">加载场景成功回调函数。</param>
-            <param name="loadSceneFailureCallback">加载场景失败回调函数。</param>
-        </member>
-        <member name="P:GameFramework.Resource.LoadSceneCallbacks.LoadSceneSuccessCallback">
-            <summary>
-            获取加载场景成功回调函数。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.LoadSceneCallbacks.LoadSceneFailureCallback">
-            <summary>
-            获取加载场景失败回调函数。
-            </summary>
-        </member>
-        <member name="T:GameFramework.Resource.LoadSceneFailureCallback">
-            <summary>
-            加载场景失败回调函数。
-            </summary>
-            <param name="sceneAssetName">要加载的场景资源名称。</param>
-            <param name="status">加载场景状态。</param>
-            <param name="errorMessage">错误信息。</param>
-            <param name="userData">用户自定义数据。</param>
-        </member>
-        <member name="T:GameFramework.Resource.LoadSceneSuccessCallback">
-            <summary>
-            加载场景成功回调函数。
-            </summary>
-            <param name="sceneAssetName">要加载的场景资源名称。</param>
-            <param name="duration">加载持续时间。</param>
-            <param name="userData">用户自定义数据。</param>
         </member>
         <member name="T:GameFramework.Resource.ResourceManager">
             <summary>
@@ -16072,98 +16190,6 @@
             </summary>
             <param name="sceneAssetName">要卸载场景资源的名称。</param>
             <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
-            <param name="userData">用户自定义数据。</param>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.PackageName">
-            <summary>
-            所属包裹名称
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.FileName">
-            <summary>
-            下载失败的文件名称
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadFailureEventArgs.ErrorMessage">
-            <summary>
-            错误信息
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadSuccessEventArgs.PackageName">
-            <summary>
-            所属包裹名称
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.PackageName">
-            <summary>
-            所属包裹名称
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.Progress">
-            <summary>
-            下载进度 (0-1f)
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.TotalDownloadCount">
-            <summary>
-            下载文件总数
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.CurrentDownloadCount">
-            <summary>
-            当前完成的下载文件数量
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.TotalDownloadBytes">
-            <summary>
-            下载数据总大小（单位：字节）
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.ResourcePackageDownloadUpdateEventArgs.CurrentDownloadBytes">
-            <summary>
-            当前完成的下载数据大小（单位：字节）
-            </summary>
-        </member>
-        <member name="T:GameFramework.Resource.UnloadSceneCallbacks">
-            <summary>
-            卸载场景回调函数集。
-            </summary>
-        </member>
-        <member name="M:GameFramework.Resource.UnloadSceneCallbacks.#ctor(GameFramework.Resource.UnloadSceneSuccessCallback)">
-            <summary>
-            初始化卸载场景回调函数集的新实例。
-            </summary>
-            <param name="unloadSceneSuccessCallback">卸载场景成功回调函数。</param>
-        </member>
-        <member name="M:GameFramework.Resource.UnloadSceneCallbacks.#ctor(GameFramework.Resource.UnloadSceneSuccessCallback,GameFramework.Resource.UnloadSceneFailureCallback)">
-            <summary>
-            初始化卸载场景回调函数集的新实例。
-            </summary>
-            <param name="unloadSceneSuccessCallback">卸载场景成功回调函数。</param>
-            <param name="unloadSceneFailureCallback">卸载场景失败回调函数。</param>
-        </member>
-        <member name="P:GameFramework.Resource.UnloadSceneCallbacks.UnloadSceneSuccessCallback">
-            <summary>
-            获取卸载场景成功回调函数。
-            </summary>
-        </member>
-        <member name="P:GameFramework.Resource.UnloadSceneCallbacks.UnloadSceneFailureCallback">
-            <summary>
-            获取卸载场景失败回调函数。
-            </summary>
-        </member>
-        <member name="T:GameFramework.Resource.UnloadSceneFailureCallback">
-            <summary>
-            卸载场景失败回调函数。
-            </summary>
-            <param name="sceneAssetName">要卸载的场景资源名称。</param>
-            <param name="userData">用户自定义数据。</param>
-        </member>
-        <member name="T:GameFramework.Resource.UnloadSceneSuccessCallback">
-            <summary>
-            卸载场景成功回调函数。
-            </summary>
-            <param name="sceneAssetName">要卸载的场景资源名称。</param>
             <param name="userData">用户自定义数据。</param>
         </member>
         <member name="T:GameFramework.Scene.ISceneManager">

@@ -33,6 +33,9 @@ namespace UnityGameFramework.Runtime
 
         public abstract IResourcePackageDownloader CreatePackageDownloader(string packageName);
 
+        public abstract void ClearPackageCacheFiles(string packageName, FileClearMode fileClearMode,
+            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks, object userData = null);
+
         public abstract void UnloadScene(string sceneAssetName, object sceneAsset, UnloadSceneCallbacks unloadSceneCallbacks,
             object userData);
     }

@@ -368,5 +368,25 @@ namespace UnityGameFramework.Runtime
         {
             m_ResourceManager.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
         }
+
+        public void ClearAllCacheFiles(
+            FileClearMode fileClearMode,
+            ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
+            object userData = null)
+        {
+            m_ResourceManager.ClearAllCacheFiles(fileClearMode, clearAllCacheFilesCallbacks, userData);
+        }
+
+        public void ClearPackageCacheFiles(
+            FileClearMode fileClearMode,
+            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+            string customPackageName = "",
+            object userData = null)
+        {
+            m_ResourceManager.ClearPackageCacheFiles(string.IsNullOrEmpty(customPackageName)
+                    ? m_DefaultPackageName
+                    : customPackageName,
+                fileClearMode, clearPackageCacheFilesCallbacks, userData);
+        }
     }
 }

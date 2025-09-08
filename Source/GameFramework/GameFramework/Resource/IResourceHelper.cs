@@ -1,24 +1,5 @@
 ﻿namespace GameFramework.Resource
 {
-    public delegate void InitPackageCompleteCallback(string packageName);
-    public delegate void InitPackageFailureCallback(string packageName, string errorMessage, object userData);
-
-    public class InitPackageCallbacks
-    {
-        private readonly InitPackageCompleteCallback m_InitPackageComplete;
-        private readonly InitPackageFailureCallback m_InitPackageFailure;
-
-        public InitPackageCallbacks(InitPackageCompleteCallback initPackageCompleteCallback,
-            InitPackageFailureCallback initPackageFailureCallback)
-        {
-            m_InitPackageComplete = initPackageCompleteCallback;
-            m_InitPackageFailure = initPackageFailureCallback;
-        }
-
-        public InitPackageCompleteCallback InitPackageComplete => m_InitPackageComplete;
-        public InitPackageFailureCallback InitPackageFailure => m_InitPackageFailure;
-    }
-
     public interface IResourceHelper
     {
         void Initialize();
@@ -34,6 +15,12 @@
 
 
         IResourcePackageDownloader CreatePackageDownloader(string packageName);
+
+        void ClearPackageCacheFiles(
+            string packageName,
+            FileClearMode fileClearMode,
+            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+            object userData = null);
 
         /// <summary>
         /// 卸载场景。
