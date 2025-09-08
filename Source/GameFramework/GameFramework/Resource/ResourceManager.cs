@@ -27,6 +27,7 @@ namespace GameFramework.Resource
 
         private readonly ResourceLoader m_ResourceLoader;
         private readonly Dictionary<string, AssetInfo> m_AssetInfosCache;
+        private readonly Dictionary<(string packageName, string[] tags), AssetInfo[]> m_AssetInfosCacheByTags;
         private readonly Dictionary<string, IResourcePackageDownloader> m_PackageDownloaders;
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace GameFramework.Resource
             m_InternalResourceVersion = 0;
             m_ResourceLoader = new ResourceLoader(this);
             m_AssetInfosCache = new Dictionary<string, AssetInfo>();
+            m_AssetInfosCacheByTags = new Dictionary<(string packageName, string[] tags), AssetInfo[]>();
             m_PackageDownloaders = new Dictionary<string, IResourcePackageDownloader>();
         }
 
@@ -241,6 +243,34 @@ namespace GameFramework.Resource
             assetInfo = m_ResourceHelper.GetAssetInfo(CurrentPackageName, assetName);
             m_AssetInfosCache[key] = assetInfo;
             return assetInfo;
+        }
+
+        public AssetInfo[] GetAssetInfos(string[] tags)
+        {
+            if (tags == null || tags.Length == 0)
+            {
+                throw new GameFrameworkException("Tags is empty.");
+            }
+
+            var key = (CurrentPackageName, tags);
+            if (m_AssetInfosCacheByTags.TryGetValue(key, out AssetInfo[] assetInfos))
+            {
+                return assetInfos;
+            }
+
+            assetInfos = m_ResourceHelper.GetAssetInfos(CurrentPackageName, tags);
+            m_AssetInfosCacheByTags[key] = assetInfos;
+            return assetInfos;
+        }
+
+        public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData = null)
+        {
+            m_ResourceHelper.RequestPackageVersion(CurrentPackageName, requestPackageVersionCallbacks, userData);
+        }
+
+        public void UpdatePackageManifest(string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null)
+        {
+            m_ResourceHelper.UpdatePackageManifest(CurrentPackageName, packageVersion, updatePackageManifestCallbacks, userData);
         }
 
         public void LoadAsset(

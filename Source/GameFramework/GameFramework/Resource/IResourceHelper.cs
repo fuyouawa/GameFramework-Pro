@@ -27,6 +27,11 @@
         bool CheckAssetNameValid(string packageName, string assetName);
         bool IsNeedDownloadFromRemote(AssetInfo assetInfo);
         AssetInfo GetAssetInfo(string packageName, string assetName);
+        AssetInfo[] GetAssetInfos(string packageName, string[] tags);
+
+        void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData = null);
+        void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null);
+
 
         IResourcePackageDownloader CreatePackageDownloader(string packageName);
 

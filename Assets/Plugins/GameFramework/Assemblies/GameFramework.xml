@@ -15435,11 +15435,6 @@
             资源名称
             </summary>
         </member>
-        <member name="P:GameFramework.Resource.AssetInfo.AssetPath">
-            <summary>
-            资源路径
-            </summary>
-        </member>
         <member name="P:GameFramework.Resource.AssetInfo.Reference">
             <summary>
             引用对象

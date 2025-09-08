@@ -23,6 +23,13 @@ namespace UnityGameFramework.Runtime
         public abstract bool IsNeedDownloadFromRemote(AssetInfo assetInfo);
 
         public abstract AssetInfo GetAssetInfo(string packageName, string assetName);
+        public abstract AssetInfo[] GetAssetInfos(string packageName, string[] tags);
+
+        public abstract void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks,
+            object userData = null);
+
+        public abstract void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
+            object userData = null);
 
         public abstract IResourcePackageDownloader CreatePackageDownloader(string packageName);
 

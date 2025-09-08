@@ -196,6 +196,11 @@ namespace GameFramework.Resource
         /// <returns></returns>
         AssetInfo GetAssetInfo(string assetName);
 
+        AssetInfo[] GetAssetInfos(string[] tags);
+
+        void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData = null);
+        void UpdatePackageManifest(string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null);
+
         /// <summary>
         /// 异步加载资源。
         /// </summary>

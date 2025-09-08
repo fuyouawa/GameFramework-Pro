@@ -152,6 +152,8 @@ namespace UnityGameFramework.Runtime
             set { m_ResourceManager.AssetPriority = m_AssetPriority = value; }
         }
 
+        public string PackageVersion { get; set; }
+
         private void Start()
         {
             BaseComponent baseComponent = GameEntry.GetComponent<BaseComponent>();
@@ -224,6 +226,28 @@ namespace UnityGameFramework.Runtime
                 initPackageCallbacks);
         }
 
+        public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
+            string customPackageName = "",
+            object userData = null)
+        {
+            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
+                ? customPackageName
+                : m_DefaultPackageName;
+
+            m_ResourceManager.RequestPackageVersion(requestPackageVersionCallbacks, userData);
+        }
+
+        public void UpdatePackageManifest(string packageVersion,
+            UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
+            string customPackageName = "", object userData = null)
+        {
+            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
+                ? customPackageName
+                : m_DefaultPackageName;
+
+            m_ResourceManager.UpdatePackageManifest(packageVersion, updatePackageManifestCallbacks, userData);
+        }
+
         /// <summary>
         /// 检查资源是否存在。
         /// </summary>
@@ -264,6 +288,15 @@ namespace UnityGameFramework.Runtime
                 : m_DefaultPackageName;
 
             return m_ResourceManager.GetAssetInfo(assetName);
+        }
+
+        public AssetInfo[] GetAssetInfos(string[] tags, string customPackageName = "")
+        {
+            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
+                ? customPackageName
+                : m_DefaultPackageName;
+
+            return m_ResourceManager.GetAssetInfos(tags);
         }
 
         /// <summary>

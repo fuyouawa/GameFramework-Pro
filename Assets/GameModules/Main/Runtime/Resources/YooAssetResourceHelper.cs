@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GameFramework.Resource;
 using UnityGameFramework.Runtime;
 using YooAsset;
@@ -52,6 +53,7 @@ namespace GameMain.Runtime
             {
                 YooAssets.Initialize(new ResourceLogger());
             }
+
             YooAssets.SetOperationSystemMaxTimeSlice(_resourceComponent.Milliseconds);
 
             // 创建默认的资源包
@@ -95,7 +97,8 @@ namespace GameMain.Runtime
             // 联机运行模式
             else if (_resourceComponent.PlayMode == PlayMode.HostPlayMode)
             {
-                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL, _resourceComponent.FallbackHostServerURL);
+                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL,
+                    _resourceComponent.FallbackHostServerURL);
                 var cacheFileSystemParams = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
                 var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
 
@@ -107,9 +110,11 @@ namespace GameMain.Runtime
             // WebGL运行模式
             else if (_resourceComponent.PlayMode == PlayMode.WebPlayMode)
             {
-                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL, _resourceComponent.FallbackHostServerURL);
+                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL,
+                    _resourceComponent.FallbackHostServerURL);
                 var webServerFileSystemParams = FileSystemParameters.CreateDefaultWebServerFileSystemParameters();
-                var webRemoteFileSystemParams = FileSystemParameters.CreateDefaultWebRemoteFileSystemParameters(remoteServices); //支持跨域下载
+                var webRemoteFileSystemParams =
+                    FileSystemParameters.CreateDefaultWebRemoteFileSystemParameters(remoteServices); //支持跨域下载
 
                 var initParameters = new WebPlayModeParameters();
                 initParameters.WebServerFileSystemParameters = webServerFileSystemParams;
@@ -152,17 +157,67 @@ namespace GameMain.Runtime
         {
             var package = YooAssets.GetPackage(packageName);
             var assetInfo = package.GetAssetInfo(assetName);
-            return new AssetInfo(assetInfo.PackageName, assetInfo.AssetType, assetName, assetInfo.AssetPath, assetInfo.Error, assetInfo);
+            return new AssetInfo(assetInfo.PackageName, assetInfo.AssetType, assetName, assetInfo.Error, assetInfo);
+        }
+
+        public override AssetInfo[] GetAssetInfos(string packageName, string[] tags)
+        {
+            var package = YooAssets.GetPackage(packageName);
+            var assetInfos = package.GetAssetInfos(tags);
+            return assetInfos.Select(assetInfo => new AssetInfo(assetInfo.PackageName, assetInfo.AssetType,
+                assetInfo.AssetPath, assetInfo.Error, assetInfo)).ToArray();
+        }
+
+        public override void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks,
+            object userData = null)
+        {
+            var package = YooAssets.GetPackage(packageName);
+            var operation = package.RequestPackageVersionAsync();
+            operation.Completed += op =>
+            {
+                if (operation.Status == EOperationStatus.Succeed)
+                {
+                    Log.Info($"Request package version of '{packageName}' succeed.");
+                    requestPackageVersionCallbacks.RequestPackageVersionSuccessCallback?.Invoke(packageName, operation.PackageVersion);
+                }
+                else
+                {
+                    Log.Error($"Request package version of '{packageName}' failure: {operation.Error}.");
+                    requestPackageVersionCallbacks.RequestPackageVersionFailureCallback?.Invoke(packageName, operation.Error);
+                }
+            };
+        }
+
+        public override void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
+            object userData = null)
+        {
+            var package = YooAssets.GetPackage(packageName);
+            var operation = package.UpdatePackageManifestAsync(packageVersion);
+            operation.Completed += op =>
+            {
+                if (operation.Status == EOperationStatus.Succeed)
+                {
+                    Log.Info($"Request package version of '{packageName}' succeed.");
+                    updatePackageManifestCallbacks.UpdatePackageManifestSuccessCallback?.Invoke(packageName);
+                }
+                else
+                {
+                    Log.Error($"Request package version of '{packageName}' failure: {operation.Error}.");
+                    updatePackageManifestCallbacks.UpdatePackageManifestFailureCallback?.Invoke(packageName, operation.Error);
+                }
+            };
         }
 
         public override IResourcePackageDownloader CreatePackageDownloader(string packageName)
         {
             var package = YooAssets.GetPackage(packageName);
-            var downloader = package.CreateResourceDownloader(_resourceComponent.DownloadingMaxNum, _resourceComponent.FailedTryAgain);
+            var downloader = package.CreateResourceDownloader(_resourceComponent.DownloadingMaxNum,
+                _resourceComponent.FailedTryAgain);
             return new YooAssetResourcePackageDownloader(downloader);
         }
 
-        public override void UnloadScene(string sceneAssetName, object sceneAsset, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
+        public override void UnloadScene(string sceneAssetName, object sceneAsset,
+            UnloadSceneCallbacks unloadSceneCallbacks, object userData)
         {
             var sceneHandle = sceneAsset as YooAsset.SceneHandle;
             var unloadOperation = sceneHandle.UnloadAsync();
