@@ -22,6 +22,10 @@ namespace UnityGameFramework.Editor
             "UnityGameFramework.Runtime",
 #endif
             "Assembly-CSharp",
+
+            "GameMain.Runtime",
+            "GameLogic.Runtime",
+            "GameProto.Runtime"
         };
 
         private static readonly string[] RuntimeOrEditorAssemblyNames =
@@ -34,6 +38,14 @@ namespace UnityGameFramework.Editor
             "UnityGameFramework.Editor",
 #endif
             "Assembly-CSharp-Editor",
+
+            "GameMain.Runtime",
+            "GameLogic.Runtime",
+            "GameProto.Runtime",
+
+            "GameMain.Editor",
+            "GameLogic.Editor",
+            "GameProto.Editor"
         };
 
         /// <summary>

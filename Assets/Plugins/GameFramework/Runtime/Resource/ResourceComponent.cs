@@ -153,6 +153,7 @@ namespace UnityGameFramework.Runtime
         }
 
         public string PackageVersion { get; set; }
+        public bool IsInitialized { get; private set; }
 
         private void Start()
         {
@@ -194,6 +195,9 @@ namespace UnityGameFramework.Runtime
                 m_ResourceManager.SetReadWritePath(Application.persistentDataPath);
             }
 
+            m_ResourceManager.AddLoadResourceAgentHelper(m_LoadResourceAgentHelper);
+            m_ResourceManager.SetResourceHelper(m_ResourceHelper);
+
             m_ResourceManager.CurrentPackageName = m_DefaultPackageName;
             m_ResourceManager.PlayMode = m_PlayMode;
             m_ResourceManager.FileVerifyLevel = m_FileVerifyLevel;
@@ -203,9 +207,7 @@ namespace UnityGameFramework.Runtime
             m_ResourceManager.AssetCapacity = m_AssetCapacity;
             m_ResourceManager.AssetExpireTime = m_AssetExpireTime;
             m_ResourceManager.AssetPriority = m_AssetPriority;
-
-            m_ResourceManager.AddLoadResourceAgentHelper(m_LoadResourceAgentHelper);
-            m_ResourceManager.SetResourceHelper(m_ResourceHelper);
+            IsInitialized = true;
             Log.Info($"ResourceComponent Run Mode：{m_PlayMode}");
         }
 

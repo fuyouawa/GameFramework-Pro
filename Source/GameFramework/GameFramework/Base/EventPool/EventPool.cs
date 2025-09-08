@@ -66,14 +66,18 @@ namespace GameFramework
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
         public void Update(float elapseSeconds, float realElapseSeconds)
         {
+            Queue<Event> tempEvents;
             lock (m_Events)
             {
-                while (m_Events.Count > 0)
-                {
-                    Event eventNode = m_Events.Dequeue();
-                    HandleEvent(eventNode.Sender, eventNode.EventArgs);
-                    ReferencePool.Release(eventNode);
-                }
+                tempEvents = new Queue<Event>(m_Events);
+                m_Events.Clear();
+            }
+
+            while (tempEvents.Count > 0)
+            {
+                Event eventNode = tempEvents.Dequeue();
+                HandleEvent(eventNode.Sender, eventNode.EventArgs);
+                ReferencePool.Release(eventNode);
             }
         }
 

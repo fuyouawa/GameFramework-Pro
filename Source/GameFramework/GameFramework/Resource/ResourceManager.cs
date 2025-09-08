@@ -371,10 +371,10 @@ namespace GameFramework.Resource
                     throw new GameFrameworkException();
                 }
                 clearingPackageCount--;
-                clearAllCacheFilesCallbacks.ClearPackageUnusedCacheFilesSuccess?.Invoke(packageName);
+                clearAllCacheFilesCallbacks.ClearPackageCacheFilesSuccess?.Invoke(packageName);
                 if (clearingPackageCount == 0)
                 {
-                    clearAllCacheFilesCallbacks.ClearAllUnusedCacheFilesComplete?.Invoke(hasError);
+                    clearAllCacheFilesCallbacks.ClearAllCacheFilesComplete?.Invoke(hasError);
                 }
             }
 
@@ -386,10 +386,10 @@ namespace GameFramework.Resource
                 }
                 clearingPackageCount--;
                 hasError = true;
-                clearAllCacheFilesCallbacks.ClearPackageUnusedCacheFilesFailure?.Invoke(packageName, errorMessage);
+                clearAllCacheFilesCallbacks.ClearPackageCacheFilesFailure?.Invoke(packageName, errorMessage);
                 if (clearingPackageCount == 0)
                 {
-                    clearAllCacheFilesCallbacks.ClearAllUnusedCacheFilesComplete?.Invoke(hasError);
+                    clearAllCacheFilesCallbacks.ClearAllCacheFilesComplete?.Invoke(hasError);
                 }
             }
         }

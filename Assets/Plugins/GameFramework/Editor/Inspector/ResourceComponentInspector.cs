@@ -189,7 +189,7 @@ namespace UnityGameFramework.Editor
 
             EditorGUI.EndDisabledGroup();
 
-            if (EditorApplication.isPlaying && IsPrefabInHierarchy(t.gameObject))
+            if (EditorApplication.isPlaying && IsPrefabInHierarchy(t.gameObject) && t.IsInitialized)
             {
                 EditorGUILayout.LabelField("Unload Unused Assets",
                     Utility.Text.Format("{0:F2} / {1:F2}", t.LastUnloadUnusedAssetsOperationElapseSeconds, t.MaxUnloadUnusedAssetsInterval));

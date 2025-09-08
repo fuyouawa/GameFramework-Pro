@@ -52,6 +52,8 @@ namespace UnityGameFramework.Runtime
             }
         }
 
+        public bool IsInitialized { get; private set; }
+
         /// <summary>
         /// 游戏框架组件初始化。
         /// </summary>
@@ -99,6 +101,7 @@ namespace UnityGameFramework.Runtime
             }
 
             m_ProcedureManager.Initialize(GameFrameworkEntry.GetModule<IFsmManager>(), procedures);
+            IsInitialized = true;
 
             yield return new WaitForEndOfFrame();
 

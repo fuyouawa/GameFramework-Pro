@@ -1,30 +1,30 @@
 ﻿namespace GameFramework.Resource
 {
-    public delegate void ClearAllUnusedCacheFilesCompleteCallback(bool hasError);
+    public delegate void ClearAllCacheFilesCompleteCallback(bool hasError);
 
     public class ClearAllCacheFilesCallbacks
     {
-        private ClearAllUnusedCacheFilesCompleteCallback m_ClearAllUnusedCacheFilesComplete;
-        private ClearPackageUnusedCacheFilesSuccessCallback m_ClearPackageUnusedCacheFilesSuccess;
-        private ClearPackageUnusedCacheFilesFailureCallback m_ClearPackageUnusedCacheFilesFailure;
+        private ClearAllCacheFilesCompleteCallback m_ClearAllCacheFilesComplete;
+        private ClearPackageCacheFilesSuccessCallback m_ClearPackageCacheFilesSuccess;
+        private ClearPackageCacheFilesFailureCallback m_ClearPackageCacheFilesFailure;
 
         public ClearAllCacheFilesCallbacks(
-            ClearAllUnusedCacheFilesCompleteCallback clearAllUnusedCacheFilesComplete,
-            ClearPackageUnusedCacheFilesSuccessCallback clearPackageUnusedCacheFilesSuccess,
-            ClearPackageUnusedCacheFilesFailureCallback clearPackageUnusedCacheFilesFailure)
+            ClearAllCacheFilesCompleteCallback clearAllCacheFilesComplete,
+            ClearPackageCacheFilesSuccessCallback clearPackageCacheFilesSuccess,
+            ClearPackageCacheFilesFailureCallback clearPackageCacheFilesFailure)
         {
-            m_ClearAllUnusedCacheFilesComplete = clearAllUnusedCacheFilesComplete;
-            m_ClearPackageUnusedCacheFilesSuccess = clearPackageUnusedCacheFilesSuccess;
-            m_ClearPackageUnusedCacheFilesFailure = clearPackageUnusedCacheFilesFailure;
+            m_ClearAllCacheFilesComplete = clearAllCacheFilesComplete;
+            m_ClearPackageCacheFilesSuccess = clearPackageCacheFilesSuccess;
+            m_ClearPackageCacheFilesFailure = clearPackageCacheFilesFailure;
         }
 
-        public ClearAllUnusedCacheFilesCompleteCallback ClearAllUnusedCacheFilesComplete =>
-            m_ClearAllUnusedCacheFilesComplete;
+        public ClearAllCacheFilesCompleteCallback ClearAllCacheFilesComplete =>
+            m_ClearAllCacheFilesComplete;
 
-        public ClearPackageUnusedCacheFilesSuccessCallback ClearPackageUnusedCacheFilesSuccess =>
-            m_ClearPackageUnusedCacheFilesSuccess;
+        public ClearPackageCacheFilesSuccessCallback ClearPackageCacheFilesSuccess =>
+            m_ClearPackageCacheFilesSuccess;
 
-        public ClearPackageUnusedCacheFilesFailureCallback ClearPackageUnusedCacheFilesFailure =>
-            m_ClearPackageUnusedCacheFilesFailure;
+        public ClearPackageCacheFilesFailureCallback ClearPackageCacheFilesFailure =>
+            m_ClearPackageCacheFilesFailure;
     }
 }

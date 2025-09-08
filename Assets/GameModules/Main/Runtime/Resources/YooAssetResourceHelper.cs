@@ -36,13 +36,19 @@ namespace GameMain.Runtime
     {
         private ResourceComponent _resourceComponent = null;
 
-        private void Start()
+        private ResourceComponent ResourceComponent
         {
-            _resourceComponent = UnityGameFramework.Runtime.GameEntry.GetComponent<ResourceComponent>();
-            if (_resourceComponent == null)
+            get
             {
-                Log.Fatal("Resource component is invalid.");
-                return;
+                if (_resourceComponent == null)
+                {
+                    _resourceComponent = UnityGameFramework.Runtime.GameEntry.GetComponent<ResourceComponent>();
+                    if (_resourceComponent == null)
+                    {
+                        throw new InvalidOperationException("Resource component is invalid.");
+                    }
+                }
+                return _resourceComponent;
             }
         }
 
@@ -54,10 +60,10 @@ namespace GameMain.Runtime
                 YooAssets.Initialize(new ResourceLogger());
             }
 
-            YooAssets.SetOperationSystemMaxTimeSlice(_resourceComponent.Milliseconds);
+            YooAssets.SetOperationSystemMaxTimeSlice(ResourceComponent.Milliseconds);
 
             // 创建默认的资源包
-            string packageName = _resourceComponent.DefaultPackageName;
+            string packageName = ResourceComponent.DefaultPackageName;
             var defaultPackage = YooAssets.TryGetPackage(packageName);
             if (defaultPackage == null)
             {
@@ -77,53 +83,58 @@ namespace GameMain.Runtime
 
             // 编辑器下的模拟模式
             InitializationOperation initializationOperation = null;
-            if (_resourceComponent.PlayMode == PlayMode.EditorSimulateMode)
+            switch (ResourceComponent.PlayMode)
             {
-                var buildResult = EditorSimulateModeHelper.SimulateBuild(packageName);
-                var packageRoot = buildResult.PackageRootDirectory;
-                var editorFileSystemParams = FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);
-                var initParameters = new EditorSimulateModeParameters();
-                initParameters.EditorFileSystemParameters = editorFileSystemParams;
-                initializationOperation = package.InitializeAsync(initParameters);
-            }
-            // 单机运行模式
-            else if (_resourceComponent.PlayMode == PlayMode.OfflinePlayMode)
-            {
-                var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
-                var initParameters = new OfflinePlayModeParameters();
-                initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
-                initializationOperation = package.InitializeAsync(initParameters);
-            }
-            // 联机运行模式
-            else if (_resourceComponent.PlayMode == PlayMode.HostPlayMode)
-            {
-                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL,
-                    _resourceComponent.FallbackHostServerURL);
-                var cacheFileSystemParams = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
-                var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+                case PlayMode.EditorSimulateMode:
+                {
+                    var buildResult = EditorSimulateModeHelper.SimulateBuild(packageName);
+                    var packageRoot = buildResult.PackageRootDirectory;
+                    var editorFileSystemParams = FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);
+                    var initParameters = new EditorSimulateModeParameters();
+                    initParameters.EditorFileSystemParameters = editorFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                // 单机运行模式
+                case PlayMode.OfflinePlayMode:
+                {
+                    var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+                    var initParameters = new OfflinePlayModeParameters();
+                    initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                // 联机运行模式
+                case PlayMode.HostPlayMode:
+                {
+                    IRemoteServices remoteServices = new RemoteServices(ResourceComponent.HostServerURL,
+                        ResourceComponent.FallbackHostServerURL);
+                    var cacheFileSystemParams = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
+                    var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
 
-                var initParameters = new HostPlayModeParameters();
-                initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
-                initParameters.CacheFileSystemParameters = cacheFileSystemParams;
-                initializationOperation = package.InitializeAsync(initParameters);
-            }
-            // WebGL运行模式
-            else if (_resourceComponent.PlayMode == PlayMode.WebPlayMode)
-            {
-                IRemoteServices remoteServices = new RemoteServices(_resourceComponent.HostServerURL,
-                    _resourceComponent.FallbackHostServerURL);
-                var webServerFileSystemParams = FileSystemParameters.CreateDefaultWebServerFileSystemParameters();
-                var webRemoteFileSystemParams =
-                    FileSystemParameters.CreateDefaultWebRemoteFileSystemParameters(remoteServices); //支持跨域下载
+                    var initParameters = new HostPlayModeParameters();
+                    initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
+                    initParameters.CacheFileSystemParameters = cacheFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                // WebGL运行模式
+                case PlayMode.WebPlayMode:
+                {
+                    IRemoteServices remoteServices = new RemoteServices(ResourceComponent.HostServerURL,
+                        ResourceComponent.FallbackHostServerURL);
+                    var webServerFileSystemParams = FileSystemParameters.CreateDefaultWebServerFileSystemParameters();
+                    var webRemoteFileSystemParams =
+                        FileSystemParameters.CreateDefaultWebRemoteFileSystemParameters(remoteServices); //支持跨域下载
 
-                var initParameters = new WebPlayModeParameters();
-                initParameters.WebServerFileSystemParameters = webServerFileSystemParams;
-                initParameters.WebRemoteFileSystemParameters = webRemoteFileSystemParams;
-                initializationOperation = package.InitializeAsync(initParameters);
-            }
-            else
-            {
-                throw new InvalidOperationException();
+                    var initParameters = new WebPlayModeParameters();
+                    initParameters.WebServerFileSystemParameters = webServerFileSystemParams;
+                    initParameters.WebRemoteFileSystemParameters = webRemoteFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                default:
+                    throw new InvalidOperationException();
             }
 
             initializationOperation.Completed += op =>
@@ -211,8 +222,8 @@ namespace GameMain.Runtime
         public override IResourcePackageDownloader CreatePackageDownloader(string packageName)
         {
             var package = YooAssets.GetPackage(packageName);
-            var downloader = package.CreateResourceDownloader(_resourceComponent.DownloadingMaxNum,
-                _resourceComponent.FailedTryAgain);
+            var downloader = package.CreateResourceDownloader(ResourceComponent.DownloadingMaxNum,
+                ResourceComponent.FailedTryAgain);
             return new YooAssetResourcePackageDownloader(downloader);
         }
 
@@ -235,12 +246,12 @@ namespace GameMain.Runtime
                 if (operation.Status == EOperationStatus.Succeed)
                 {
                     Log.Info($"Clear package '{packageName}' cache files by mode '{fileClearMode}' succeed.");
-                    clearPackageCacheFilesCallbacks.ClearPackageUnusedCacheFilesSuccess?.Invoke(packageName);
+                    clearPackageCacheFilesCallbacks.ClearPackageCacheFilesSuccess?.Invoke(packageName);
                 }
                 else
                 {
                     Log.Error($"Clear package '{packageName}' cache files by mode '{fileClearMode}' failure: {operation.Error}.");
-                    clearPackageCacheFilesCallbacks.ClearPackageUnusedCacheFilesFailure?.Invoke(packageName, operation.Error);
+                    clearPackageCacheFilesCallbacks.ClearPackageCacheFilesFailure?.Invoke(packageName, operation.Error);
                 }
             };
         }
