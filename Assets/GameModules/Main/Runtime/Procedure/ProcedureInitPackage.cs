@@ -28,12 +28,12 @@ namespace GameMain.Runtime
                 var package = YooAssets.TryGetPackage(GameEntry.Resource.DefaultPackageName);
                 if (package != null && package.InitializeStatus == EOperationStatus.Succeed)
                 {
-                    OnInitPackageComplete(procedureOwner, GameEntry.Resource.DefaultPackageName);
+                    OnInitPackageSuccess(procedureOwner, GameEntry.Resource.DefaultPackageName);
                     return;
                 }
 
                 GameEntry.Resource.InitPackage(new InitPackageCallbacks(
-                    name => OnInitPackageComplete(procedureOwner, name),
+                    name => OnInitPackageSuccess(procedureOwner, name),
                     (name, error, data) => OnInitPackageFailure(procedureOwner, name, error)));
             }
             catch (Exception e)
@@ -42,42 +42,41 @@ namespace GameMain.Runtime
             }
         }
 
-        private void OnInitPackageComplete(ProcedureOwner procedureOwner, string packageName)
+        private void OnInitPackageSuccess(ProcedureOwner procedureOwner, string packageName)
         {
-            // 编辑器模式。
-            if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
-            {
-                Log.Debug("Editor resource mode detected.");
-                ChangeState<ProcedurePreload>(procedureOwner);
-            }
-            // 单机模式。
-            else if (GameEntry.Resource.PlayMode == PlayMode.OfflinePlayMode)
-            {
-                Log.Debug("Package resource mode detected.");
-                ChangeState<ProcedureInitResources>(procedureOwner);
-            }
-            // 可更新模式。
-            else if (GameEntry.Resource.PlayMode == PlayMode.HostPlayMode ||
-                     GameEntry.Resource.PlayMode == PlayMode.WebPlayMode)
-            {
-                // 打开启动UI。
-                // UILoadMgr.Show(UIDefine.UILoadUpdate);
-
-                Log.Debug("Updatable resource mode detected.");
-                ChangeState<ProcedureUpdateVersion>(procedureOwner);
-            }
-            else
-            {
-                Log.Error("UnKnow resource mode detected Please check???");
-            }
+            // // 编辑器模式。
+            // if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
+            // {
+            //     Log.Debug("Editor resource mode detected.");
+            //     ChangeState<ProcedurePreload>(procedureOwner);
+            // }
+            // // 单机模式。
+            // else if (GameEntry.Resource.PlayMode == PlayMode.OfflinePlayMode)
+            // {
+            //     Log.Debug("Package resource mode detected.");
+            //     ChangeState<ProcedureInitResources>(procedureOwner);
+            // }
+            // // 可更新模式。
+            // else if (GameEntry.Resource.PlayMode == PlayMode.HostPlayMode ||
+            //          GameEntry.Resource.PlayMode == PlayMode.WebPlayMode)
+            // {
+            //     // 打开启动UI。
+            //     // UILoadMgr.Show(UIDefine.UILoadUpdate);
+            //
+            //     Log.Debug("Updatable resource mode detected.");
+            //     ChangeState<ProcedureUpdateVersion>(procedureOwner);
+            // }
+            // else
+            // {
+            //     Log.Error("UnKnow resource mode detected Please check???");
+            // }
+            ChangeState<ProcedureUpdateVersion>(procedureOwner);
         }
 
         private void OnInitPackageFailure(ProcedureOwner procedureOwner, string packageName, string error)
         {
             // 打开启动UI。
             // UILoadMgr.Show(UIDefine.UILoadUpdate);
-
-            Log.Error($"Init package {packageName} failure: {error}.");
 
             // 打开启动UI。
             // UILoadMgr.Show(UIDefine.UILoadUpdate, $"资源初始化失败！");

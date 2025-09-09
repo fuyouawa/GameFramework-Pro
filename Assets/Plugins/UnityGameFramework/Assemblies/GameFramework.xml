@@ -15929,6 +15929,12 @@
             </summary>
             <param name="loadResourceAgentHelper">要添加的加载资源代理辅助器。</param>
         </member>
+        <member name="M:GameFramework.Resource.IResourceManager.SetObjectPoolManager(GameFramework.ObjectPool.IObjectPoolManager)">
+            <summary>
+            设置对象池管理器。
+            </summary>
+            <param name="objectPoolManager">对象池管理器。</param>
+        </member>
         <member name="M:GameFramework.Resource.IResourceManager.Initialize">
             <summary>
             初始化接口。

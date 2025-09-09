@@ -30,7 +30,6 @@ namespace GameMain.Runtime
         {
             if (GameEntry.Resource.PlayMode == PlayMode.WebPlayMode)
             {
-                // 边玩边下载还可以拓展首包支持。
                 ChangeState<ProcedurePreload>(_procedureOwner);
                 return;
             }
@@ -40,8 +39,6 @@ namespace GameMain.Runtime
 
         private void OnUpdatePackageManifestFailure(string packageName, string error)
         {
-            Log.Error(error);
-
             // UILoadTip.ShowMessageBox($"用户尝试更新清单失败！点击确认重试 \n \n <color=#FF0000>原因{operation.Error}</color>", MessageShowType.TwoButton,
             //     LoadStyle.StyleEnum.Style_Retry
             //     , () => { ChangeState<ProcedureUpdateManifest>(procedureOwner); }, UnityEngine.Application.Quit);

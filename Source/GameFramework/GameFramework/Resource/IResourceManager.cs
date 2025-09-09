@@ -156,6 +156,13 @@ namespace GameFramework.Resource
         void SetResourceHelper(IResourceHelper resourceHelper);
 
         /// <summary>
+        /// 设置对象池管理器。
+        /// </summary>
+        /// <param name="objectPoolManager">对象池管理器。</param>
+        void SetObjectPoolManager(IObjectPoolManager objectPoolManager);
+
+
+        /// <summary>
         /// 初始化接口。
         /// </summary>
         void Initialize();

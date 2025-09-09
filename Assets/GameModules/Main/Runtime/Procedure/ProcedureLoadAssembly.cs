@@ -31,8 +31,7 @@ namespace GameMain.Runtime
         private bool m_LoadMetadataAssemblyComplete;
         private bool m_LoadAssemblyWait;
         private bool m_LoadMetadataAssemblyWait;
-        private Assembly _entryAssembly;
-        private List<Assembly> _hotfixAssemblys;
+        private List<Assembly> _hotUpdateAssemblys;
         private IFsm<IProcedureManager> m_ProcedureOwner;
 
         protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
@@ -40,24 +39,41 @@ namespace GameMain.Runtime
             base.OnEnter(procedureOwner);
             m_ProcedureOwner = procedureOwner;
             m_LoadAssemblyComplete = false;
-            _hotfixAssemblys = new List<Assembly>();
+            _hotUpdateAssemblys = new List<Assembly>();
 
 #if !UNITY_EDITOR
-                m_LoadMetadataAssemblyComplete = false;
-                LoadMetadataForAOTAssembly();
+            m_LoadMetadataAssemblyComplete = false;
+            LoadMetadataForAOTAssembly();
 #else
             m_LoadMetadataAssemblyComplete = true;
 #endif
 
-            if (GameEntry.Resource.PlayMode != PlayMode.EditorSimulateMode)
+            if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
+            {
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach (var hotUpdateAssemblyName in GameSettings.Instance.HotUpdateAssemblyNames)
+                    {
+                        if (hotUpdateAssemblyName == $"{assembly.GetName().Name}")
+                        {
+                            _hotUpdateAssemblys.Add(assembly);
+                        }
+                    }
+
+                    if (_hotUpdateAssemblys.Count == GameSettings.Instance.HotUpdateAssemblyNames.Count)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
             {
                 var callbacks = new LoadAssetCallbacks(OnLoadAssemblyAssetSuccess, OnLoadAssemblyAssetFailure);
-                foreach (string hotUpdateDllName in GameSettings.Instance.HotUpdateAssemblyNames)
+                foreach (string hotUpdateAssemblyName in GameSettings.Instance.HotUpdateAssemblyNames)
                 {
-                    var assetLocation = hotUpdateDllName;
-                    Log.Debug($"LoadAsset: [ {assetLocation} ]");
+                    Log.Debug($"LoadAsset: [ {hotUpdateAssemblyName} ]");
                     m_LoadAssetCount++;
-                    GameEntry.Resource.LoadAsset(assetLocation, callbacks, assetType:typeof(TextAsset));
+                    GameEntry.Resource.LoadAsset(hotUpdateAssemblyName, callbacks, assetType:typeof(TextAsset));
                 }
 
                 m_LoadAssemblyWait = true;
@@ -86,12 +102,7 @@ namespace GameMain.Runtime
             try
             {
                 var assembly = Assembly.Load(textAsset.bytes);
-                if (string.Compare(GameSettings.Instance.HotUpdateEntryAssemblyName, assetName, StringComparison.Ordinal) == 0)
-                {
-                    _entryAssembly = assembly;
-                }
-
-                _hotfixAssemblys.Add(assembly);
+                _hotUpdateAssemblys.Add(assembly);
                 Log.Debug($"Assembly [ {assembly.GetName().Name} ] loaded");
             }
             catch (Exception e)
@@ -129,57 +140,23 @@ namespace GameMain.Runtime
 
         private void AllAssemblyLoadComplete()
         {
-#if UNITY_EDITOR
-            _entryAssembly = GetHotUpdateEntryAssembly();
-#endif
-            if (_entryAssembly == null)
+            _hotUpdateAssemblys.Sort(GameSettings.Instance.HotUpdateAssemblyComparison);
+            foreach (var assembly in _hotUpdateAssemblys)
             {
-                Log.Fatal($"Entry assembly missing.");
-                return;
+                EntryAssembly(assembly);
             }
-
-            EntryAssembly(_entryAssembly);
-
             ChangeState<ProcedureStartGame>(m_ProcedureOwner);
         }
 
         private void EntryAssembly(Assembly assembly)
         {
-            var entrances = assembly.GetTypes()
+            var entries = assembly.GetTypes()
                 .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                .Where(method => method.IsDefined(typeof(HotUpdateEntranceAttribute)));
-            foreach (var entrance in entrances)
+                .Where(method => method.IsDefined(typeof(HotUpdateEntryAttribute)));
+            foreach (var entry in entries)
             {
-                entrance.Invoke(null, null);
+                entry.Invoke(null, null);
             }
-        }
-
-        private Assembly GetHotUpdateEntryAssembly()
-        {
-            Assembly entryAssembly = null;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (string.Compare(GameSettings.Instance.HotUpdateEntryAssemblyName, $"{assembly.GetName().Name}",
-                        StringComparison.Ordinal) == 0)
-                {
-                    entryAssembly = assembly;
-                }
-
-                foreach (var hotUpdateAssemblyName in GameSettings.Instance.HotUpdateAssemblyNames)
-                {
-                    if (hotUpdateAssemblyName == $"{assembly.GetName().Name}")
-                    {
-                        _hotfixAssemblys.Add(assembly);
-                    }
-                }
-
-                if (entryAssembly != null && _hotfixAssemblys.Count == GameSettings.Instance.HotUpdateAssemblyNames.Count)
-                {
-                    break;
-                }
-            }
-
-            return entryAssembly;
         }
 
         /// <summary>

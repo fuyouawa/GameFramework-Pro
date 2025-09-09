@@ -36,7 +36,6 @@ namespace GameMain.Runtime
         private void OnInitResourcesComplete()
         {
             m_InitResourcesComplete = true;
-            Log.Info("Init resources complete.");
         }
     }
 }

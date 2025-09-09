@@ -4,7 +4,7 @@ using UnityGameFramework.Runtime;
 
 namespace GameMain.Runtime
 {
-    public static class SoundComponentExtensions
+    public static class SoundExtensions
     {
         private const float FadeVolumeDuration = 1f;
         private static int? s_MusicSerialId = null;

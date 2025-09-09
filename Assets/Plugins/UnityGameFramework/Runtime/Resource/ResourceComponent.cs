@@ -176,7 +176,7 @@ namespace UnityGameFramework.Runtime
                 Log.Debug(
                     "During this run, Game Framework will use editor resource files, which you should validate first.");
 #if !UNITY_EDITOR
-                PlayMode = EPlayMode.OfflinePlayMode;
+                m_PlayMode = PlayMode.OfflinePlayMode;
 #endif
             }
 
@@ -232,9 +232,7 @@ namespace UnityGameFramework.Runtime
             string customPackageName = "",
             object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             m_ResourceManager.RequestPackageVersion(requestPackageVersionCallbacks, userData);
         }
@@ -243,9 +241,7 @@ namespace UnityGameFramework.Runtime
             UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
             string customPackageName = "", object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             m_ResourceManager.UpdatePackageManifest(packageVersion, updatePackageManifestCallbacks, userData);
         }
@@ -257,25 +253,19 @@ namespace UnityGameFramework.Runtime
         /// <returns>检查资源是否存在的结果。</returns>
         public HasAssetResult HasAsset(string assetName, string customPackageName = "")
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             return m_ResourceManager.HasAsset(assetName);
         }
 
         public IResourcePackageDownloader CreatePackageDownloader(string customPackageName = "")
         {
-            return m_ResourceManager.CreatePackageDownloader(string.IsNullOrEmpty(customPackageName)
-                ? m_DefaultPackageName
-                : customPackageName);
+            return m_ResourceManager.CreatePackageDownloader(GetPackageName(customPackageName));
         }
 
         public IResourcePackageDownloader GetPackageDownloader(string customPackageName = "")
         {
-            return m_ResourceManager.GetPackageDownloader(string.IsNullOrEmpty(customPackageName)
-                ? m_DefaultPackageName
-                : customPackageName);
+            return m_ResourceManager.GetPackageDownloader(GetPackageName(customPackageName));
         }
 
         /// <summary>
@@ -285,18 +275,14 @@ namespace UnityGameFramework.Runtime
         /// <returns></returns>
         public AssetInfo GetAssetInfo(string assetName, string customPackageName = "")
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             return m_ResourceManager.GetAssetInfo(assetName);
         }
 
         public AssetInfo[] GetAssetInfos(string[] tags, string customPackageName = "")
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             return m_ResourceManager.GetAssetInfos(tags);
         }
@@ -317,9 +303,7 @@ namespace UnityGameFramework.Runtime
             int? priority = null,
             object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             m_ResourceManager.LoadAsset(assetName, loadAssetCallbacks, assetType, priority, userData);
         }
@@ -352,9 +336,7 @@ namespace UnityGameFramework.Runtime
             int? priority = null,
             object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = string.IsNullOrEmpty(customPackageName)
-                ? customPackageName
-                : m_DefaultPackageName;
+            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
 
             m_ResourceManager.LoadScene(sceneAssetName, loadSceneCallbacks, priority, userData);
         }
@@ -389,6 +371,11 @@ namespace UnityGameFramework.Runtime
                     ? m_DefaultPackageName
                     : customPackageName,
                 fileClearMode, clearPackageCacheFilesCallbacks, userData);
+        }
+
+        private string GetPackageName(string packageName)
+        {
+            return string.IsNullOrEmpty(packageName) ? m_DefaultPackageName : packageName;
         }
     }
 }

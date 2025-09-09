@@ -52,7 +52,7 @@ namespace GameMain.Runtime
 
                     if (!dataTable.AddDataRow(null, node))
                     {
-                        Log.Warning("Can not parse data row string '{0}'.", node.ToString());
+                        Log.Error("Can not parse data row string '{0}'.", node.ToString());
                         return false;
                     }
                 }
@@ -60,7 +60,7 @@ namespace GameMain.Runtime
             }
             catch (Exception e)
             {
-                Log.Warning("Can not parse data table string with exception '{0}'.", e);
+                Log.Error("Can not parse data table string with exception '{0}'.", e);
                 return false;
             }
         }

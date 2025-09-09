@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameFramework.ObjectPool;
 
 namespace GameFramework.Resource
 {
@@ -10,12 +11,14 @@ namespace GameFramework.Resource
             private readonly ResourceManager m_ResourceManager;
             private readonly TaskPool<LoadResourceTaskBase> m_TaskPool;
             private readonly Dictionary<string, object> m_SceneNameToAssetMap;
+            private readonly Dictionary<string, object> m_AssetPathToAssetMap;
 
             public ResourceLoader(ResourceManager resourceManager)
             {
                 m_ResourceManager = resourceManager;
                 m_TaskPool = new TaskPool<LoadResourceTaskBase>();
                 m_SceneNameToAssetMap = new Dictionary<string, object>();
+                m_AssetPathToAssetMap = new Dictionary<string, object>();
             }
 
             public void Update(float elapseSeconds, float realElapseSeconds)
@@ -26,6 +29,10 @@ namespace GameFramework.Resource
             public void Shutdown()
             {
                 m_TaskPool.Shutdown();
+            }
+
+            public void SetObjectPoolManager(IObjectPoolManager objectPoolManager)
+            {
             }
 
 
@@ -56,8 +63,20 @@ namespace GameFramework.Resource
                 LoadAssetCallbacks loadAssetCallbacks,
                 object userData)
             {
+                var key = $"{packageName}/{assetName}";
+                if (m_AssetPathToAssetMap.TryGetValue(key, out object asset))
+                {
+                    loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(assetName, asset, 0, userData);
+                    return;
+                }
+
                 LoadAssetTask loadAssetTask = LoadAssetTask.Create(packageName, assetName, assetType, priority,
-                    loadAssetCallbacks, userData);
+                    new LoadAssetCallbacks((name, o, duration, data) =>
+                    {
+                        m_AssetPathToAssetMap[key] = o;
+                        loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(name, o, duration, data);
+                    }, loadAssetCallbacks.LoadAssetFailureCallback), userData);
+
                 m_TaskPool.AddTask(loadAssetTask);
             }
 
@@ -85,7 +104,8 @@ namespace GameFramework.Resource
                         loadSceneCallbacks.LoadSceneSuccessCallback?.Invoke(sceneAssetName, asset, duration, data);
                     }, loadSceneCallbacks.LoadSceneFailureCallback);
 
-                LoadSceneTask loadSceneTask = LoadSceneTask.Create(packageName, sceneAssetName, priority, callbacks, userData);
+                LoadSceneTask loadSceneTask =
+                    LoadSceneTask.Create(packageName, sceneAssetName, priority, callbacks, userData);
                 m_TaskPool.AddTask(loadSceneTask);
             }
 
@@ -104,7 +124,8 @@ namespace GameFramework.Resource
 
                 if (m_SceneNameToAssetMap.TryGetValue(sceneAssetName, out object asset))
                 {
-                    m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, asset, unloadSceneCallbacks, userData);
+                    m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, asset, unloadSceneCallbacks,
+                        userData);
                 }
                 else
                 {

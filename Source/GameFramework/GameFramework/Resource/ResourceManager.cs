@@ -142,6 +142,7 @@ namespace GameFramework.Resource
             {
                 throw new GameFrameworkException("Object pool manager is invalid.");
             }
+            m_ResourceLoader.SetObjectPoolManager(objectPoolManager);
         }
 
         /// <summary>

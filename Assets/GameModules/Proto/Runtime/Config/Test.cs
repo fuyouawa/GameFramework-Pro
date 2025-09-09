@@ -1,11 +1,10 @@
-using System;
 using Luban;
 using SimpleJSON;
 using UnityGameFramework.Runtime;
 
 namespace GameProto.Runtime
 {
-    public class TestConfig : DataRowBase
+    public class Test : DataRowBase
     {
         private int _id;
 
@@ -27,7 +26,7 @@ namespace GameProto.Runtime
                 throw new SerializationException("Id is not a number.");
 
             if (node["Name"].IsString)
-                _id = node["Name"];
+                Name = node["Name"];
             else
                 throw new SerializationException("Name is not a string.");
             return true;

@@ -18,15 +18,15 @@ namespace GameMain.Runtime
                 ? package.LoadAssetAsync(assetName)
                 : package.LoadAssetAsync(assetName, assetType);
 
-            assetHandle.Completed += op =>
+            assetHandle.Completed += handle =>
             {
-                if (op.Status == EOperationStatus.Succeed)
+                if (handle.Status == EOperationStatus.Succeed)
                 {
-                    LoadComplete?.Invoke(this, LoadResourceAgentHelperLoadCompleteEventArgs.Create(op.AssetObject));
+                    LoadComplete?.Invoke(this, LoadResourceAgentHelperLoadCompleteEventArgs.Create(handle.AssetObject));
                 }
                 else
                 {
-                    Error?.Invoke(this, LoadResourceAgentHelperErrorEventArgs.Create(LoadResourceStatus.AssetError, op.LastError));
+                    Error?.Invoke(this, LoadResourceAgentHelperErrorEventArgs.Create(LoadResourceStatus.AssetError, handle.LastError));
                 }
             };
         }
