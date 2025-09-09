@@ -172,7 +172,12 @@ namespace GameFramework.Resource
 
         public IResourcePackageDownloader GetPackageDownloader(string packageName)
         {
-            return m_PackageDownloaders.GetValueOrDefault(packageName);
+            if (m_PackageDownloaders.TryGetValue(packageName, out IResourcePackageDownloader downloader))
+            {
+                return downloader;
+            }
+
+            return null;
         }
 
         public void SetResourceHelper(IResourceHelper resourceHelper)

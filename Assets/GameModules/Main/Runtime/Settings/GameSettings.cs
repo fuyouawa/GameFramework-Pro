@@ -6,21 +6,26 @@ using UnityEngine;
 namespace GameMain.Runtime
 {
     [EasyInspector]
-    [ScriptableObjectSingletonAssetPath("Resources/Settings")]
+    [ScriptableObjectSingletonAssetPath("Assets/Resources/Settings")]
     public class GameSettings : ScriptableObjectSingleton<GameSettings>
     {
         [Title("Assets")]
+        [ListDrawerSettings(ShowIndexLabel = false)]
         [SerializeField] private List<string> _preloadAssetTags;
 
         [Title("HybridCLR")]
-        [SerializeField] private List<string> _hotUpdateAssemblies = new List<string>();
-        [SerializeField] private List<string> _aotMetaAssemblies = new List<string>();
-        [SerializeField] private string _hotUpdateEntryDllName;
+        [ListDrawerSettings(ShowIndexLabel = false)]
+        [SerializeField] private List<string> _hotUpdateAssemblyNames = new List<string>();
+
+        [ListDrawerSettings(ShowIndexLabel = false)]
+        [SerializeField] private List<string> _aotMetaAssemblyNames = new List<string>();
+
+        [SerializeField] private string _hotUpdateEntryAssemblyName;
 
         public IReadOnlyList<string> PreloadAssetTags => _preloadAssetTags;
 
-        public IReadOnlyList<string> HotUpdateAssemblies => _hotUpdateAssemblies;
-        public IReadOnlyList<string> AOTMetaAssemblies => _aotMetaAssemblies;
-        public string HotUpdateEntryDllName => _hotUpdateEntryDllName;
+        public IReadOnlyList<string> HotUpdateAssemblyNames => _hotUpdateAssemblyNames;
+        public IReadOnlyList<string> AOTMetaAssemblyNames => _aotMetaAssemblyNames;
+        public string HotUpdateEntryAssemblyName => _hotUpdateEntryAssemblyName;
     }
 }

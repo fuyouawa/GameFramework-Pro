@@ -141,7 +141,7 @@ namespace GameMain.Runtime
             {
                 if (op.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Initialize package '{packageName}' succeed.");
+                    Log.Debug($"Initialize package '{packageName}' succeed.");
                     initPackageCallbacks.InitPackageSuccess?.Invoke(packageName);
                 }
                 else
@@ -188,7 +188,7 @@ namespace GameMain.Runtime
             {
                 if (operation.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Request package '{packageName}' version '{operation.PackageVersion}' succeed.");
+                    Log.Debug($"Request package '{packageName}' version '{operation.PackageVersion}' succeed.");
                     requestPackageVersionCallbacks.RequestPackageVersionSuccessCallback?.Invoke(packageName, operation.PackageVersion);
                 }
                 else
@@ -208,7 +208,7 @@ namespace GameMain.Runtime
             {
                 if (operation.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Update package '{packageName}' manifest succeed.");
+                    Log.Debug($"Update package '{packageName}' manifest succeed.");
                     updatePackageManifestCallbacks.UpdatePackageManifestSuccessCallback?.Invoke(packageName);
                 }
                 else
@@ -245,7 +245,7 @@ namespace GameMain.Runtime
             {
                 if (operation.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Clear package '{packageName}' cache files by mode '{fileClearMode}' succeed.");
+                    Log.Debug($"Clear package '{packageName}' cache files by mode '{fileClearMode}' succeed.");
                     clearPackageCacheFilesCallbacks.ClearPackageCacheFilesSuccess?.Invoke(packageName);
                 }
                 else
@@ -265,7 +265,7 @@ namespace GameMain.Runtime
             {
                 if (op.Status == EOperationStatus.Succeed)
                 {
-                    Log.Info($"Unload scene '{sceneAssetName}' succeed.");
+                    Log.Debug($"Unload scene '{sceneAssetName}' succeed.");
                     unloadSceneCallbacks.UnloadSceneSuccessCallback?.Invoke(sceneAssetName, userData);
                 }
                 else

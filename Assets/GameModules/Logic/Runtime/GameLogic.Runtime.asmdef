@@ -1,3 +1,17 @@
 {
-	"name": "GameLogic.Runtime"
+    "name": "GameLogic.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:1d849fa9517835640946a01c595fd648",
+        "GUID:363c5eb08ff8e6a439b85e37b8c20d96"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

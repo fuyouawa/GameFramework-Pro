@@ -320,6 +320,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameFramework
       objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.data[0].m_Name
+      value: Music
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.data[1].m_Name
+      value: Sound
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.data[2].m_Name
+      value: UISound
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.data[0].m_AgentHelperCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.data[1].m_AgentHelperCount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680536787472966621, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_SoundGroups.Array.data[2].m_AgentHelperCount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3998953907903142514, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_DefaultPackageName
+      value: Common
+      objectReference: {fileID: 0}
     - target: {fileID: 7510343117618053930, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

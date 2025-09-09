@@ -16,7 +16,7 @@ MonoBehaviour:
   ShowEditorAlias: 1
   UniqueBundleName: 1
   Packages:
-  - PackageName: Main
+  - PackageName: Common
     PackageDesc: 
     EnableAddressable: 1
     LocationToLower: 0
@@ -29,8 +29,21 @@ MonoBehaviour:
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/GameRes/Main/Audio
+      - CollectPath: Assets/GameRes/Common/Audio
         CollectorGUID: 933262fd963a30545be8b2b363a3bbe0
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+    - GroupName: Config
+      GroupDesc: 
+      AssetTags: Preload
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/GameRes/Common/Config
+        CollectorGUID: 9ab1e7d8937fcb147ba94c71e05f2dbc
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
