@@ -173,7 +173,7 @@ namespace UnityGameFramework.Runtime
 
             if (m_PlayMode == PlayMode.EditorSimulateMode)
             {
-                Log.Info(
+                Log.Debug(
                     "During this run, Game Framework will use editor resource files, which you should validate first.");
 #if !UNITY_EDITOR
                 PlayMode = EPlayMode.OfflinePlayMode;
@@ -208,7 +208,7 @@ namespace UnityGameFramework.Runtime
             m_ResourceManager.AssetExpireTime = m_AssetExpireTime;
             m_ResourceManager.AssetPriority = m_AssetPriority;
             IsInitialized = true;
-            Log.Info($"ResourceComponent Run Mode：{m_PlayMode}");
+            Log.Debug($"ResourceComponent Run Mode：{m_PlayMode}");
         }
 
         /// <summary>
