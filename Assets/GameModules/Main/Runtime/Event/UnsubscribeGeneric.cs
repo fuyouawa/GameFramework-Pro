@@ -1,12 +1,7 @@
-using System;
+﻿using System;
 
 namespace GameMain.Runtime
 {
-    public interface IUnsubscribe
-    {
-        void Unsubscribe();
-    }
-
     public class UnsubscribeGeneric : IUnsubscribe
     {
         private readonly Action _onUnsubscribe;
@@ -21,5 +16,4 @@ namespace GameMain.Runtime
             _onUnsubscribe?.Invoke();
         }
     }
-
 }
