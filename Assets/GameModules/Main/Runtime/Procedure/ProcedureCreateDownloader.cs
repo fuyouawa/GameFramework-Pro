@@ -11,10 +11,7 @@ namespace GameMain.Runtime
     {
         protected override void OnEnter(ProcedureOwner procedureOwner)
         {
-            Log.Debug("创建补丁下载器");
-
             // UILoadMgr.Show(UIDefine.UILoadUpdate,$"创建补丁下载器...");
-
             CreateDownloader(procedureOwner).Forget();
         }
 

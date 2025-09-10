@@ -18,8 +18,6 @@ namespace GameMain.Runtime
         protected override void OnEnter(ProcedureOwner procedureOwner)
         {
             _procedureOwner = procedureOwner;
-            Log.Info("更新资源清单！！！");
-
             // UILoadMgr.Show(UIDefine.UILoadUpdate,$"更新清单文件...");
 
             GameEntry.Resource.UpdatePackageManifest(GameEntry.Resource.PackageVersion,
@@ -28,12 +26,6 @@ namespace GameMain.Runtime
 
         private void OnUpdatePackageManifestSuccess(string packageName)
         {
-            if (GameEntry.Resource.PlayMode == PlayMode.WebPlayMode)
-            {
-                ChangeState<ProcedurePreload>(_procedureOwner);
-                return;
-            }
-
             ChangeState<ProcedureCreateDownloader>(_procedureOwner);
         }
 
