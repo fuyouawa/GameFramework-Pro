@@ -1,24 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using EasyToolKit.Core;
-using EasyToolKit.Inspector;
 using UnityEngine;
 
 namespace GameMain.Runtime
 {
-    [EasyInspector]
-    [ScriptableObjectSingletonAssetPath("Assets/Resources/Settings")]
-    public class GameSettings : ScriptableObjectSingleton<GameSettings>
+    public class GameSettings : ScriptableObject
     {
-        [Title("Assets")] [ListDrawerSettings(ShowIndexLabel = false)] [SerializeField]
-        private List<string> _preloadAssetTags;
+        private static GameSettings s_instance;
 
-        [Title("HybridCLR")] [ListDrawerSettings(ShowIndexLabel = false)] [SerializeField]
-        private List<string> _hotUpdateAssemblyNames = new List<string>();
+        public static GameSettings Instance
+        {
+            get
+            {
+                if (s_instance == null)
+                {
+                    s_instance = Resources.Load<GameSettings>("GameSettings");
+                    if (s_instance == null)
+                    {
+#if UNITY_EDITOR
+                        s_instance = CreateInstance<GameSettings>();
+                        UnityEditor.AssetDatabase.CreateAsset(s_instance, "Assets/Resources/GameSettings.asset");
+#else
+                        throw new Exception("GameSettings is not found.");
+#endif
+                    }
+                }
+                return s_instance;
+            }
+        }
 
-        [ListDrawerSettings(ShowIndexLabel = false)] [SerializeField]
-        private List<string> _aotMetaAssemblyNames = new List<string>();
+        [Header("Assets")]
+        [SerializeField] private List<string> _preloadAssetTags;
+
+        [Header("HybridCLR")]
+        [SerializeField] private List<string> _hotUpdateAssemblyNames = new List<string>();
+
+        [SerializeField] private List<string> _aotMetaAssemblyNames = new List<string>();
 
         public IReadOnlyList<string> PreloadAssetTags => _preloadAssetTags;
 

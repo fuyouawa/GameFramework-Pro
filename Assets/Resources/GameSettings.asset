@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1081994611, guid: 81aeb58f16b246a49966556b632e412f, type: 3}
-  m_Name: InspectorConfigAsset
+  m_Script: {fileID: 11500000, guid: 32b99416c8674f65beb2da579707937c, type: 3}
+  m_Name: GameSettings
   m_EditorClassIdentifier: 
-  _drawMonoScriptInEditor: 1
-  _instantiateReferenceObjectIfNull: 1
+  _preloadAssetTags: []
+  _hotUpdateAssemblyNames: []
+  _aotMetaAssemblyNames: []
