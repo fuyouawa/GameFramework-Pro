@@ -13,6 +13,9 @@ namespace GameLogic.Runtime
             Log.Warning("======= 看到此条日志代表你成功运行了热更新代码 =======");
             Log.Warning("======= Entrance =======");
 
+            NetworkChannelHelper.SetAgent(new NetworkChannelAgent());
+            NetworkPacket.SetHelper(new NetworkPacketHelper());
+
             // GameEntry.DataTable.GetDataTable<Test>();
         }
     }

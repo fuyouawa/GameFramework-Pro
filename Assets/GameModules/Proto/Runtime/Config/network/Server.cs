@@ -31,6 +31,10 @@ public string Host { get; private set; }
     /// 端口
     /// </summary>
 public int Port { get; private set; }
+    /// <summary>
+    /// 网络包头长度
+    /// </summary>
+public int PackageHeaderLength { get; private set; }
 
 public const int __ID__ = 1275148067;
 
@@ -44,6 +48,7 @@ int GameFramework.DataTable.IDataRow.Id => Id;
         { if(!__node["type"].IsNumber) { throw new SerializationException(); }  Type = (network.ServerType)__node["type"].AsInt; }
         { if(!__node["host"].IsString) { throw new SerializationException(); }  Host = __node["host"]; }
         { if(!__node["port"].IsNumber) { throw new SerializationException(); }  Port = __node["port"]; }
+        { if(!__node["package_header_length"].IsNumber) { throw new SerializationException(); }  PackageHeaderLength = __node["package_header_length"]; }
         return true;
     }
 
@@ -72,6 +77,7 @@ int GameFramework.DataTable.IDataRow.Id => Id;
         + "type:" + Type + ","
         + "host:" + Host + ","
         + "port:" + Port + ","
+        + "packageHeaderLength:" + PackageHeaderLength + ","
         + "}";
     }
 }

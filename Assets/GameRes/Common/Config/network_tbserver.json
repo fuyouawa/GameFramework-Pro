@@ -3,12 +3,14 @@
     "id": 1001,
     "type": 0,
     "host": "127.0.0.1",
-    "port": 10086
+    "port": 10086,
+    "package_header_length": 4
   },
   {
     "id": 1002,
     "type": 1,
     "host": "127.0.0.1",
-    "port": 10086
+    "port": 10086,
+    "package_header_length": 4
   }
 ]

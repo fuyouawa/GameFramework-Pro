@@ -10,11 +10,13 @@ namespace GameMain.Runtime
         public static async UniTask LoadDataTableAsync(
             this DataTableComponent dataTableComponent,
             Type dataRowType,
-            string dataTableName,
             string assetName,
+            string dataTableName = "",
             string customPackageName = "")
         {
-            var table = dataTableComponent.CreateDataTable(dataRowType, dataTableName);
+            var table = string.IsNullOrEmpty(dataTableName)
+                ? dataTableComponent.CreateDataTable(dataRowType)
+                : dataTableComponent.CreateDataTable(dataRowType, dataTableName);
             var textAsset = await GameEntry.Resource.LoadAssetAsync<TextAsset>(assetName, customPackageName);
             table.ParseData(textAsset.text);
         }
