@@ -1,8 +1,6 @@
 ﻿using GameMain.Runtime;
-using GameProto.Runtime;
 using JetBrains.Annotations;
 using UnityGameFramework.Runtime;
-using GameEntry = GameMain.Runtime.GameEntry;
 
 namespace GameLogic.Runtime
 {

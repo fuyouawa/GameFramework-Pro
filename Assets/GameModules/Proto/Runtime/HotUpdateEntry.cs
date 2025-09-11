@@ -14,13 +14,9 @@ namespace GameProto.Runtime
         [HotUpdateEntry, UsedImplicitly]
         public static void Initialize()
         {
-            // TablesLoader.LoadTablesAsync(LoadTableAsync).ContinueWith(() =>
-            // {
-            //     Log.Debug("Load tables success.");
-            // }).Forget();
             UniTask.WhenAll(Tables.DataTableInfos.Select(LoadTableAsync)).ContinueWith(() =>
             {
-                Log.Debug("Load tables success.");
+                Log.Info("Load tables success.");
             }).Forget();
         }
 

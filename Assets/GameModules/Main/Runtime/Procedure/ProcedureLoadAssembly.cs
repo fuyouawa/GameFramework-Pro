@@ -71,7 +71,6 @@ namespace GameMain.Runtime
                 var callbacks = new LoadAssetCallbacks(OnLoadAssemblyAssetSuccess, OnLoadAssemblyAssetFailure);
                 foreach (string hotUpdateAssemblyName in GameSettings.Instance.HotUpdateAssemblyNames)
                 {
-                    Log.Debug($"LoadAsset: [ {hotUpdateAssemblyName} ]");
                     m_LoadAssetCount++;
                     GameEntry.Resource.LoadAsset(hotUpdateAssemblyName, callbacks, assetType:typeof(TextAsset));
                 }
@@ -145,6 +144,7 @@ namespace GameMain.Runtime
             {
                 EntryAssembly(assembly);
             }
+            Log.Info("Load assemblies complete.");
             ChangeState<ProcedureStartGame>(m_ProcedureOwner);
         }
 
