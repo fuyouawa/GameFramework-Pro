@@ -33,8 +33,6 @@ namespace GameMain.Runtime
         {
             _procedureOwner = procedureOwner;
 
-            Log.Debug("开始下载更新文件！");
-
             // UILoadMgr.Show(UIDefine.UILoadUpdate,$"开始下载更新文件...");
 
             var downloader = GameEntry.Resource.GetPackageDownloader();

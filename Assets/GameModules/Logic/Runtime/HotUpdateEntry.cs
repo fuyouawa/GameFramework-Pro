@@ -15,7 +15,7 @@ namespace GameLogic.Runtime
             Log.Warning("======= 看到此条日志代表你成功运行了热更新代码 =======");
             Log.Warning("======= Entrance =======");
 
-            GameEntry.DataTable.GetDataTable<Test>();
+            // GameEntry.DataTable.GetDataTable<Test>();
         }
     }
 }

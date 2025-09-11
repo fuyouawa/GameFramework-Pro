@@ -1,0 +1,9 @@
+<module name="world">
+
+	<enum name="TileFlag" flags="1">
+		<var name="walkable" alias="可行走" />
+		<var name="obstacles" alias="障碍" />
+		<var name="water" alias="水域" />
+	</enum>
+	
+</module>

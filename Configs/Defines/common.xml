@@ -1,0 +1,17 @@
+<module name="common">
+
+    <bean name="Rect" valueType="1" sep=",">
+        <var name="x" type="float"/>
+        <var name="y" type="float"/>
+        <var name="width" type="float"/>
+        <var name="height" type="float"/>
+    </bean>
+    
+    <bean name="RectInt" valueType="1" sep=",">
+        <var name="x" type="int"/>
+        <var name="y" type="int"/>
+        <var name="width" type="int"/>
+        <var name="height" type="int"/>
+    </bean>
+    
+</module>

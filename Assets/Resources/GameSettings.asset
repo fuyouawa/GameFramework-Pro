@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32b99416c8674f65beb2da579707937c, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  _preloadAssetTags: []
-  _hotUpdateAssemblyNames: []
+  _preloadAssetTags:
+  - Preload
+  _hotUpdateAssemblyNames:
+  - GameLogic.Runtime
+  - GameProto.Runtime
   _aotMetaAssemblyNames: []
+  _hotUpdateEntryAssemblyName: GameLogic.Runtime

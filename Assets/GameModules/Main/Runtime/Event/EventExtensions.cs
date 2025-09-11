@@ -49,8 +49,16 @@ namespace GameMain.Runtime
         public static void Unsubscribe<T>(this EventComponent eventComponent, EventHandler<T> handler)
             where T : GameEventArgs
         {
-            int eventId = EventIdFastGetter<T>.EventId;
-            eventComponent.Unsubscribe(eventId, Handlers[handler]);
+            if (Handlers.TryGetValue(handler, out var eventHandler))
+            {
+                int eventId = EventIdFastGetter<T>.EventId;
+                eventComponent.Unsubscribe(eventId, eventHandler);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Unsubscribe<{typeof(T)}> must corresponds to Subscribe<{typeof(T)}>");
+            }
         }
     }
 }

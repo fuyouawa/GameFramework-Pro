@@ -9,6 +9,8 @@ using GameFramework.Resource;
 using UnityEngine;
 using UnityGameFramework.Runtime;
 using YooAsset;
+using AssetInfo = GameFramework.Resource.AssetInfo;
+using Object = UnityEngine.Object;
 using PlayMode = GameFramework.Resource.PlayMode;
 using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
@@ -19,21 +21,12 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedurePreload : ProcedureBase
     {
-        private float _progress = 0f;
-
-        private readonly Dictionary<string, bool> _loadedFlag = new Dictionary<string, bool>();
-
-        private readonly bool _needProLoad = true;
-
-        /// <summary>
-        /// 预加载回调。
-        /// </summary>
-        private LoadAssetCallbacks m_PreLoadAssetCallbacks;
+        private ProcedureOwner _procedureOwner;
 
         protected override void OnInit(ProcedureOwner procedureOwner)
         {
             base.OnInit(procedureOwner);
-            m_PreLoadAssetCallbacks = new LoadAssetCallbacks(OnPreLoadAssetSuccess, OnPreLoadAssetFailure);
+            _procedureOwner = procedureOwner;
         }
 
 
@@ -41,119 +34,38 @@ namespace GameMain.Runtime
         {
             base.OnEnter(procedureOwner);
 
-            _loadedFlag.Clear();
-
-            // UILoadMgr.Show(UIDefine.UILoadUpdate, Utility.Text.Format(LoadText.Instance.Label_Load_Load_Progress, 0));
-            //
-            // GameEvent.Send("UILoadUpdate.RefreshVersion");
-
-            PreloadResources();
-        }
-
-        protected override void OnUpdate(ProcedureOwner procedureOwner, float elapseSeconds, float realElapseSeconds)
-        {
-            base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
-
-            var totalCount = _loadedFlag.Count <= 0 ? 1 : _loadedFlag.Count;
-
-            var loadCount = _loadedFlag.Count <= 0 ? 1 : 0;
-
-            foreach (KeyValuePair<string, bool> loadedFlag in _loadedFlag)
+            if (GameSettings.Instance.PreloadAssetTags.Count == 0)
             {
-                if (!loadedFlag.Value)
-                {
-                    break;
-                }
-                else
-                {
-                    loadCount++;
-                }
+                OnPreloadComplete();
+                return;
             }
 
-            if (_loadedFlag.Count != 0)
+            var assetInfos = GameEntry.Resource.GetAssetInfos(GameSettings.Instance.PreloadAssetTags.ToArray());
+
+            if (assetInfos.Length > 0)
             {
-                // UILoadMgr.Show(UIDefine.UILoadUpdate, Utility.Text.Format(LoadText.Instance.Label_Load_Load_Progress, (float)loadCount / totalCount * 100));
+                UniTask.WhenAll(assetInfos.Select(LoadAssetAsync)).ContinueWith(OnPreloadComplete);
             }
             else
             {
-                // GameEvent.Send(StringId.StringToHash("DownProgress"), _progress);
-                //
-                // string progressStr = $"{_progress * 100:f1}";
-                //
-                // if (Math.Abs(_progress - 1f) < 0.001f)
-                // {
-                //     UILoadMgr.Show(UIDefine.UILoadUpdate, "加载完成");
-                // }
-                // else
-                // {
-                //     UILoadMgr.Show(UIDefine.UILoadUpdate, Utility.Text.Format(LoadText.Instance.Label_Load_Load_Progress, progressStr));
-                // }
-            }
-
-            if (loadCount < totalCount)
-            {
-                return;
-            }
-
-            ChangeState<ProcedureLoadAssembly>(procedureOwner);
-        }
-
-
-        public IEnumerator SmoothValue(float value, float duration, Action callback = null)
-        {
-            float time = 0f;
-            while (time < duration)
-            {
-                time += Time.deltaTime;
-                var result = Mathf.Lerp(0, value, time / duration);
-                _progress = result;
-                yield return new WaitForEndOfFrame();
-            }
-
-            _progress = value;
-            callback?.Invoke();
-        }
-
-        private void PreloadResources()
-        {
-            // await SmoothValue(1f, 1.2f).ToUniTask(GameModule.Procedure);
-            if (_needProLoad)
-            {
-                PreLoad();
+                OnPreloadComplete();
             }
         }
 
-        private void PreLoad()
+        private async UniTask LoadAssetAsync(AssetInfo assetInfo)
         {
-            if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
-            {
-                return;
-            }
-
-            string[] preLoadTags = GameSettings.Instance.PreloadAssetTags.ToArray();
-            var assetInfos = GameEntry.Resource.GetAssetInfos(preLoadTags);
-            foreach (var assetInfo in assetInfos)
-            {
-                PreLoad(assetInfo.AssetName);
-            }
+            var asset = await GameEntry.Resource.LoadAssetAsync(assetInfo.AssetName, assetInfo.PackageName, assetInfo.AssetType);
+            OnLoadAssetSuccess(asset);
         }
 
-        private void PreLoad(string configName)
+        private void OnLoadAssetSuccess(Object asset)
         {
-            _loadedFlag.Add(configName, false);
-            GameEntry.Resource.LoadAsset(configName, m_PreLoadAssetCallbacks, null);
         }
 
-        private void OnPreLoadAssetFailure(string assetName, LoadResourceStatus status, string errormessage, object userdata)
+        private void OnPreloadComplete()
         {
-            Log.Warning("Can not preload asset from '{0}' with error message '{1}'.", assetName, errormessage);
-            _loadedFlag[assetName] = true;
-        }
-
-        private void OnPreLoadAssetSuccess(string assetName, object asset, float duration, object userdata)
-        {
-            Log.Debug("Success preload asset from '{0}' duration '{1}'.", assetName, duration);
-            _loadedFlag[assetName] = true;
+            Log.Info("Preload complete");
+            ChangeState<ProcedureLoadAssembly>(_procedureOwner);
         }
     }
 }

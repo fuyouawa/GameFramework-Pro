@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1001,
+    "name": "小智",
+    "walk_speed": 3,
+    "run_speed": 6
+  }
+]

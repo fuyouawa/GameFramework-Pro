@@ -161,7 +161,7 @@ namespace GameMain.Runtime
         public override bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
         {
             var package = YooAssets.GetPackage(assetInfo.PackageName);
-            return package.IsNeedDownloadFromRemote(assetInfo.Reference as YooAsset.AssetInfo);
+            return package.IsNeedDownloadFromRemote(assetInfo.UserData as YooAsset.AssetInfo);
         }
 
         public override AssetInfo GetAssetInfo(string packageName, string assetName)

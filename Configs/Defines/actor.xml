@@ -1,0 +1,13 @@
+<module name="actor">
+
+    <bean name="Actor">
+        <var name="id" type="int" comment="Id" />
+        <var name="name" type="string" comment="名称" />
+        <var name="walk_speed" type="float" comment="走路速度（m/s）" />
+    </bean>
+
+    <bean name="Player" parent="Actor">
+        <var name="run_speed" type="float" comment="跑步速度（m/s）" />
+    </bean>
+
+</module>

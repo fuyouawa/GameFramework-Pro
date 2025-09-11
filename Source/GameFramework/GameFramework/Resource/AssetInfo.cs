@@ -9,7 +9,7 @@ namespace GameFramework.Resource
         private readonly string m_Error;
         private readonly string m_AssetName;
 
-        private readonly object m_Reference;
+        private readonly object m_UserData;
 
 
         /// <summary>
@@ -35,15 +35,15 @@ namespace GameFramework.Resource
         /// <summary>
         /// 引用对象
         /// </summary>
-        public object Reference => m_Reference;
+        public object UserData => m_UserData;
 
-        public AssetInfo(string packageName, Type assetType, string assetName, string error, object reference)
+        public AssetInfo(string packageName, Type assetType, string assetName, string error, object userData)
         {
             m_PackageName = packageName;
             m_AssetType = assetType;
             m_AssetName = assetName;
             m_Error = error;
-            m_Reference = reference;
+            m_UserData = userData;
         }
     }
 }

@@ -1,0 +1,31 @@
+using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+
+{{namespace_with_grace_begin __namespace}}
+
+    public static class {{__name}}
+    {
+        public struct DataTableInfo
+        {
+            public Type DataRowType;
+            public string DataTableName;
+            public string OutputDataFile;
+
+            public DataTableInfo(Type dataRowType, string dataTableName, string outputDataFile)
+            {
+                DataRowType = dataRowType;
+                DataTableName = dataTableName;
+                OutputDataFile = outputDataFile;
+            }
+        }
+
+        public static readonly DataTableInfo[] DataTableInfos = new DataTableInfo[]
+        {
+            {{~for table in __tables ~}}
+            new DataTableInfo(typeof({{declaring_type_name table.value_ttype}}), "{{format_property_name __code_style table.name}}", "{{table.output_data_file}}"),
+            {{~end~}}
+        };
+    }
+
+{{namespace_with_grace_end __namespace}}

@@ -1,0 +1,8 @@
+<module name="network">
+
+	<enum name="ServerType" comment="服务器类型">
+		<var name="main" alias="主要" />
+		<var name="resource_download" alias="资源下载" />
+	</enum>
+
+</module>

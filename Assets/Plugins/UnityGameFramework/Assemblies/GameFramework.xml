@@ -15435,7 +15435,7 @@
             资源名称
             </summary>
         </member>
-        <member name="P:GameFramework.Resource.AssetInfo.Reference">
+        <member name="P:GameFramework.Resource.AssetInfo.UserData">
             <summary>
             引用对象
             </summary>

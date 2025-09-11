@@ -28,15 +28,7 @@ MonoBehaviour:
       GroupDesc: 
       AssetTags: 
       ActiveRuleName: EnableGroup
-      Collectors:
-      - CollectPath: Assets/GameRes/Common/Audio
-        CollectorGUID: 933262fd963a30545be8b2b363a3bbe0
-        CollectorType: 0
-        AddressRuleName: AddressByFileName
-        PackRuleName: PackDirectory
-        FilterRuleName: CollectAll
-        AssetTags: 
-        UserData: 
+      Collectors: []
     - GroupName: Config
       GroupDesc: 
       AssetTags: Preload
