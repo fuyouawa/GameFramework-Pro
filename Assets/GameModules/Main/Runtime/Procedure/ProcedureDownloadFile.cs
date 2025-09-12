@@ -21,7 +21,7 @@ namespace GameMain.Runtime
             get
             {
                 float interval = Time.deltaTime;
-                var downloader = GameEntry.Resource.GetPackageDownloader();
+                var downloader = GameEntry.Resource.GetPackageDownloader(GameEntry.Resource.DefaultPackageName);
                 var sizeDiff = downloader.CurrentDownloadBytes - _lastUpdateDownloadedSize;
                 _lastUpdateDownloadedSize = downloader.CurrentDownloadBytes;
                 var speed = (float)Math.Floor(sizeDiff / interval);
@@ -35,7 +35,7 @@ namespace GameMain.Runtime
 
             // UILoadMgr.Show(UIDefine.UILoadUpdate,$"开始下载更新文件...");
 
-            var downloader = GameEntry.Resource.GetPackageDownloader();
+            var downloader = GameEntry.Resource.GetPackageDownloader(GameEntry.Resource.DefaultPackageName);
 
             downloader.DownloadFailure += OnDownloadFailure;
             downloader.DownloadSuccess += OnDownloadSuccess;

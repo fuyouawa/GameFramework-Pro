@@ -284,7 +284,7 @@ namespace GameFramework.Resource
             string assetName,
             LoadAssetCallbacks loadAssetCallbacks,
             Type assetType = null,
-            int? priority = null,
+            int? customPriority = null,
             object userData = null)
         {
             if (string.IsNullOrEmpty(assetName))
@@ -297,7 +297,7 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Load asset callbacks is invalid.");
             }
 
-            m_ResourceLoader.LoadAsset(CurrentPackageName, assetName, assetType, priority ?? Constant.DefaultPriority,
+            m_ResourceLoader.LoadAsset(CurrentPackageName, assetName, assetType, customPriority ?? Constant.DefaultPriority,
                 loadAssetCallbacks, userData);
         }
 
@@ -315,7 +315,7 @@ namespace GameFramework.Resource
             m_ResourceLoader.UnloadAsset(asset);
         }
 
-        public void LoadScene(string sceneAssetName, LoadSceneCallbacks loadSceneCallbacks, int? priority = null,
+        public void LoadScene(string sceneAssetName, LoadSceneCallbacks loadSceneCallbacks, int? customPriority = null,
             object userData = null)
         {
             if (string.IsNullOrEmpty(sceneAssetName))
@@ -328,7 +328,7 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Load scene callbacks is invalid.");
             }
 
-            m_ResourceLoader.LoadScene(CurrentPackageName, sceneAssetName, priority ?? Constant.DefaultPriority,
+            m_ResourceLoader.LoadScene(CurrentPackageName, sceneAssetName, customPriority ?? Constant.DefaultPriority,
                 loadSceneCallbacks, userData);
         }
 

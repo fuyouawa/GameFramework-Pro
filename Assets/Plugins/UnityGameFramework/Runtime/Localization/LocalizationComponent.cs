@@ -24,11 +24,11 @@ namespace UnityGameFramework.Runtime
         private ILocalizationManager m_LocalizationManager = null;
         private EventComponent m_EventComponent = null;
 
-        [SerializeField]
-        private bool m_EnableLoadDictionaryUpdateEvent = false;
-
-        [SerializeField]
-        private bool m_EnableLoadDictionaryDependencyAssetEvent = false;
+        // [SerializeField]
+        // private bool m_EnableLoadDictionaryUpdateEvent = false;
+        //
+        // [SerializeField]
+        // private bool m_EnableLoadDictionaryDependencyAssetEvent = false;
 
         [SerializeField]
         private string m_LocalizationHelperTypeName = "UnityGameFramework.Runtime.DefaultLocalizationHelper";
@@ -121,14 +121,7 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            if (baseComponent.EditorResourceMode)
-            {
-                m_LocalizationManager.SetResourceManager(baseComponent.EditorResourceHelper);
-            }
-            else
-            {
-                m_LocalizationManager.SetResourceManager(GameFrameworkEntry.GetModule<IResourceManager>());
-            }
+            m_LocalizationManager.SetResourceManager(GameFrameworkEntry.GetModule<IResourceManager>());
 
             LocalizationHelperBase localizationHelper = Helper.CreateHelper(m_LocalizationHelperTypeName, m_CustomLocalizationHelper);
             if (localizationHelper == null)
@@ -144,7 +137,7 @@ namespace UnityGameFramework.Runtime
 
             m_LocalizationManager.SetDataProviderHelper(localizationHelper);
             m_LocalizationManager.SetLocalizationHelper(localizationHelper);
-            m_LocalizationManager.Language = baseComponent.EditorResourceMode && baseComponent.EditorLanguage != Language.Unspecified ? baseComponent.EditorLanguage : m_LocalizationManager.SystemLanguage;
+            m_LocalizationManager.Language = baseComponent.EditorLanguage != Language.Unspecified ? baseComponent.EditorLanguage : m_LocalizationManager.SystemLanguage;
             if (m_CachedBytesSize > 0)
             {
                 EnsureCachedBytesSize(m_CachedBytesSize);

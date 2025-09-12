@@ -110,41 +110,15 @@ namespace GameFramework.Scene
         /// 加载场景。
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
-        void LoadScene(string sceneAssetName);
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
-        void LoadScene(string sceneAssetName, int priority);
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
+        /// <param name="customPriority">加载场景资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        void LoadScene(string sceneAssetName, object userData);
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        void LoadScene(string sceneAssetName, int priority, object userData);
-
-        /// <summary>
-        /// 卸载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        void UnloadScene(string sceneAssetName);
+        void LoadScene(string sceneAssetName, int? customPriority = null, object userData = null);
 
         /// <summary>
         /// 卸载场景。
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
         /// <param name="userData">用户自定义数据。</param>
-        void UnloadScene(string sceneAssetName, object userData);
+        void UnloadScene(string sceneAssetName, object userData = null);
     }
 }

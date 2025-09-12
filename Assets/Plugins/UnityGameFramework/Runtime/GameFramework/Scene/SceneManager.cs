@@ -291,38 +291,9 @@ namespace GameFramework.Scene
         /// 加载场景。
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
-        public void LoadScene(string sceneAssetName)
-        {
-            LoadScene(sceneAssetName, Constant.DefaultPriority, null);
-        }
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
-        public void LoadScene(string sceneAssetName, int priority)
-        {
-            LoadScene(sceneAssetName, priority, null);
-        }
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
+        /// <param name="customPriority">加载场景资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void LoadScene(string sceneAssetName, object userData)
-        {
-            LoadScene(sceneAssetName, Constant.DefaultPriority, userData);
-        }
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public void LoadScene(string sceneAssetName, int priority, object userData)
+        public void LoadScene(string sceneAssetName, int? customPriority = null, object userData = null)
         {
             if (string.IsNullOrEmpty(sceneAssetName))
             {
@@ -350,16 +321,7 @@ namespace GameFramework.Scene
             }
 
             m_LoadingSceneAssetNames.Add(sceneAssetName);
-            m_ResourceManager.LoadScene(sceneAssetName, m_LoadSceneCallbacks, priority, userData);
-        }
-
-        /// <summary>
-        /// 卸载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        public void UnloadScene(string sceneAssetName)
-        {
-            UnloadScene(sceneAssetName, null);
+            m_ResourceManager.LoadScene(sceneAssetName, m_LoadSceneCallbacks, customPriority, userData);
         }
 
         /// <summary>
@@ -367,7 +329,7 @@ namespace GameFramework.Scene
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void UnloadScene(string sceneAssetName, object userData)
+        public void UnloadScene(string sceneAssetName, object userData = null)
         {
             if (string.IsNullOrEmpty(sceneAssetName))
             {

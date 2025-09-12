@@ -200,14 +200,14 @@ namespace GameFramework.Resource
         /// </summary>
         /// <param name="assetName">要加载资源的名称。</param>
         /// <param name="assetType">要加载资源的类型。</param>
-        /// <param name="priority">加载资源的优先级。</param>
+        /// <param name="customPriority">加载资源的优先级。</param>
         /// <param name="loadAssetCallbacks">加载资源回调函数集。</param>
         /// <param name="userData">用户自定义数据。</param>
         void LoadAsset(
             string assetName,
             LoadAssetCallbacks loadAssetCallbacks,
             Type assetType = null,
-            int? priority = null,
+            int? customPriority = null,
             object userData = null);
 
         /// <summary>
@@ -220,13 +220,13 @@ namespace GameFramework.Resource
         /// 异步加载场景。
         /// </summary>
         /// <param name="sceneAssetName">要加载场景资源的名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
+        /// <param name="customPriority">加载场景资源的优先级。</param>
         /// <param name="loadSceneCallbacks">加载场景回调函数集。</param>
         /// <param name="userData">用户自定义数据。</param>
         void LoadScene(
             string sceneAssetName,
             LoadSceneCallbacks loadSceneCallbacks,
-            int? priority = null,
+            int? customPriority = null,
             object userData = null);
 
         /// <summary>

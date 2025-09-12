@@ -32,7 +32,7 @@ namespace GameMain.Runtime
                     return;
                 }
 
-                GameEntry.Resource.InitPackage(new InitPackageCallbacks(
+                GameEntry.Resource.InitPackage(GameEntry.Resource.DefaultPackageName, new InitPackageCallbacks(
                     name => OnInitPackageSuccess(procedureOwner, name),
                     (name, error, data) => OnInitPackageFailure(procedureOwner, name, error)));
             }

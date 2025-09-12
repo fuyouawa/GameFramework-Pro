@@ -1,5 +1,6 @@
 ﻿using GameFramework;
 using GameFramework.Sound;
+using UnityEngine;
 using UnityGameFramework.Runtime;
 
 namespace GameMain.Runtime
@@ -9,7 +10,13 @@ namespace GameMain.Runtime
         private const float FadeVolumeDuration = 1f;
         private static int? s_MusicSerialId = null;
 
-        public static int? PlayMusic(this SoundComponent soundComponent, string assetName, object userData = null)
+        public static int? PlayMusic(this SoundComponent soundComponent,
+            string assetName,
+            string customPackageName = "",
+            Entity bindingEntity = null,
+            Vector3 worldPosition = new Vector3(),
+            int? customPriority = null,
+            object userData = null)
         {
             soundComponent.StopMusic();
             PlaySoundParams playSoundParams = PlaySoundParams.Create();
@@ -18,7 +25,8 @@ namespace GameMain.Runtime
             playSoundParams.VolumeInSoundGroup = 1f;
             playSoundParams.FadeInSeconds = FadeVolumeDuration;
             playSoundParams.SpatialBlend = 0f;
-            s_MusicSerialId = soundComponent.PlaySound(assetName, "Music", Constant.AssetPriority.MusicAsset, playSoundParams, null, userData);
+            s_MusicSerialId = soundComponent.PlaySound(assetName, "Music", customPackageName, playSoundParams,
+                bindingEntity, worldPosition, customPriority, userData);
             return s_MusicSerialId;
         }
 
@@ -33,7 +41,12 @@ namespace GameMain.Runtime
             s_MusicSerialId = null;
         }
 
-        public static int? PlaySound(this SoundComponent soundComponent, string assetName, Entity bindingEntity = null, object userData = null)
+        public static int? PlaySound(this SoundComponent soundComponent,
+            string assetName,
+            string customPackageName = "",
+            Entity bindingEntity = null,
+            Vector3 worldPosition = new Vector3(),
+            object userData = null)
         {
             if (string.IsNullOrEmpty(assetName))
             {
@@ -48,18 +61,24 @@ namespace GameMain.Runtime
             playSoundParams.SpatialBlend = 1;
 
             string soundAssetName = assetName;
-            return soundComponent.PlaySound(soundAssetName, "Sound", Constant.AssetPriority.SoundAsset, playSoundParams,
-                bindingEntity != null ? bindingEntity : null, userData);
+            return soundComponent.PlaySound(soundAssetName, "Sound", customPackageName, playSoundParams, bindingEntity, worldPosition, Constant.AssetPriority.SoundAsset, userData);
         }
 
-        public static int? PlayUISound(this SoundComponent soundComponent, string assetName, float volume = 1, int priority = 0, object userData = null)
+        public static int? PlayUISound(this SoundComponent soundComponent,
+            string assetName,
+            string customPackageName = "",
+            float volume = 1,
+            int priority = 0,
+            Entity bindingEntity = null,
+            Vector3 worldPosition = new Vector3(),
+            object userData = null)
         {
             PlaySoundParams playSoundParams = PlaySoundParams.Create();
             playSoundParams.Priority = priority;
             playSoundParams.Loop = false;
             playSoundParams.VolumeInSoundGroup = volume;
             playSoundParams.SpatialBlend = 0f;
-            return soundComponent.PlaySound(assetName, "UISound", Constant.AssetPriority.UISoundAsset, playSoundParams, userData);
+            return soundComponent.PlaySound(assetName, "UISound", customPackageName, playSoundParams, bindingEntity, worldPosition, Constant.AssetPriority.UISoundAsset, userData);
         }
 
         public static bool IsMuted(this SoundComponent soundComponent, string soundGroupName)

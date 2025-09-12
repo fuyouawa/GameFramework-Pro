@@ -19,7 +19,7 @@ namespace GameMain.Runtime
         {
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
 
-            var downloader = GameEntry.Resource.CreatePackageDownloader();
+            var downloader = GameEntry.Resource.CreatePackageDownloader(GameEntry.Resource.DefaultPackageName);
 
             if (downloader.TotalDownloadCount == 0)
             {

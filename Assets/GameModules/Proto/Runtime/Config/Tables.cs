@@ -34,8 +34,6 @@ namespace GameProto.Runtime.Config
         {
             new DataTableInfo(typeof(actor.Player), "TbPlayer", "actor_tbplayer"),
             new DataTableInfo(typeof(network.Server), "TbServer", "network_tbserver"),
-            new DataTableInfo(typeof(world.Tile), "TbTile", "world_tbtile"),
-            new DataTableInfo(typeof(world.MapRegion), "TbMapRegion", "world_tbmapregion"),
         };
     }
 

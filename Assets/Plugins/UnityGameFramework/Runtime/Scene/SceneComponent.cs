@@ -23,10 +23,9 @@ namespace UnityGameFramework.Runtime
     [AddComponentMenu("Game Framework/Scene")]
     public sealed class SceneComponent : GameFrameworkComponent
     {
-        private const int DefaultPriority = 0;
-
         private ISceneManager m_SceneManager = null;
         private EventComponent m_EventComponent = null;
+        private IResourceManager m_ResourceManager = null;
         private readonly SortedDictionary<string, int> m_SceneOrder = new SortedDictionary<string, int>(StringComparer.Ordinal);
         private Camera m_MainCamera = null;
         private Scene m_GameFrameworkScene = default(Scene);
@@ -86,14 +85,8 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            if (baseComponent.EditorResourceMode)
-            {
-                m_SceneManager.SetResourceManager(baseComponent.EditorResourceHelper);
-            }
-            else
-            {
-                m_SceneManager.SetResourceManager(GameFrameworkEntry.GetModule<IResourceManager>());
-            }
+            m_ResourceManager = GameFrameworkEntry.GetModule<IResourceManager>();
+            m_SceneManager.SetResourceManager(m_ResourceManager);
         }
 
         /// <summary>
@@ -236,38 +229,9 @@ namespace UnityGameFramework.Runtime
         /// 加载场景。
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
-        public void LoadScene(string sceneAssetName)
-        {
-            LoadScene(sceneAssetName, DefaultPriority, null);
-        }
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
-        public void LoadScene(string sceneAssetName, int priority)
-        {
-            LoadScene(sceneAssetName, priority, null);
-        }
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
+        /// <param name="customPriority">加载场景资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void LoadScene(string sceneAssetName, object userData)
-        {
-            LoadScene(sceneAssetName, DefaultPriority, userData);
-        }
-
-        /// <summary>
-        /// 加载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        /// <param name="priority">加载场景资源的优先级。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public void LoadScene(string sceneAssetName, int priority, object userData)
+        public void LoadScene(string sceneAssetName, string customPackageName = "", int? customPriority = null, object userData = null)
         {
             if (string.IsNullOrEmpty(sceneAssetName))
             {
@@ -275,22 +239,18 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            if (!sceneAssetName.StartsWith("Assets/", StringComparison.Ordinal) || !sceneAssetName.EndsWith(".unity", StringComparison.Ordinal))
+            // if (!sceneAssetName.StartsWith("Assets/", StringComparison.Ordinal) || !sceneAssetName.EndsWith(".unity", StringComparison.Ordinal))
+            // {
+            //     Log.Error("Scene asset name '{0}' is invalid.", sceneAssetName);
+            //     return;
+            // }
+
+            if (!string.IsNullOrEmpty(customPackageName))
             {
-                Log.Error("Scene asset name '{0}' is invalid.", sceneAssetName);
-                return;
+                m_ResourceManager.CurrentPackageName = customPackageName;
             }
 
-            m_SceneManager.LoadScene(sceneAssetName, priority, userData);
-        }
-
-        /// <summary>
-        /// 卸载场景。
-        /// </summary>
-        /// <param name="sceneAssetName">场景资源名称。</param>
-        public void UnloadScene(string sceneAssetName)
-        {
-            UnloadScene(sceneAssetName, null);
+            m_SceneManager.LoadScene(sceneAssetName, customPriority, userData);
         }
 
         /// <summary>
@@ -298,7 +258,7 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void UnloadScene(string sceneAssetName, object userData)
+        public void UnloadScene(string sceneAssetName, object userData = null)
         {
             if (string.IsNullOrEmpty(sceneAssetName))
             {

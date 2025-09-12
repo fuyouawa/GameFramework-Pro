@@ -24,6 +24,7 @@ namespace UnityGameFramework.Runtime
         private const int DefaultPriority = 0;
 
         private IDataTableManager m_DataTableManager = null;
+        private IResourceManager m_ResourceManager = null;
         private EventComponent m_EventComponent = null;
 
         [SerializeField]
@@ -88,14 +89,8 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            if (baseComponent.EditorResourceMode)
-            {
-                m_DataTableManager.SetResourceManager(baseComponent.EditorResourceHelper);
-            }
-            else
-            {
-                m_DataTableManager.SetResourceManager(GameFrameworkEntry.GetModule<IResourceManager>());
-            }
+            m_ResourceManager = GameFrameworkEntry.GetModule<IResourceManager>();
+            m_DataTableManager.SetResourceManager(m_ResourceManager);
 
             DataTableHelperBase dataTableHelper = Helper.CreateHelper(m_DataTableHelperTypeName, m_CustomDataTableHelper);
             if (dataTableHelper == null)

@@ -26,6 +26,7 @@ namespace UnityGameFramework.Runtime
 
         private IEntityManager m_EntityManager = null;
         private EventComponent m_EventComponent = null;
+        private IResourceManager m_ResourceManager = null;
 
         private readonly List<IEntity> m_InternalEntityResults = new List<IEntity>();
 
@@ -105,14 +106,8 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            if (baseComponent.EditorResourceMode)
-            {
-                m_EntityManager.SetResourceManager(baseComponent.EditorResourceHelper);
-            }
-            else
-            {
-                m_EntityManager.SetResourceManager(GameFrameworkEntry.GetModule<IResourceManager>());
-            }
+            m_ResourceManager = GameFrameworkEntry.GetModule<IResourceManager>();
+            m_EntityManager.SetResourceManager(m_ResourceManager);
 
             m_EntityManager.SetObjectPoolManager(GameFrameworkEntry.GetModule<IObjectPoolManager>());
 
@@ -371,103 +366,13 @@ namespace UnityGameFramework.Runtime
         /// <summary>
         /// 显示实体。
         /// </summary>
-        /// <typeparam name="T">实体逻辑类型。</typeparam>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
-        public void ShowEntity<T>(int entityId, string entityAssetName, string entityGroupName) where T : EntityLogic
-        {
-            ShowEntity(entityId, typeof(T), entityAssetName, entityGroupName, DefaultPriority, null);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
         /// <param name="entityId">实体编号。</param>
         /// <param name="entityLogicType">实体逻辑类型。</param>
         /// <param name="entityAssetName">实体资源名称。</param>
         /// <param name="entityGroupName">实体组名称。</param>
-        public void ShowEntity(int entityId, Type entityLogicType, string entityAssetName, string entityGroupName)
-        {
-            ShowEntity(entityId, entityLogicType, entityAssetName, entityGroupName, DefaultPriority, null);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
-        /// <typeparam name="T">实体逻辑类型。</typeparam>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
-        /// <param name="priority">加载实体资源的优先级。</param>
-        public void ShowEntity<T>(int entityId, string entityAssetName, string entityGroupName, int priority) where T : EntityLogic
-        {
-            ShowEntity(entityId, typeof(T), entityAssetName, entityGroupName, priority, null);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityLogicType">实体逻辑类型。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
-        /// <param name="priority">加载实体资源的优先级。</param>
-        public void ShowEntity(int entityId, Type entityLogicType, string entityAssetName, string entityGroupName, int priority)
-        {
-            ShowEntity(entityId, entityLogicType, entityAssetName, entityGroupName, priority, null);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
-        /// <typeparam name="T">实体逻辑类型。</typeparam>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
+        /// <param name="customPriority">加载实体资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void ShowEntity<T>(int entityId, string entityAssetName, string entityGroupName, object userData) where T : EntityLogic
-        {
-            ShowEntity(entityId, typeof(T), entityAssetName, entityGroupName, DefaultPriority, userData);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityLogicType">实体逻辑类型。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public void ShowEntity(int entityId, Type entityLogicType, string entityAssetName, string entityGroupName, object userData)
-        {
-            ShowEntity(entityId, entityLogicType, entityAssetName, entityGroupName, DefaultPriority, userData);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
-        /// <typeparam name="T">实体逻辑类型。</typeparam>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
-        /// <param name="priority">加载实体资源的优先级。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public void ShowEntity<T>(int entityId, string entityAssetName, string entityGroupName, int priority, object userData) where T : EntityLogic
-        {
-            ShowEntity(entityId, typeof(T), entityAssetName, entityGroupName, priority, userData);
-        }
-
-        /// <summary>
-        /// 显示实体。
-        /// </summary>
-        /// <param name="entityId">实体编号。</param>
-        /// <param name="entityLogicType">实体逻辑类型。</param>
-        /// <param name="entityAssetName">实体资源名称。</param>
-        /// <param name="entityGroupName">实体组名称。</param>
-        /// <param name="priority">加载实体资源的优先级。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        public void ShowEntity(int entityId, Type entityLogicType, string entityAssetName, string entityGroupName, int priority, object userData)
+        public void ShowEntity(int entityId, Type entityLogicType, string entityAssetName, string entityGroupName, string customPackageName = "", int? customPriority = null, object userData = null)
         {
             if (entityLogicType == null)
             {
@@ -475,7 +380,12 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            m_EntityManager.ShowEntity(entityId, entityAssetName, entityGroupName, priority, ShowEntityInfo.Create(entityLogicType, userData));
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                m_ResourceManager.CurrentPackageName = customPackageName;
+            }
+
+            m_EntityManager.ShowEntity(entityId, entityAssetName, entityGroupName, customPriority, ShowEntityInfo.Create(entityLogicType, userData));
         }
 
         /// <summary>

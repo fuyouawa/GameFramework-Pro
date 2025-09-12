@@ -27,7 +27,7 @@ namespace UnityGameFramework.Runtime
         private const int DefaultPriority = 0;
 
         private IResourceManager m_ResourceManager = null;
-        private EventComponent m_EventComponent = null;
+        // private EventComponent m_EventComponent = null;
 
         /// <summary>
         /// 资源系统运行模式。
@@ -152,6 +152,12 @@ namespace UnityGameFramework.Runtime
             set { m_ResourceManager.AssetPriority = m_AssetPriority = value; }
         }
 
+        public string CurrentPackageName
+        {
+            get => m_ResourceManager.CurrentPackageName;
+            set => m_ResourceManager.CurrentPackageName = value;
+        }
+
         public string PackageVersion { get; set; }
         public bool IsInitialized { get; private set; }
 
@@ -214,7 +220,7 @@ namespace UnityGameFramework.Runtime
         /// <summary>
         /// 初始化操作。
         /// </summary>
-        public void InitPackage(InitPackageCallbacks initPackageCallbacks, string customPackageName = "")
+        public void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
         {
             if (m_ResourceManager == null)
             {
@@ -222,17 +228,17 @@ namespace UnityGameFramework.Runtime
                 return;
             }
 
-            m_ResourceManager.InitPackage(string.IsNullOrEmpty(customPackageName)
-                    ? m_DefaultPackageName
-                    : customPackageName,
-                initPackageCallbacks);
+            m_ResourceManager.InitPackage(packageName, initPackageCallbacks);
         }
 
         public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
             string customPackageName = "",
             object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             m_ResourceManager.RequestPackageVersion(requestPackageVersionCallbacks, userData);
         }
@@ -241,7 +247,10 @@ namespace UnityGameFramework.Runtime
             UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
             string customPackageName = "", object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             m_ResourceManager.UpdatePackageManifest(packageVersion, updatePackageManifestCallbacks, userData);
         }
@@ -253,19 +262,22 @@ namespace UnityGameFramework.Runtime
         /// <returns>检查资源是否存在的结果。</returns>
         public HasAssetResult HasAsset(string assetName, string customPackageName = "")
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             return m_ResourceManager.HasAsset(assetName);
         }
 
-        public IResourcePackageDownloader CreatePackageDownloader(string customPackageName = "")
+        public IResourcePackageDownloader CreatePackageDownloader(string packageName)
         {
-            return m_ResourceManager.CreatePackageDownloader(GetPackageName(customPackageName));
+            return m_ResourceManager.CreatePackageDownloader(packageName);
         }
 
-        public IResourcePackageDownloader GetPackageDownloader(string customPackageName = "")
+        public IResourcePackageDownloader GetPackageDownloader(string packageName)
         {
-            return m_ResourceManager.GetPackageDownloader(GetPackageName(customPackageName));
+            return m_ResourceManager.GetPackageDownloader(packageName);
         }
 
         /// <summary>
@@ -275,14 +287,20 @@ namespace UnityGameFramework.Runtime
         /// <returns></returns>
         public AssetInfo GetAssetInfo(string assetName, string customPackageName = "")
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             return m_ResourceManager.GetAssetInfo(assetName);
         }
 
         public AssetInfo[] GetAssetInfos(string[] tags, string customPackageName = "")
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             return m_ResourceManager.GetAssetInfos(tags);
         }
@@ -303,7 +321,10 @@ namespace UnityGameFramework.Runtime
             int? priority = null,
             object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             m_ResourceManager.LoadAsset(assetName, loadAssetCallbacks, assetType, priority, userData);
         }
@@ -336,7 +357,10 @@ namespace UnityGameFramework.Runtime
             int? priority = null,
             object userData = null)
         {
-            m_ResourceManager.CurrentPackageName = GetPackageName(customPackageName);
+            if (!string.IsNullOrEmpty(customPackageName))
+            {
+                CurrentPackageName = customPackageName;
+            }
 
             m_ResourceManager.LoadScene(sceneAssetName, loadSceneCallbacks, priority, userData);
         }
@@ -362,20 +386,12 @@ namespace UnityGameFramework.Runtime
         }
 
         public void ClearPackageCacheFiles(
+            string packageName,
             FileClearMode fileClearMode,
             ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
-            string customPackageName = "",
             object userData = null)
         {
-            m_ResourceManager.ClearPackageCacheFiles(string.IsNullOrEmpty(customPackageName)
-                    ? m_DefaultPackageName
-                    : customPackageName,
-                fileClearMode, clearPackageCacheFilesCallbacks, userData);
-        }
-
-        private string GetPackageName(string packageName)
-        {
-            return string.IsNullOrEmpty(packageName) ? m_DefaultPackageName : packageName;
+            m_ResourceManager.ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
         }
     }
 }
