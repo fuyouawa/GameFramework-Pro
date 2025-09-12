@@ -15,6 +15,11 @@ namespace GameFramework
     /// </summary>
     public static partial class ReferencePool
     {
+        private struct ReferenceCollectionFastGetter<T> where T : class, IReference
+        {
+            public static readonly ReferenceCollection Instance = GetReferenceCollection(typeof(T));
+        }
+
         private static readonly Dictionary<Type, ReferenceCollection> s_ReferenceCollections = new Dictionary<Type, ReferenceCollection>();
         private static bool m_EnableStrictCheck = false;
 
@@ -88,7 +93,8 @@ namespace GameFramework
         /// <returns>引用。</returns>
         public static T Acquire<T>() where T : class, IReference, new()
         {
-            return GetReferenceCollection(typeof(T)).Acquire<T>();
+            return ReferenceCollectionFastGetter<T>.Instance.Acquire<T>();
+            // return GetReferenceCollection(typeof(T)).Acquire<T>();
         }
 
         /// <summary>
@@ -106,17 +112,35 @@ namespace GameFramework
         /// 将引用归还引用池。
         /// </summary>
         /// <param name="reference">引用。</param>
-        public static void Release(IReference reference)
+        public static void Release<T>(T reference) where T : class, IReference
         {
             if (reference == null)
             {
                 throw new GameFrameworkException("Reference is invalid.");
             }
 
-            Type referenceType = reference.GetType();
-            InternalCheckReferenceType(referenceType);
-            GetReferenceCollection(referenceType).Release(reference);
+            if (typeof(T).IsAbstract || typeof(T).IsInterface)
+            {
+                InternalCheckReferenceType(reference.GetType());
+            }
+            ReferenceCollectionFastGetter<T>.Instance.Release(reference);
         }
+
+        // /// <summary>
+        // /// 将引用归还引用池。
+        // /// </summary>
+        // /// <param name="reference">引用。</param>
+        // public static void Release(IReference reference)
+        // {
+        //     if (reference == null)
+        //     {
+        //         throw new GameFrameworkException("Reference is invalid.");
+        //     }
+        //
+        //     Type referenceType = reference.GetType();
+        //     InternalCheckReferenceType(referenceType);
+        //     GetReferenceCollection(referenceType).Release(reference);
+        // }
 
         /// <summary>
         /// 向引用池中追加指定数量的引用。
@@ -125,7 +149,7 @@ namespace GameFramework
         /// <param name="count">追加数量。</param>
         public static void Add<T>(int count) where T : class, IReference, new()
         {
-            GetReferenceCollection(typeof(T)).Add<T>(count);
+            ReferenceCollectionFastGetter<T>.Instance.Add<T>(count);
         }
 
         /// <summary>
@@ -146,7 +170,8 @@ namespace GameFramework
         /// <param name="count">移除数量。</param>
         public static void Remove<T>(int count) where T : class, IReference
         {
-            GetReferenceCollection(typeof(T)).Remove(count);
+            ReferenceCollectionFastGetter<T>.Instance.Remove(count);
+            // GetReferenceCollection(typeof(T)).Remove(count);
         }
 
         /// <summary>
@@ -166,7 +191,7 @@ namespace GameFramework
         /// <typeparam name="T">引用类型。</typeparam>
         public static void RemoveAll<T>() where T : class, IReference
         {
-            GetReferenceCollection(typeof(T)).RemoveAll();
+            ReferenceCollectionFastGetter<T>.Instance.RemoveAll();
         }
 
         /// <summary>

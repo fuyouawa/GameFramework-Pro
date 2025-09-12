@@ -1,9 +1,18 @@
-﻿using GameMain.Runtime;
+﻿using System;
+using GameFramework;
+using GameMain.Runtime;
 using JetBrains.Annotations;
 using UnityGameFramework.Runtime;
 
 namespace GameLogic.Runtime
 {
+    public class TestEventArgs : GameEventArgs
+    {
+        public override void Clear()
+        {
+        }
+    }
+
     [UsedImplicitly]
     public class HotUpdateEntry
     {

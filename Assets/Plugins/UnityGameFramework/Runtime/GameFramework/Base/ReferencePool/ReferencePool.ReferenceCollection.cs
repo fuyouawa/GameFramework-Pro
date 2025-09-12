@@ -15,6 +15,7 @@ namespace GameFramework
         private sealed class ReferenceCollection
         {
             private readonly Queue<IReference> m_References;
+            private readonly HashSet<IReference> m_UsingReferences;
             private readonly Type m_ReferenceType;
             private int m_UsingReferenceCount;
             private int m_AcquireReferenceCount;
@@ -25,6 +26,7 @@ namespace GameFramework
             public ReferenceCollection(Type referenceType)
             {
                 m_References = new Queue<IReference>();
+                m_UsingReferences = new HashSet<IReference>();
                 m_ReferenceType = referenceType;
                 m_UsingReferenceCount = 0;
                 m_AcquireReferenceCount = 0;
@@ -112,6 +114,16 @@ namespace GameFramework
 
             public IReference Acquire()
             {
+                var reference = AcquireImpl();
+                if (m_EnableStrictCheck && !m_UsingReferences.Add(reference))
+                {
+                    throw new InvalidOperationException("Acquired a using reference.");
+                }
+                return reference;
+            }
+
+            private IReference AcquireImpl()
+            {
                 m_UsingReferenceCount++;
                 m_AcquireReferenceCount++;
                 lock (m_References)
@@ -131,7 +143,7 @@ namespace GameFramework
                 reference.Clear();
                 lock (m_References)
                 {
-                    if (m_EnableStrictCheck && m_References.Contains(reference))
+                    if (m_EnableStrictCheck && m_UsingReferences.Remove(reference))
                     {
                         throw new GameFrameworkException("The reference has been released.");
                     }
