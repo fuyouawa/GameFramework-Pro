@@ -176,7 +176,7 @@ namespace GameMain.Runtime
             var package = YooAssets.GetPackage(packageName);
             var assetInfos = package.GetAssetInfos(tags);
             return assetInfos.Select(assetInfo => new AssetInfo(assetInfo.PackageName, assetInfo.AssetType,
-                assetInfo.AssetPath, assetInfo.Error, assetInfo)).ToArray();
+                assetInfo.Address, assetInfo.Error, assetInfo)).ToArray();
         }
 
         public override void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks,

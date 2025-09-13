@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using EasyToolKit.Core;
 
 namespace GameMain.Runtime
 {
-    public class NetworkMessageRouter
+    public class NetworkMessageRouter : Singleton<NetworkMessageRouter>
     {
-        private static readonly Lazy<NetworkMessageRouter> LazyInstance = new Lazy<NetworkMessageRouter>();
-        public static NetworkMessageRouter Instance => LazyInstance.Value;
-
         private readonly Dictionary<Type, Delegate> _messageHandlersByMessageType = new Dictionary<Type, Delegate>();
 
-        public void RegisterHandler<T>(NetworkMessageHandler<T> handler)
-        {
-            RegisterHandler(typeof(T), handler);
-        }
-
-        public bool Dispatch<T>(string channelName, T message)
-        {
-            return Dispatch(channelName, typeof(T), message);
-        }
+        private NetworkMessageRouter() {}
 
         public void RegisterHandler(Type messageType, Delegate handler)
         {

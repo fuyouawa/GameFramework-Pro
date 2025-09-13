@@ -76,3 +76,6 @@ crashlytics-build.properties
 /Assets/Packages
 /HybridCLRData
 /Bundles
+
+/Assets/TextMesh Pro
+/Assets/TextMesh Pro.meta
