@@ -90,16 +90,6 @@ namespace UnityGameFramework.Runtime
         public int FailedTryAgain => m_FailedTryAgain;
 
         /// <summary>
-        /// 获取当前资源适用的游戏版本号。
-        /// </summary>
-        public string ApplicableGameVersion => m_ResourceManager.ApplicableGameVersion;
-
-        /// <summary>
-        /// 获取当前内部资源版本号。
-        /// </summary>
-        public int InternalResourceVersion => m_ResourceManager.InternalResourceVersion;
-
-        /// <summary>
         /// 获取资源只读路径。
         /// </summary>
         public string ReadOnlyPath => m_ResourceManager.ReadOnlyPath;
@@ -158,7 +148,6 @@ namespace UnityGameFramework.Runtime
             set => m_ResourceManager.CurrentPackageName = value;
         }
 
-        public string PackageVersion { get; set; }
         public bool IsInitialized { get; private set; }
 
         private void Start()
@@ -216,30 +205,6 @@ namespace UnityGameFramework.Runtime
             Log.Debug($"ResourceComponent Run Mode：{m_PlayMode}");
         }
 
-        public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
-            string customPackageName = "",
-            object userData = null)
-        {
-            if (!string.IsNullOrEmpty(customPackageName))
-            {
-                CurrentPackageName = customPackageName;
-            }
-
-            m_ResourceManager.RequestPackageVersion(requestPackageVersionCallbacks, userData);
-        }
-
-        public void UpdatePackageManifest(string packageVersion,
-            UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
-            string customPackageName = "", object userData = null)
-        {
-            if (!string.IsNullOrEmpty(customPackageName))
-            {
-                CurrentPackageName = customPackageName;
-            }
-
-            m_ResourceManager.UpdatePackageManifest(packageVersion, updatePackageManifestCallbacks, userData);
-        }
-
         /// <summary>
         /// 检查资源是否存在。
         /// </summary>
@@ -253,16 +218,6 @@ namespace UnityGameFramework.Runtime
             }
 
             return m_ResourceManager.HasAsset(assetName);
-        }
-
-        public IResourcePackageDownloader CreatePackageDownloader(string packageName)
-        {
-            return m_ResourceManager.CreatePackageDownloader(packageName);
-        }
-
-        public IResourcePackageDownloader GetPackageDownloader(string packageName)
-        {
-            return m_ResourceManager.GetPackageDownloader(packageName);
         }
 
         /// <summary>

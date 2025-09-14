@@ -22,17 +22,6 @@ namespace UnityGameFramework.Runtime
         public abstract AssetInfo GetAssetInfo(string packageName, string assetName);
         public abstract AssetInfo[] GetAssetInfos(string packageName, string[] tags);
 
-        public abstract void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks,
-            object userData);
-
-        public abstract void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
-            object userData);
-
-        public abstract IResourcePackageDownloader CreatePackageDownloader(string packageName);
-
-        // public abstract void ClearPackageCacheFiles(string packageName, FileClearMode fileClearMode,
-        //     ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks, object userData);
-
         public abstract void UnloadScene(string sceneAssetName, object sceneAsset, UnloadSceneCallbacks unloadSceneCallbacks,
             object userData);
     }

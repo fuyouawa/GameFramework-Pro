@@ -7,18 +7,6 @@
         AssetInfo GetAssetInfo(string packageName, string assetName);
         AssetInfo[] GetAssetInfos(string packageName, string[] tags);
 
-        void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData);
-        void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData);
-
-
-        IResourcePackageDownloader CreatePackageDownloader(string packageName);
-
-        // void ClearPackageCacheFiles(
-        //     string packageName,
-        //     FileClearMode fileClearMode,
-        //     ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
-        //     object userData = null);
-
         /// <summary>
         /// 卸载场景。
         /// </summary>

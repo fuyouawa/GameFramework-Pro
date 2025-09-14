@@ -22,20 +22,22 @@ namespace GameMain.Runtime
             _procedureOwner = procedureOwner;
         }
 
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            base.OnEnter(procedureOwner);
-
             YooAssets.Initialize();
 
-            InitPackagesAsync().Forget();
-        }
+            if (YooAssets.TryGetPackage(Constant.Package.Builtin) != null)
+            {
+                var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+                await InitializePackageWithRetryAsync(packageName);
+                return;
+            }
 
-        private async UniTask InitPackagesAsync()
-        {
             try
             {
-                await GameEntry.Resource.InitializePackageAsync(Constant.Package.Builtin,
+                GameEntry.Context.Set(Constant.Context.InitializePackageName, Constant.Package.Builtin);
+
+                await InitializePackageAsync(Constant.Package.Builtin,
                     GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode
                         ? PlayMode.EditorSimulateMode
                         : PlayMode.OfflinePlayMode);
@@ -46,34 +48,123 @@ namespace GameMain.Runtime
                 Log.Error($"Initialize builtin package failed: {e}");
                 SafeErrorBox.Show("初始化内置资源包失败，游戏即将退出。");
                 ChangeState<ProcedureEndGame>(_procedureOwner);
+                return;
             }
 
-            await InitializeDefaultPackageAsync();
+            GameEntry.Context.Set(Constant.Context.InitializePackageName, GameEntry.Resource.DefaultPackageName);
+            if (await InitializePackageWithRetryAsync(GameEntry.Resource.DefaultPackageName))
+            {
+                YooAssets.SetDefaultPackage(YooAssets.GetPackage(GameEntry.Resource.DefaultPackageName));
+                ChangeState<ProcedureUpdateVersion>(_procedureOwner);
+            }
+            else
+            {
+                ChangeState<ProcedureEndGame>(_procedureOwner);
+            }
         }
 
-        private async UniTask InitializeDefaultPackageAsync()
+        private async UniTask<bool> InitializePackageWithRetryAsync(string packageName, int retryCount = 0)
         {
             try
             {
-                await GameEntry.Resource.InitializePackageAsync(GameEntry.Resource.DefaultPackageName,
-                    GameEntry.Resource.PlayMode);
-                Log.Debug($"Initialize default package '{GameEntry.Resource.DefaultPackageName}' success.");
-                ChangeState<ProcedureUpdateVersion>(_procedureOwner);
+                await InitializePackageAsync(packageName, GameEntry.Resource.PlayMode);
+                Log.Debug($"Initialize default package '{packageName}' success.");
+                return true;
             }
             catch (Exception e)
             {
-                Log.Error($"Initialize default package '{GameEntry.Resource.DefaultPackageName}' failed: {e}");
+                Log.Error($"Initialize default package '{packageName}' failed: {e}");
 
-                var result = await GameEntry.UI.ShowMessageBoxAsync("初始化资源包失败，是否尝试重新初始化", UIMessageBoxButtons.YesNo);
+                var result = await GameEntry.UI.ShowMessageBoxAsync($"初始化资源包“{packageName}”失败，是否尝试重新初始化",
+                    UIMessageBoxType.Error,
+                    UIMessageBoxButtons.YesNo);
                 if (result == 0)
                 {
-                    InitializeDefaultPackageAsync().Forget();
+                    if (retryCount >= GameEntry.Resource.FailedTryAgain)
+                    {
+                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Error);
+                        return false;
+                    }
+
+                    if (await InitializePackageWithRetryAsync(packageName, retryCount + 1))
+                    {
+                        return true;
+                    }
                 }
-                else
-                {
-                    ChangeState<ProcedureEndGame>(_procedureOwner);
-                }
+
+                return false;
             }
+        }
+
+        private static async UniTask InitializePackageAsync(string packageName, PlayMode playMode)
+        {
+            var package = YooAssets.TryGetPackage(packageName);
+            if (package is { InitializeStatus: EOperationStatus.Succeed })
+            {
+                return;
+            }
+
+            package = YooAssets.CreatePackage(packageName);
+
+            // 编辑器下的模拟模式
+            InitializationOperation initializationOperation = null;
+            switch (playMode)
+            {
+                case PlayMode.EditorSimulateMode:
+                {
+                    var buildResult = EditorSimulateModeHelper.SimulateBuild(packageName);
+                    var packageRoot = buildResult.PackageRootDirectory;
+                    var editorFileSystemParams =
+                        FileSystemParameters.CreateDefaultEditorFileSystemParameters(packageRoot);
+                    var initParameters = new EditorSimulateModeParameters();
+                    initParameters.EditorFileSystemParameters = editorFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                // 单机运行模式
+                case PlayMode.OfflinePlayMode:
+                {
+                    var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+                    var initParameters = new OfflinePlayModeParameters();
+                    initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                // 联机运行模式
+                case PlayMode.HostPlayMode:
+                {
+                    IRemoteServices remoteServices = new RemoteServices(GameEntry.Resource.HostServerURL,
+                        GameEntry.Resource.FallbackHostServerURL);
+                    var cacheFileSystemParams =
+                        FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
+                    var buildinFileSystemParams = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+
+                    var initParameters = new HostPlayModeParameters();
+                    initParameters.BuildinFileSystemParameters = buildinFileSystemParams;
+                    initParameters.CacheFileSystemParameters = cacheFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                // WebGL运行模式
+                case PlayMode.WebPlayMode:
+                {
+                    IRemoteServices remoteServices = new RemoteServices(GameEntry.Resource.HostServerURL,
+                        GameEntry.Resource.FallbackHostServerURL);
+                    var webServerFileSystemParams = FileSystemParameters.CreateDefaultWebServerFileSystemParameters();
+                    var webRemoteFileSystemParams =
+                        FileSystemParameters.CreateDefaultWebRemoteFileSystemParameters(remoteServices); //支持跨域下载
+
+                    var initParameters = new WebPlayModeParameters();
+                    initParameters.WebServerFileSystemParameters = webServerFileSystemParams;
+                    initParameters.WebRemoteFileSystemParameters = webRemoteFileSystemParams;
+                    initializationOperation = package.InitializeAsync(initParameters);
+                    break;
+                }
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            await initializationOperation.ToUniTask();
         }
     }
 }

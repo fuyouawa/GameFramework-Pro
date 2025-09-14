@@ -195,7 +195,7 @@ namespace UnityGameFramework.Editor
                     Utility.Text.Format("{0:F2} / {1:F2}", t.LastUnloadUnusedAssetsOperationElapseSeconds, t.MaxUnloadUnusedAssetsInterval));
                 EditorGUILayout.LabelField("Read-Only Path", t?.ReadOnlyPath?.ToString());
                 EditorGUILayout.LabelField("Read-Write Path", t?.ReadWritePath?.ToString());
-                EditorGUILayout.LabelField("Applicable Game Version", t.ApplicableGameVersion ?? "<Unknwon>");
+                // EditorGUILayout.LabelField("Applicable Game Version", t.ApplicableGameVersion ?? "<Unknwon>");
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityGameFramework.Runtime;
@@ -13,27 +14,57 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureUpdateManifest : ProcedureBase
     {
-        private ProcedureOwner _procedureOwner;
-
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            _procedureOwner = procedureOwner;
-            // UILoadMgr.Show(UIDefine.UILoadUpdate,$"更新清单文件...");
-
-            GameEntry.Resource.UpdatePackageManifest(GameEntry.Resource.PackageVersion,
-                new UpdatePackageManifestCallbacks(OnUpdatePackageManifestSuccess, OnUpdatePackageManifestFailure));
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+            if (await UpdatePackageManifestWithRetryAsync(packageName))
+            {
+                ChangeState<ProcedureCreateDownloader>(procedureOwner);
+            }
+            else
+            {
+                ChangeState<ProcedureEndGame>(procedureOwner);
+            }
         }
 
-        private void OnUpdatePackageManifestSuccess(string packageName)
+        private async UniTask<bool> UpdatePackageManifestWithRetryAsync(string packageName, int retryCount = 0)
         {
-            ChangeState<ProcedureCreateDownloader>(_procedureOwner);
+            try
+            {
+                await UpdatePackageManifestAsync(packageName);
+                Log.Debug($"Update package '{packageName}' manifest success.");
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Update package '{packageName}' manifest failed: {e}");
+                var result = await GameEntry.UI.ShowMessageBoxAsync($"更新资源包“{packageName}”清单失败，是否尝试重新更新",
+                    UIMessageBoxType.Error,
+                    UIMessageBoxButtons.YesNo);
+                if (result == 0)
+                {
+                    if (retryCount >= GameEntry.Resource.FailedTryAgain)
+                    {
+                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Error);
+                        return false;
+                    }
+
+                    if (await UpdatePackageManifestWithRetryAsync(packageName, retryCount + 1))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
-        private void OnUpdatePackageManifestFailure(string packageName, string error)
+        private async UniTask UpdatePackageManifestAsync(string packageName)
         {
-            // UILoadTip.ShowMessageBox($"用户尝试更新清单失败！点击确认重试 \n \n <color=#FF0000>原因{operation.Error}</color>", MessageShowType.TwoButton,
-            //     LoadStyle.StyleEnum.Style_Retry
-            //     , () => { ChangeState<ProcedureUpdateManifest>(procedureOwner); }, UnityEngine.Application.Quit);
+            var package = YooAssets.GetPackage(packageName);
+
+            var packageVersion = GameEntry.Setting.GetString(Utility.Text.Format(Constant.Setting.PackageVersion, packageName));
+            var operation = package.UpdatePackageManifestAsync(packageVersion);
+            await operation.ToUniTask();
         }
     }
 }

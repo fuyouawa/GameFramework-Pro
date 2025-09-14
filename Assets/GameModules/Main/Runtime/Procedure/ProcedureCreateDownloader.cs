@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using GameFramework.Procedure;
+using UnityEngine;
 using UnityGameFramework.Runtime;
 using YooAsset;
 using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
@@ -9,18 +10,17 @@ namespace GameMain.Runtime
 {
     public class ProcedureCreateDownloader : ProcedureBase
     {
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            // UILoadMgr.Show(UIDefine.UILoadUpdate,$"创建补丁下载器...");
-            CreateDownloader(procedureOwner).Forget();
-        }
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+            Log.Debug($"Create downloader for package '{packageName}'");
 
-        private async UniTaskVoid CreateDownloader(ProcedureOwner procedureOwner)
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
+            var package = YooAssets.GetPackage(packageName);
+            var downloader = package.CreateResourceDownloader(
+                GameEntry.Resource.DownloadingMaxNum,
+                GameEntry.Resource.FailedTryAgain);
 
-            var downloader = GameEntry.Resource.CreatePackageDownloader(GameEntry.Resource.DefaultPackageName);
-
+            GameEntry.Context.Set(Constant.Context.PackageDownloader, downloader);
             if (downloader.TotalDownloadCount == 0)
             {
                 Log.Debug("Not found any download files !");
@@ -28,28 +28,24 @@ namespace GameMain.Runtime
             }
             else
             {
-                //A total of 10 files were found that need to be downloaded
                 Log.Debug($"Found total {downloader.TotalDownloadCount} files that need download ！");
 
-                // 发现新更新文件后，挂起流程系统
-                // 注意：开发者需要在下载前检测磁盘空间不足
-                int totalDownloadCount = downloader.TotalDownloadCount;
-                long totalDownloadBytes = downloader.TotalDownloadBytes;
+                var size = downloader.TotalDownloadBytes / 1024f / 1024f;
+                size = Mathf.Clamp(size, 0.01f, float.MaxValue);
 
-                float sizeMb = totalDownloadBytes / 1048576f;
-                sizeMb = UnityEngine.Mathf.Clamp(sizeMb, 0.1f, float.MaxValue);
-                string totalSizeMb = sizeMb.ToString("f1");
+                var index = await GameEntry.UI.ShowMessageBoxAsync(
+                    $"找到更新补丁文件，数量：{downloader.TotalDownloadCount}，大小：{size:F2}MB。\n是否下载？",
+                    UIMessageBoxType.Tip, UIMessageBoxButtons.YesNo);
 
-                // UILoadTip.ShowMessageBox($"Found update patch files, Total count {totalDownloadCount} Total size {totalSizeMb}MB", MessageShowType.TwoButton,
-                //     LoadStyle.StyleEnum.Style_StartUpdate_Notice
-                //     , () => { StartDownFile(procedureOwner: procedureOwner); }, UnityEngine.Application.Quit);
-                StartDownFile(procedureOwner);
+                if (index == 0)
+                {
+                    ChangeState<ProcedureDownloadFiles>(procedureOwner);
+                }
+                else
+                {
+                    ChangeState<ProcedureEndGame>(procedureOwner);
+                }
             }
-        }
-
-        void StartDownFile(ProcedureOwner procedureOwner)
-        {
-            ChangeState<ProcedureDownloadFile>(procedureOwner);
         }
     }
 }

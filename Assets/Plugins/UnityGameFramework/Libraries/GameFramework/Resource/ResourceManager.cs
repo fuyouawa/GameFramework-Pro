@@ -21,14 +21,11 @@ namespace GameFramework.Resource
     {
         private string m_ReadOnlyPath;
         private string m_ReadWritePath;
-        private string m_ApplicableGameVersion;
-        private int m_InternalResourceVersion;
         private IResourceHelper m_ResourceHelper;
 
         private readonly ResourceLoader m_ResourceLoader;
         private readonly Dictionary<string, AssetInfo> m_AssetInfosCache;
         private readonly Dictionary<(string packageName, string[] tags), AssetInfo[]> m_AssetInfosCacheByTags;
-        private readonly Dictionary<string, IResourcePackageDownloader> m_PackageDownloaders;
 
         /// <summary>
         /// 初始化资源管理器的新实例。
@@ -37,12 +34,9 @@ namespace GameFramework.Resource
         {
             m_ReadOnlyPath = null;
             m_ReadWritePath = null;
-            m_ApplicableGameVersion = null;
-            m_InternalResourceVersion = 0;
             m_ResourceLoader = new ResourceLoader(this);
             m_AssetInfosCache = new Dictionary<string, AssetInfo>();
             m_AssetInfosCacheByTags = new Dictionary<(string packageName, string[] tags), AssetInfo[]>();
-            m_PackageDownloaders = new Dictionary<string, IResourcePackageDownloader>();
         }
 
         /// <summary>
@@ -54,8 +48,6 @@ namespace GameFramework.Resource
             get { return 3; }
         }
 
-        public string ApplicableGameVersion => m_ApplicableGameVersion;
-        public int InternalResourceVersion => m_InternalResourceVersion;
         public PlayMode PlayMode { get; set; }
         public FileVerifyLevel FileVerifyLevel { get; set; }
         public int DownloadingMaxNum { get; set; }
@@ -162,23 +154,6 @@ namespace GameFramework.Resource
             m_ResourceLoader.AddLoadResourceAgentHelper(loadResourceAgentHelper, m_ReadOnlyPath, m_ReadWritePath);
         }
 
-        public IResourcePackageDownloader CreatePackageDownloader(string packageName)
-        {
-            var downloader = m_ResourceHelper.CreatePackageDownloader(packageName);
-            m_PackageDownloaders[packageName] = downloader;
-            return downloader;
-        }
-
-        public IResourcePackageDownloader GetPackageDownloader(string packageName)
-        {
-            if (m_PackageDownloaders.TryGetValue(packageName, out IResourcePackageDownloader downloader))
-            {
-                return downloader;
-            }
-
-            return null;
-        }
-
         public void SetResourceHelper(IResourceHelper resourceHelper)
         {
             m_ResourceHelper = resourceHelper;
@@ -249,19 +224,6 @@ namespace GameFramework.Resource
             assetInfos = m_ResourceHelper.GetAssetInfos(CurrentPackageName, tags);
             m_AssetInfosCacheByTags[key] = assetInfos;
             return assetInfos;
-        }
-
-        public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
-            object userData = null)
-        {
-            m_ResourceHelper.RequestPackageVersion(CurrentPackageName, requestPackageVersionCallbacks, userData);
-        }
-
-        public void UpdatePackageManifest(string packageVersion,
-            UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null)
-        {
-            m_ResourceHelper.UpdatePackageManifest(CurrentPackageName, packageVersion, updatePackageManifestCallbacks,
-                userData);
         }
 
         public void LoadAsset(

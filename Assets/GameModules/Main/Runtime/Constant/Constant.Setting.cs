@@ -15,6 +15,8 @@
             public const string UISoundMuted = "Setting.UISoundMuted";
             public const string UISoundVolume = "Setting.UISoundVolume";
             public const string LevelStarRecord = "Setting.Level{0}LevelStarRecord";
+
+            public const string PackageVersion = "Setting.Package{0}Version";
         }
     }
 }

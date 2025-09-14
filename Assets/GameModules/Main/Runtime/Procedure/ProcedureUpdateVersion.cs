@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityEngine;
@@ -15,47 +16,74 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureUpdateVersion : ProcedureBase
     {
-        private ProcedureOwner _procedureOwner;
-
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            _procedureOwner = procedureOwner;
-
-            base.OnEnter(procedureOwner);
-
-            // UILoadMgr.Show(UIDefine.UILoadUpdate, $"更新静态版本文件...");
-
             if (GameEntry.Resource.PlayMode is not (PlayMode.EditorSimulateMode or PlayMode.OfflinePlayMode))
             {
                 //检查设备是否能够访问互联网
-                if (Application.internetReachability == NetworkReachability.NotReachable)
+                while (Application.internetReachability != NetworkReachability.NotReachable)
                 {
-                    Log.Warning("The device is not connected to the network");
-                    // UILoadMgr.Show(UIDefine.UILoadUpdate, LoadText.Instance.Label_Net_UnReachable);
-                    // UILoadTip.ShowMessageBox(LoadText.Instance.Label_Net_UnReachable, MessageShowType.TwoButton,
-                    //     LoadStyle.StyleEnum.Style_Retry,
-                    //     GetStaticVersion().Forget,
-                    //     () => { ChangeState<ProcedureInitResources>(procedureOwner); });
+                    var i = await GameEntry.UI.ShowMessageBoxAsync("网络不可用，请检查网络链接。", UIMessageBoxType.Error,
+                        UIMessageBoxButtons.OkCancel);
+                    if (i == 1)
+                    {
+                        ChangeState<ProcedureEndGame>(procedureOwner);
+                        return;
+                    }
                 }
             }
 
-            // UILoadMgr.Show(UIDefine.UILoadUpdate, LoadText.Instance.Label_RequestVersionIng);
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+            var packageVersion = await RequestPackageVersionWithRetryAsync(packageName);
+            if (string.IsNullOrEmpty(packageVersion))
+            {
+                ChangeState<ProcedureEndGame>(procedureOwner);
+                return;
+            }
 
-            // 用户尝试更新静态版本。
-            GameEntry.Resource.RequestPackageVersion(new RequestPackageVersionCallbacks(OnRequestPackageVersionSuccess, OnRequestPackageVersionFailure));
+            GameEntry.Setting.SetString(Utility.Text.Format(Constant.Setting.PackageVersion, packageName), packageVersion);
+            ChangeState<ProcedureUpdateManifest>(procedureOwner);
         }
 
-        private void OnRequestPackageVersionSuccess(string packageName, string packageVersion)
+        private async UniTask<string> RequestPackageVersionWithRetryAsync(string packageName, int retryCount = 0)
         {
-            GameEntry.Resource.PackageVersion = packageVersion;
-            ChangeState<ProcedureUpdateManifest>(_procedureOwner);
+            try
+            {
+                var packageVersion = await RequestPackageVersionAsync(packageName);
+                Log.Debug($"Request package '{packageName}' version '{packageVersion}' success.");
+                return packageVersion;
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Update package '{packageName}' version failed: {e}");
+                var result = await GameEntry.UI.ShowMessageBoxAsync($"请求获取资源包“{packageName}”版本失败，是否尝试重新请求",
+                    UIMessageBoxType.Error,
+                    UIMessageBoxButtons.YesNo);
+                if (result == 0)
+                {
+                    if (retryCount >= GameEntry.Resource.FailedTryAgain)
+                    {
+                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Error);
+                        return null;
+                    }
+
+                    var packageVersion = await RequestPackageVersionWithRetryAsync(packageName, retryCount + 1);
+                    if (!string.IsNullOrEmpty(packageVersion))
+                    {
+                        return packageVersion;
+                    }
+                }
+
+                return null;
+            }
         }
 
-        private void OnRequestPackageVersionFailure(string packageName, string error)
+        private async UniTask<string> RequestPackageVersionAsync(string packageName)
         {
-            // UILoadTip.ShowMessageBox($"用户尝试更新静态版本失败！点击确认重试 \n \n <color=#FF0000>原因{error}</color>", MessageShowType.TwoButton,
-            //     LoadStyle.StyleEnum.Style_Retry
-            //     , () => { ChangeState<ProcedureUpdateVersion>(_procedureOwner); }, UnityEngine.Application.Quit);
+            var package = YooAssets.GetPackage(packageName);
+            var operation = package.RequestPackageVersionAsync();
+            await operation.ToUniTask();
+            return operation.PackageVersion;
         }
     }
 }

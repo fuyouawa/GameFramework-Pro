@@ -34,6 +34,7 @@ namespace GameMain.Runtime
         {
             base.OnEnter(procedureOwner);
 
+            Log.Debug("Preload assets");
             if (GameConfigAsset.Instance.PreloadAssetTags.Count == 0)
             {
                 OnPreloadComplete();

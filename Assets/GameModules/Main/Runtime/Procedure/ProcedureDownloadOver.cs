@@ -10,6 +10,7 @@ namespace GameMain.Runtime
 
         protected override void OnEnter(ProcedureOwner procedureOwner)
         {
+            Log.Debug("DownloadOver");
             // UILoadMgr.Show(UIDefine.UILoadUpdate,$"下载完成...");
         }
 

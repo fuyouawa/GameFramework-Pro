@@ -1,14 +1,18 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityEngine;
+using UnityGameFramework.Runtime;
+using YooAsset;
 using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
-    public class ProcedureDownloadFile : ProcedureBase
+    public class ProcedureDownloadFiles : ProcedureBase
     {
         private ProcedureOwner _procedureOwner;
+        private ResourceDownloaderOperation _downloader;
 
         private float _lastUpdateDownloadedSize;
 
@@ -17,9 +21,8 @@ namespace GameMain.Runtime
             get
             {
                 float interval = Time.deltaTime;
-                var downloader = GameEntry.Resource.GetPackageDownloader(GameEntry.Resource.DefaultPackageName);
-                var sizeDiff = downloader.CurrentDownloadBytes - _lastUpdateDownloadedSize;
-                _lastUpdateDownloadedSize = downloader.CurrentDownloadBytes;
+                var sizeDiff = _downloader.CurrentDownloadBytes - _lastUpdateDownloadedSize;
+                _lastUpdateDownloadedSize = _downloader.CurrentDownloadBytes;
                 var speed = (float)Math.Floor(sizeDiff / interval);
                 return speed;
             }
@@ -28,19 +31,21 @@ namespace GameMain.Runtime
         protected override void OnEnter(ProcedureOwner procedureOwner)
         {
             _procedureOwner = procedureOwner;
+            _downloader = GameEntry.Context.Get<ResourceDownloaderOperation>(Constant.Context.PackageDownloader);
 
-            // UILoadMgr.Show(UIDefine.UILoadUpdate,$"开始下载更新文件...");
+            _downloader.DownloadFinishCallback += OnDownloadFinish;
+            _downloader.DownloadErrorCallback += OnDownloadError;
+            _downloader.DownloadUpdateCallback += OnDownloadUpdate;
 
-            var downloader = GameEntry.Resource.GetPackageDownloader(GameEntry.Resource.DefaultPackageName);
-
-            downloader.DownloadFailure += OnDownloadFailure;
-            downloader.DownloadSuccess += OnDownloadSuccess;
-            downloader.DownloadUpdate += OnDownloadUpdate;
-
-            downloader.BeginDownload();
+            _downloader.BeginDownload();
         }
 
-        private void OnDownloadUpdate(object sender, ResourcePackageDownloadUpdateEventArgs e)
+        private void OnDownloadFinish(DownloaderFinishData data)
+        {
+            ChangeState<ProcedureDownloadOver>(_procedureOwner);
+        }
+
+        private void OnDownloadUpdate(DownloadUpdateData data)
         {
             // string currentSizeMb = (currentDownloadBytes / 1048576f).ToString("f1");
             // string totalSizeMb = (totalDownloadBytes / 1048576f).ToString("f1");
@@ -67,16 +72,24 @@ namespace GameMain.Runtime
             // Log.Info(updateProgress);
         }
 
-        private void OnDownloadSuccess(object sender, ResourcePackageDownloadSuccessEventArgs e)
+        private void OnDownloadError(DownloadErrorData data)
         {
-            ChangeState<ProcedureDownloadOver>(_procedureOwner);
-        }
-
-        private void OnDownloadFailure(object sender, ResourcePackageDownloadFailureEventArgs e)
-        {
-            // UILoadTip.ShowMessageBox($"Failed to download file : {fileName}", MessageShowType.TwoButton,
-            //     LoadStyle.StyleEnum.Style_Default
-            //     , () => { ChangeState<ProcedureCreateDownloader>(_procedureOwner); }, UnityEngine.Application.Quit);
+            Log.Error($"Download files failed: {data.ErrorInfo}");
+            GameEntry.UI.ShowMessageBoxAsync($"下载资源失败，是否尝试重新下载？",
+                    UIMessageBoxType.Error,
+                    UIMessageBoxButtons.YesNo)
+                .ContinueWith(i =>
+                {
+                    if (i == 0)
+                    {
+                        ChangeState<ProcedureCreateDownloader>(_procedureOwner);
+                    }
+                    else
+                    {
+                        ChangeState<ProcedureEndGame>(_procedureOwner);
+                    }
+                })
+                .Forget();
         }
     }
 }

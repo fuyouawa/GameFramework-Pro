@@ -5,11 +5,8 @@
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 
-using GameFramework.Download;
-using GameFramework.FileSystem;
 using GameFramework.ObjectPool;
 using System;
-using System.Collections.Generic;
 
 namespace GameFramework.Resource
 {
@@ -62,16 +59,6 @@ namespace GameFramework.Resource
     /// </summary>
     public interface IResourceManager
     {
-        /// <summary>
-        /// 获取当前资源适用的游戏版本号。
-        /// </summary>
-        string ApplicableGameVersion { get; }
-
-        /// <summary>
-        /// 获取当前内部资源版本号。
-        /// </summary>
-        int InternalResourceVersion { get; }
-
         /// <summary>
         /// 获取或设置运行模式。
         /// </summary>
@@ -150,9 +137,6 @@ namespace GameFramework.Resource
         /// <param name="loadResourceAgentHelper">要添加的加载资源代理辅助器。</param>
         void AddLoadResourceAgentHelper(ILoadResourceAgentHelper loadResourceAgentHelper);
 
-        IResourcePackageDownloader CreatePackageDownloader(string packageName);
-        IResourcePackageDownloader GetPackageDownloader(string packageName);
-
         void SetResourceHelper(IResourceHelper resourceHelper);
 
         /// <summary>
@@ -176,12 +160,6 @@ namespace GameFramework.Resource
         AssetInfo GetAssetInfo(string assetName);
 
         AssetInfo[] GetAssetInfos(string[] tags);
-
-        void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
-            object userData = null);
-
-        void UpdatePackageManifest(string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks,
-            object userData = null);
 
         /// <summary>
         /// 异步加载资源。
