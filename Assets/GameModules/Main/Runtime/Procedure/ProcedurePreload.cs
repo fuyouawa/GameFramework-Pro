@@ -34,13 +34,13 @@ namespace GameMain.Runtime
         {
             base.OnEnter(procedureOwner);
 
-            if (GameSettings.Instance.PreloadAssetTags.Count == 0)
+            if (GameConfigAsset.Instance.PreloadAssetTags.Count == 0)
             {
                 OnPreloadComplete();
                 return;
             }
 
-            var assetInfos = GameEntry.Resource.GetAssetInfos(GameSettings.Instance.PreloadAssetTags.ToArray());
+            var assetInfos = GameEntry.Resource.GetAssetInfos(GameConfigAsset.Instance.PreloadAssetTags.ToArray());
 
             if (assetInfos.Length > 0)
             {

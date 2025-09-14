@@ -1,6 +1,8 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using GameFramework.Procedure;
 using GameFramework.Resource;
+using UnityGameFramework.Runtime;
 using YooAsset;
 using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
@@ -11,86 +13,67 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureInitPackage : ProcedureBase
     {
+        private ProcedureOwner _procedureOwner;
+
+        protected override void OnInit(ProcedureOwner procedureOwner)
+        {
+            base.OnInit(procedureOwner);
+
+            _procedureOwner = procedureOwner;
+        }
+
         protected override void OnEnter(ProcedureOwner procedureOwner)
         {
             base.OnEnter(procedureOwner);
 
-            //Fire Forget立刻触发UniTask初始化Package
-            InitPackage(procedureOwner);
+            YooAssets.Initialize();
+
+            InitPackagesAsync().Forget();
         }
 
-        private void InitPackage(ProcedureOwner procedureOwner)
+        private async UniTask InitPackagesAsync()
         {
             try
             {
-                var package = YooAssets.TryGetPackage(GameEntry.Resource.DefaultPackageName);
-                if (package != null && package.InitializeStatus == EOperationStatus.Succeed)
-                {
-                    OnInitPackageSuccess(procedureOwner, GameEntry.Resource.DefaultPackageName);
-                    return;
-                }
-
-                GameEntry.Resource.InitPackage(GameEntry.Resource.DefaultPackageName, new InitPackageCallbacks(
-                    name => OnInitPackageSuccess(procedureOwner, name),
-                    (name, error, data) => OnInitPackageFailure(procedureOwner, name, error)));
+                await GameEntry.Resource.InitializePackageAsync(Constant.Package.Builtin,
+                    GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode
+                        ? PlayMode.EditorSimulateMode
+                        : PlayMode.OfflinePlayMode);
+                Log.Debug($"Initialize builtin package success.");
             }
             catch (Exception e)
             {
-                OnInitPackageFailure(procedureOwner, GameEntry.Resource.DefaultPackageName, e.Message);
+                Log.Error($"Initialize builtin package failed: {e}");
+                SafeErrorBox.Show("初始化内置资源包失败，游戏即将退出。");
+                ChangeState<ProcedureEndGame>(_procedureOwner);
             }
+
+            await InitializeDefaultPackageAsync();
         }
 
-        private void OnInitPackageSuccess(ProcedureOwner procedureOwner, string packageName)
+        private async UniTask InitializeDefaultPackageAsync()
         {
-            // // 编辑器模式。
-            // if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
-            // {
-            //     Log.Debug("Editor resource mode detected.");
-            //     ChangeState<ProcedurePreload>(procedureOwner);
-            // }
-            // // 单机模式。
-            // else if (GameEntry.Resource.PlayMode == PlayMode.OfflinePlayMode)
-            // {
-            //     Log.Debug("Package resource mode detected.");
-            //     ChangeState<ProcedureInitResources>(procedureOwner);
-            // }
-            // // 可更新模式。
-            // else if (GameEntry.Resource.PlayMode == PlayMode.HostPlayMode ||
-            //          GameEntry.Resource.PlayMode == PlayMode.WebPlayMode)
-            // {
-            //     // 打开启动UI。
-            //     // UILoadMgr.Show(UIDefine.UILoadUpdate);
-            //
-            //     Log.Debug("Updatable resource mode detected.");
-            //     ChangeState<ProcedureUpdateVersion>(procedureOwner);
-            // }
-            // else
-            // {
-            //     Log.Error("UnKnow resource mode detected Please check???");
-            // }
-            ChangeState<ProcedureUpdateVersion>(procedureOwner);
-        }
+            try
+            {
+                await GameEntry.Resource.InitializePackageAsync(GameEntry.Resource.DefaultPackageName,
+                    GameEntry.Resource.PlayMode);
+                Log.Debug($"Initialize default package '{GameEntry.Resource.DefaultPackageName}' success.");
+                ChangeState<ProcedureUpdateVersion>(_procedureOwner);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Initialize default package '{GameEntry.Resource.DefaultPackageName}' failed: {e}");
 
-        private void OnInitPackageFailure(ProcedureOwner procedureOwner, string packageName, string error)
-        {
-            // 打开启动UI。
-            // UILoadMgr.Show(UIDefine.UILoadUpdate);
-
-            // 打开启动UI。
-            // UILoadMgr.Show(UIDefine.UILoadUpdate, $"资源初始化失败！");
-            //
-            // UILoadTip.ShowMessageBox($"资源初始化失败！点击确认重试 \n \n <color=#FF0000>原因{message}</color>", MessageShowType.TwoButton,
-            //     LoadStyle.StyleEnum.Style_Retry
-            //     , () => { Retry(procedureOwner); },
-            //     GameModule.QuitApplication);
-        }
-
-        private void Retry(ProcedureOwner procedureOwner)
-        {
-            // 打开启动UI。
-            // UILoadMgr.Show(UIDefine.UILoadUpdate, $"重新初始化资源中...");
-
-            InitPackage(procedureOwner);
+                var result = await GameEntry.UI.ShowMessageBoxAsync("初始化资源包失败，是否尝试重新初始化", UIMessageBoxButtons.YesNo);
+                if (result == 0)
+                {
+                    InitializeDefaultPackageAsync().Forget();
+                }
+                else
+                {
+                    ChangeState<ProcedureEndGame>(_procedureOwner);
+                }
+            }
         }
     }
 }

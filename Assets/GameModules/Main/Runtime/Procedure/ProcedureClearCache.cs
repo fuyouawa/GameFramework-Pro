@@ -23,15 +23,7 @@ namespace GameMain.Runtime
             //
             // var operation = GameModule.Resource.ClearUnusedCacheFilesAsync();
             // operation.Completed += Operation_Completed;
-            GameEntry.Resource.ClearAllCacheFiles(
-                FileClearMode.ClearUnusedBundleFiles,
-                new ClearAllCacheFilesCallbacks(OnClearAllUnusedCacheFilesComplete, null, null));
-        }
 
-        private void OnClearAllUnusedCacheFilesComplete(bool hasError)
-        {
-            // UILoadMgr.Show(UIDefine.UILoadUpdate,$"清理完成 即将进入游戏...");
-            ChangeState<ProcedureLoadAssembly>(_procedureOwner);
         }
     }
 }

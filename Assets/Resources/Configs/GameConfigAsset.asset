@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32b99416c8674f65beb2da579707937c, type: 3}
-  m_Name: GameSettings
+  m_Name: GameConfigAsset
   m_EditorClassIdentifier: 
   _preloadAssetTags:
   - Preload

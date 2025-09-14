@@ -10,7 +10,7 @@ namespace GameMain.Runtime
     public class UIMessageBox : UIPanel
     {
         [SerializeField] private TextMeshProUGUI _titleText;
-        [SerializeField] private TextMeshProUGUI _contentText;
+        [SerializeField] private TextMeshProUGUI _messageText;
         [SerializeField] private RectTransform _buttonGroup;
 
         [SerializeField] private AssetReference _buttonAsset;
@@ -24,10 +24,18 @@ namespace GameMain.Runtime
             set => _titleText.text = value;
         }
 
-        public string Content
+        public string Message
         {
-            get => _contentText.text;
-            set => _contentText.text = value;
+            get => _messageText.text;
+            set => _messageText.text = value;
+        }
+
+        public UIMessageBoxType MessageBoxType
+        {
+            set
+            {
+                //TODO MessageBoxType
+            }
         }
 
         public void AddButton(string text, Action<Button> onClick)

@@ -22,6 +22,12 @@ namespace GameMain.Runtime
             set => _assetName = value;
         }
 
+        public AssetReference(string packageName, string assetName)
+        {
+            _packageName = packageName;
+            _assetName = assetName;
+        }
+
         public bool IsValid()
         {
             return !string.IsNullOrEmpty(_packageName) && !string.IsNullOrEmpty(_assetName);

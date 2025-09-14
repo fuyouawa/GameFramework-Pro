@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityGameFramework.Runtime;
 
 namespace GameMain.Runtime
@@ -7,6 +8,8 @@ namespace GameMain.Runtime
     {
         private CanvasGroup _canvasGroup;
         private RectTransform _rectTransform;
+
+        public event Action CloseCompleted;
 
         public CanvasGroup CanvasGroup => _canvasGroup;
         public RectTransform RectTransform => _rectTransform;
@@ -22,6 +25,12 @@ namespace GameMain.Runtime
             _rectTransform.anchorMax = Vector2.one;
             _rectTransform.anchoredPosition = Vector2.zero;
             _rectTransform.sizeDelta = Vector2.zero;
+        }
+
+        protected override void OnClose(bool isShutdown, object userData)
+        {
+            base.OnClose(isShutdown, userData);
+            CloseCompleted?.Invoke();
         }
     }
 }

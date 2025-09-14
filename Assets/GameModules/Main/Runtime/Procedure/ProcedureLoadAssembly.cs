@@ -52,7 +52,7 @@ namespace GameMain.Runtime
             {
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    foreach (var hotUpdateAssemblyName in GameSettings.Instance.HotUpdateAssemblyNames)
+                    foreach (var hotUpdateAssemblyName in GameConfigAsset.Instance.HotUpdateAssemblyNames)
                     {
                         if (hotUpdateAssemblyName == $"{assembly.GetName().Name}")
                         {
@@ -60,7 +60,7 @@ namespace GameMain.Runtime
                         }
                     }
 
-                    if (_hotUpdateAssemblys.Count == GameSettings.Instance.HotUpdateAssemblyNames.Count)
+                    if (_hotUpdateAssemblys.Count == GameConfigAsset.Instance.HotUpdateAssemblyNames.Count)
                     {
                         break;
                     }
@@ -69,7 +69,7 @@ namespace GameMain.Runtime
             else
             {
                 var callbacks = new LoadAssetCallbacks(OnLoadAssemblyAssetSuccess, OnLoadAssemblyAssetFailure);
-                foreach (string hotUpdateAssemblyName in GameSettings.Instance.HotUpdateAssemblyNames)
+                foreach (string hotUpdateAssemblyName in GameConfigAsset.Instance.HotUpdateAssemblyNames)
                 {
                     m_LoadAssetCount++;
                     GameEntry.Resource.LoadAsset(hotUpdateAssemblyName, callbacks, assetType:typeof(TextAsset));
@@ -139,7 +139,7 @@ namespace GameMain.Runtime
 
         private void AllAssemblyLoadComplete()
         {
-            _hotUpdateAssemblys.Sort(GameSettings.Instance.HotUpdateAssemblyComparison);
+            _hotUpdateAssemblys.Sort(GameConfigAsset.Instance.HotUpdateAssemblyComparison);
             foreach (var assembly in _hotUpdateAssemblys)
             {
                 EntryAssembly(assembly);
@@ -178,13 +178,13 @@ namespace GameMain.Runtime
 
             // 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
             // 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
-            if (GameSettings.Instance.AOTMetaAssemblyNames.Count == 0)
+            if (GameConfigAsset.Instance.AOTMetaAssemblyNames.Count == 0)
             {
                 m_LoadMetadataAssemblyComplete = true;
                 return;
             }
 
-            foreach (string aotDllName in GameSettings.Instance.AOTMetaAssemblyNames)
+            foreach (string aotDllName in GameConfigAsset.Instance.AOTMetaAssemblyNames)
             {
                 var assetLocation = aotDllName;
                 Log.Debug($"LoadMetadataAsset: [ {assetLocation} ]");

@@ -208,27 +208,12 @@ namespace UnityGameFramework.Runtime
             m_ResourceManager.PlayMode = m_PlayMode;
             m_ResourceManager.FileVerifyLevel = m_FileVerifyLevel;
             m_ResourceManager.Milliseconds = m_Milliseconds;
-            m_ResourceManager.Initialize();
             m_ResourceManager.AssetAutoReleaseInterval = m_AssetAutoReleaseInterval;
             m_ResourceManager.AssetCapacity = m_AssetCapacity;
             m_ResourceManager.AssetExpireTime = m_AssetExpireTime;
             m_ResourceManager.AssetPriority = m_AssetPriority;
             IsInitialized = true;
             Log.Debug($"ResourceComponent Run Mode：{m_PlayMode}");
-        }
-
-        /// <summary>
-        /// 初始化操作。
-        /// </summary>
-        public void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
-        {
-            if (m_ResourceManager == null)
-            {
-                Log.Fatal("Resource component is invalid.");
-                return;
-            }
-
-            m_ResourceManager.InitPackage(packageName, initPackageCallbacks);
         }
 
         public void RequestPackageVersion(RequestPackageVersionCallbacks requestPackageVersionCallbacks,
@@ -377,21 +362,21 @@ namespace UnityGameFramework.Runtime
             m_ResourceManager.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
         }
 
-        public void ClearAllCacheFiles(
-            FileClearMode fileClearMode,
-            ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
-            object userData = null)
-        {
-            m_ResourceManager.ClearAllCacheFiles(fileClearMode, clearAllCacheFilesCallbacks, userData);
-        }
-
-        public void ClearPackageCacheFiles(
-            string packageName,
-            FileClearMode fileClearMode,
-            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
-            object userData = null)
-        {
-            m_ResourceManager.ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
-        }
+        // public void ClearAllCacheFiles(
+        //     FileClearMode fileClearMode,
+        //     ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
+        //     object userData = null)
+        // {
+        //     m_ResourceManager.ClearAllCacheFiles(fileClearMode, clearAllCacheFilesCallbacks, userData);
+        // }
+        //
+        // public void ClearPackageCacheFiles(
+        //     string packageName,
+        //     FileClearMode fileClearMode,
+        //     ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+        //     object userData = null)
+        // {
+        //     m_ResourceManager.ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
+        // }
     }
 }

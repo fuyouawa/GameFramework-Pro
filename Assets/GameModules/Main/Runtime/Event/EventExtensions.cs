@@ -24,32 +24,32 @@ namespace GameMain.Runtime
             return EventIdByType.GetOrAdd(eventType, _ => Interlocked.Increment(ref s_nextEventId));
         }
 
-        public static IUnsubscribe Subscribe<T>(this EventComponent eventComponent, EventHandler<T> handler)
-            where T : GameEventArgs
+        public static IUnsubscribe Subscribe<T>(this EventComponent eventComponent, EventHandler<T> onEvent)
+            where T : GameFramework.Event.GameEventArgs
         {
-            if (!Handlers.TryAdd(handler, Handler))
+            if (!Handlers.TryAdd(onEvent, Handler))
             {
-                throw new ArgumentException($"Handler '{handler}' already exists.");
+                throw new ArgumentException($"Handler '{onEvent}' already exists.");
             }
 
             int eventId = EventIdFastGetter<T>.EventId;
             eventComponent.Subscribe(eventId, Handler);
             return new UnsubscribeGeneric(() =>
             {
-                Handlers.Remove(handler);
+                Handlers.Remove(onEvent);
                 eventComponent.Unsubscribe(eventId, Handler);
             });
 
             void Handler(object sender, GameFramework.Event.GameEventArgs e)
             {
-                handler(sender, (T)e);
+                onEvent(sender, (T)e);
             }
         }
 
-        public static void Unsubscribe<T>(this EventComponent eventComponent, EventHandler<T> handler)
-            where T : GameEventArgs
+        public static void Unsubscribe<T>(this EventComponent eventComponent, EventHandler<T> onEvent)
+            where T : GameFramework.Event.GameEventArgs
         {
-            if (Handlers.TryGetValue(handler, out var eventHandler))
+            if (Handlers.TryGetValue(onEvent, out var eventHandler))
             {
                 int eventId = EventIdFastGetter<T>.EventId;
                 eventComponent.Unsubscribe(eventId, eventHandler);

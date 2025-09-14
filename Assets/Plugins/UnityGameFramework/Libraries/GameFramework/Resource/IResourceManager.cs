@@ -161,18 +161,6 @@ namespace GameFramework.Resource
         /// <param name="objectPoolManager">对象池管理器。</param>
         void SetObjectPoolManager(IObjectPoolManager objectPoolManager);
 
-
-        /// <summary>
-        /// 初始化接口。
-        /// </summary>
-        void Initialize();
-
-        /// <summary>
-        /// 初始化操作。
-        /// </summary>
-        /// <param name="packageName">资源包名称。</param>
-        void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks);
-
         /// <summary>
         /// 检查资源是否存在。
         /// </summary>
@@ -237,15 +225,15 @@ namespace GameFramework.Resource
         /// <param name="userData">用户自定义数据。</param>
         void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData = null);
 
-        void ClearAllCacheFiles(
-            FileClearMode fileClearMode,
-            ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
-            object userData = null);
-
-        void ClearPackageCacheFiles(
-            string packageName,
-            FileClearMode fileClearMode,
-            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
-            object userData = null);
+        // void ClearAllCacheFiles(
+        //     FileClearMode fileClearMode,
+        //     ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
+        //     object userData = null);
+        //
+        // void ClearPackageCacheFiles(
+        //     string packageName,
+        //     FileClearMode fileClearMode,
+        //     ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+        //     object userData = null);
     }
 }

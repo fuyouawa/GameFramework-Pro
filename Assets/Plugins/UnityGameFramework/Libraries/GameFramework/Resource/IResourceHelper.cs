@@ -2,25 +2,22 @@
 {
     public interface IResourceHelper
     {
-        void Initialize();
-        void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks);
-
         bool CheckAssetNameValid(string packageName, string assetName);
         bool IsNeedDownloadFromRemote(AssetInfo assetInfo);
         AssetInfo GetAssetInfo(string packageName, string assetName);
         AssetInfo[] GetAssetInfos(string packageName, string[] tags);
 
-        void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData = null);
-        void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData = null);
+        void RequestPackageVersion(string packageName, RequestPackageVersionCallbacks requestPackageVersionCallbacks, object userData);
+        void UpdatePackageManifest(string packageName, string packageVersion, UpdatePackageManifestCallbacks updatePackageManifestCallbacks, object userData);
 
 
         IResourcePackageDownloader CreatePackageDownloader(string packageName);
 
-        void ClearPackageCacheFiles(
-            string packageName,
-            FileClearMode fileClearMode,
-            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
-            object userData = null);
+        // void ClearPackageCacheFiles(
+        //     string packageName,
+        //     FileClearMode fileClearMode,
+        //     ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+        //     object userData = null);
 
         /// <summary>
         /// 卸载场景。

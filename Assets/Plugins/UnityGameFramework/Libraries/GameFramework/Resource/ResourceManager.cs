@@ -29,7 +29,6 @@ namespace GameFramework.Resource
         private readonly Dictionary<string, AssetInfo> m_AssetInfosCache;
         private readonly Dictionary<(string packageName, string[] tags), AssetInfo[]> m_AssetInfosCacheByTags;
         private readonly Dictionary<string, IResourcePackageDownloader> m_PackageDownloaders;
-        private readonly List<string> m_InitializedPackageNames;
 
         /// <summary>
         /// 初始化资源管理器的新实例。
@@ -44,7 +43,6 @@ namespace GameFramework.Resource
             m_AssetInfosCache = new Dictionary<string, AssetInfo>();
             m_AssetInfosCacheByTags = new Dictionary<(string packageName, string[] tags), AssetInfo[]>();
             m_PackageDownloaders = new Dictionary<string, IResourcePackageDownloader>();
-            m_InitializedPackageNames = new List<string>();
         }
 
         /// <summary>
@@ -184,20 +182,6 @@ namespace GameFramework.Resource
         public void SetResourceHelper(IResourceHelper resourceHelper)
         {
             m_ResourceHelper = resourceHelper;
-        }
-
-        public void Initialize()
-        {
-            m_ResourceHelper.Initialize();
-        }
-
-        public void InitPackage(string packageName, InitPackageCallbacks initPackageCallbacks)
-        {
-            m_ResourceHelper.InitPackage(packageName, new InitPackageCallbacks(name =>
-            {
-                m_InitializedPackageNames.Add(packageName);
-                initPackageCallbacks.InitPackageSuccess?.Invoke(packageName);
-            }, initPackageCallbacks.InitPackageFailure));
         }
 
         /// <summary>
@@ -354,58 +338,58 @@ namespace GameFramework.Resource
             m_ResourceLoader.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
         }
 
-        public void ClearAllCacheFiles(
-            FileClearMode fileClearMode,
-            ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
-            object userData = null)
-        {
-            int clearingPackageCount = m_InitializedPackageNames.Count;
-            bool hasError = false;
-            var clearPackageCacheFilesCallbacks = new ClearPackageCacheFilesCallbacks(
-                OnClearPackageCacheFilesSuccess,
-                OnClearPackageCacheFilesFailure);
-
-            foreach (var packageName in m_InitializedPackageNames)
-            {
-                ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
-            }
-
-            void OnClearPackageCacheFilesSuccess(string packageName)
-            {
-                if (clearingPackageCount <= 0)
-                {
-                    throw new GameFrameworkException();
-                }
-                clearingPackageCount--;
-                clearAllCacheFilesCallbacks.ClearPackageCacheFilesSuccess?.Invoke(packageName);
-                if (clearingPackageCount == 0)
-                {
-                    clearAllCacheFilesCallbacks.ClearAllCacheFilesComplete?.Invoke(hasError);
-                }
-            }
-
-            void OnClearPackageCacheFilesFailure(string packageName, string errorMessage)
-            {
-                if (clearingPackageCount <= 0)
-                {
-                    throw new GameFrameworkException();
-                }
-                clearingPackageCount--;
-                hasError = true;
-                clearAllCacheFilesCallbacks.ClearPackageCacheFilesFailure?.Invoke(packageName, errorMessage);
-                if (clearingPackageCount == 0)
-                {
-                    clearAllCacheFilesCallbacks.ClearAllCacheFilesComplete?.Invoke(hasError);
-                }
-            }
-        }
-
-        public void ClearPackageCacheFiles(string packageName,
-            FileClearMode fileClearMode,
-            ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
-            object userData = null)
-        {
-            m_ResourceHelper.ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
-        }
+        // public void ClearAllCacheFiles(
+        //     FileClearMode fileClearMode,
+        //     ClearAllCacheFilesCallbacks clearAllCacheFilesCallbacks,
+        //     object userData = null)
+        // {
+        //     int clearingPackageCount = m_InitializedPackageNames.Count;
+        //     bool hasError = false;
+        //     var clearPackageCacheFilesCallbacks = new ClearPackageCacheFilesCallbacks(
+        //         OnClearPackageCacheFilesSuccess,
+        //         OnClearPackageCacheFilesFailure);
+        //
+        //     foreach (var packageName in m_InitializedPackageNames)
+        //     {
+        //         ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
+        //     }
+        //
+        //     void OnClearPackageCacheFilesSuccess(string packageName)
+        //     {
+        //         if (clearingPackageCount <= 0)
+        //         {
+        //             throw new GameFrameworkException();
+        //         }
+        //         clearingPackageCount--;
+        //         clearAllCacheFilesCallbacks.ClearPackageCacheFilesSuccess?.Invoke(packageName);
+        //         if (clearingPackageCount == 0)
+        //         {
+        //             clearAllCacheFilesCallbacks.ClearAllCacheFilesComplete?.Invoke(hasError);
+        //         }
+        //     }
+        //
+        //     void OnClearPackageCacheFilesFailure(string packageName, string errorMessage)
+        //     {
+        //         if (clearingPackageCount <= 0)
+        //         {
+        //             throw new GameFrameworkException();
+        //         }
+        //         clearingPackageCount--;
+        //         hasError = true;
+        //         clearAllCacheFilesCallbacks.ClearPackageCacheFilesFailure?.Invoke(packageName, errorMessage);
+        //         if (clearingPackageCount == 0)
+        //         {
+        //             clearAllCacheFilesCallbacks.ClearAllCacheFilesComplete?.Invoke(hasError);
+        //         }
+        //     }
+        // }
+        //
+        // public void ClearPackageCacheFiles(string packageName,
+        //     FileClearMode fileClearMode,
+        //     ClearPackageCacheFilesCallbacks clearPackageCacheFilesCallbacks,
+        //     object userData = null)
+        // {
+        //     m_ResourceHelper.ClearPackageCacheFiles(packageName, fileClearMode, clearPackageCacheFilesCallbacks, userData);
+        // }
     }
 }

@@ -2,19 +2,24 @@
 using System.Collections.Generic;
 using System.Reflection;
 using EasyToolKit.Core;
+using EasyToolKit.Inspector;
 using UnityEngine;
 
 namespace GameMain.Runtime
 {
-    [ScriptableObjectSingletonAssetPath("Assets/Resources")]
-    public class GameSettings : ScriptableObjectSingleton<GameSettings>
+    [EasyInspector]
+    [ScriptableObjectSingletonAssetPath("Assets/Resources/Configs")]
+    public class GameConfigAsset : ScriptableObjectSingleton<GameConfigAsset>
     {
-        [Header("Assets")]
+        [Title("Assets")]
+        [ListDrawerSettings(ShowIndexLabel = false)]
         [SerializeField] private List<string> _preloadAssetTags;
 
-        [Header("HybridCLR")]
+        [Title("HybridCLR")]
+        [ListDrawerSettings(ShowIndexLabel = false)]
         [SerializeField] private List<string> _hotUpdateAssemblyNames = new List<string>();
 
+        [ListDrawerSettings(ShowIndexLabel = false)]
         [SerializeField] private List<string> _aotMetaAssemblyNames = new List<string>();
 
         public IReadOnlyList<string> PreloadAssetTags => _preloadAssetTags;
