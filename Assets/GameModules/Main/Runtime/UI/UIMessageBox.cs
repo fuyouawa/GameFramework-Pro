@@ -51,8 +51,9 @@ namespace GameMain.Runtime
             }
         }
 
-        private void Awake()
+        protected override void OnInit(object userData)
         {
+            base.OnInit(userData);
             ClearButtons();
             _buttonAsset.LoadAssetAsync<GameObject>()
                 .ContinueWith(o => _buttonPrefab = o)
