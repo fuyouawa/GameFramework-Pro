@@ -91,11 +91,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _titleText: {fileID: 6650729920889219507}
-  _contentText: {fileID: 5899066270725170896}
+  _messageText: {fileID: 0}
   _buttonGroup: {fileID: 4170632830870014534}
   _buttonAsset:
     _packageName: Common
-    _assetName: actor_tbplayer
+    _assetName: Config_actor_tbplayer
 --- !u!114 &5779124289965723995
 MonoBehaviour:
   m_ObjectHideFlags: 0

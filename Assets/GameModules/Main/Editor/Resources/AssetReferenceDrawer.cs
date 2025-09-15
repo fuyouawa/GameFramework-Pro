@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EasyToolKit.Core;
 using EasyToolKit.Core.Editor;
 using GameMain.Runtime;
@@ -13,7 +14,7 @@ namespace GameMain.Editor
     [CustomPropertyDrawer(typeof(AssetReference))]
     public class AssetReferenceDrawer : PropertyDrawer
     {
-        struct AssetInfo
+        readonly struct AssetInfo
         {
             public readonly string PackageName;
             public readonly string Address;
@@ -25,15 +26,32 @@ namespace GameMain.Editor
                 PackageName = packageName;
                 Address = address;
             }
+
+            public override int GetHashCode()
+            {
+                return AssetPath.GetHashCode();
+            }
+
+            public override string ToString()
+            {
+                return AssetPath;
+            }
         }
 
-        private static readonly List<AssetInfo> AssetInfosCache = new List<AssetInfo>();
+        private static AssetInfo[] s_assetInfosCache;
         private static readonly Dictionary<string, int> AssetInfoIndexByPath = new Dictionary<string, int>();
+
+        private static bool s_refreshing;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            if (s_refreshing || s_assetInfosCache == null)
+            {
+                EnsureInitialize();
+                return EditorGUIUtility.singleLineHeight;
+            }
+
             var assetReference = (AssetReference)property.boxedValue;
-            EnsureInitialize();
 
             var assetPath = string.IsNullOrEmpty(assetReference.PackageName)
                 ? string.Empty
@@ -51,8 +69,14 @@ namespace GameMain.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if (s_refreshing || s_assetInfosCache == null)
+            {
+                EnsureInitialize();
+                EditorGUI.LabelField(position, label, new GUIContent("Refreshing..."));
+                return;
+            }
+
             var assetReference = (AssetReference)property.boxedValue;
-            EnsureInitialize();
 
             var assetPath = string.IsNullOrEmpty(assetReference.PackageName)
                 ? string.Empty
@@ -62,6 +86,7 @@ namespace GameMain.Editor
             if (!string.IsNullOrEmpty(assetPath) && !AssetInfoIndexByPath.TryGetValue(assetPath, out selectedIndex))
             {
                 MessageBox($"无效资源引用：{assetPath}", MessageType.Error);
+                selectedIndex = -1;
             }
 
             if (string.IsNullOrEmpty(assetPath))
@@ -70,14 +95,14 @@ namespace GameMain.Editor
             }
 
             EditorGUI.BeginChangeCheck();
-            selectedIndex = EasyEditorGUI.ValueDropdown(position, label, selectedIndex, AssetInfosCache,
+            selectedIndex = EasyEditorGUI.ValueDropdown(position.SubXMax(30), label, selectedIndex, s_assetInfosCache,
                 (index, assetInfo) => new GUIContent(assetInfo.AssetPath));
 
             if (EditorGUI.EndChangeCheck())
             {
                 if (selectedIndex != -1)
                 {
-                    var assetInfo = AssetInfosCache[selectedIndex];
+                    var assetInfo = s_assetInfosCache[selectedIndex];
                     assetReference.PackageName = assetInfo.PackageName;
                     assetReference.AssetName = assetInfo.Address;
                 }
@@ -86,21 +111,28 @@ namespace GameMain.Editor
                     assetReference.PackageName = string.Empty;
                     assetReference.AssetName = string.Empty;
                 }
+
                 property.boxedValue = assetReference;
+            }
+
+            if (GUI.Button(position.SetXMin(position.xMax - 30),
+                    EditorGUIUtility.IconContent("d_Refresh").SetTooltip("刷新缓存")))
+            {
+                RefreshAssetPaths();
             }
 
             void MessageBox(string message, MessageType messageType)
             {
-                var size = EasyEditorGUI.CalculateMessageBoxSize(message, MessageType.Error);
+                var size = EasyEditorGUI.CalculateMessageBoxSize(message, messageType);
                 var rect = position.SetHeight(size.y);
-                EasyEditorGUI.MessageBox(rect, message, MessageType.Error);
+                EasyEditorGUI.MessageBox(rect, message, messageType);
                 position.y += size.y;
             }
         }
 
         private static void EnsureInitialize()
         {
-            if (AssetInfosCache.Count == 0)
+            if (s_assetInfosCache == null)
             {
                 RefreshAssetPaths();
             }
@@ -108,13 +140,23 @@ namespace GameMain.Editor
 
         private static void RefreshAssetPaths()
         {
-            AssetInfosCache.Clear();
+            if (s_refreshing)
+                return;
+
+            s_refreshing = true;
+
+            EditorApplication.delayCall += RefreshAssetPathsImpl;
+        }
+
+        private static void RefreshAssetPathsImpl()
+        {
+            var assetInfos = new List<AssetInfo>();
             foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
             {
                 var collectCommand = new CollectCommand(package.PackageName, new NormalIgnoreRule())
                 {
                     EnableAddressable = package.EnableAddressable,
-                    AutoCollectShaders = package.AutoCollectShaders
+                    AutoCollectShaders = package.AutoCollectShaders,
                 };
 
                 foreach (var group in package.Groups)
@@ -123,20 +165,25 @@ namespace GameMain.Editor
                     {
                         if (collector.IsValid())
                         {
-                            foreach (var assetInfo in collector.GetAllCollectAssets(collectCommand, group))
+                            foreach (var collectAssetInfo in collector.GetAllCollectAssets(collectCommand, group))
                             {
-                                AssetInfosCache.Add(new AssetInfo(package.PackageName, assetInfo.Address));
+                                var assetInfo = new AssetInfo(package.PackageName, collectAssetInfo.Address);
+                                assetInfos.Add(assetInfo);
                             }
                         }
                     }
                 }
             }
 
+            s_assetInfosCache = assetInfos.Distinct().ToArray();
+
             AssetInfoIndexByPath.Clear();
-            for (var i = 0; i < AssetInfosCache.Count; i++)
+            for (var i = 0; i < s_assetInfosCache.Length; i++)
             {
-                AssetInfoIndexByPath.Add(AssetInfosCache[i].AssetPath, i);
+                AssetInfoIndexByPath.Add(s_assetInfosCache[i].AssetPath, i);
             }
+
+            s_refreshing = false;
         }
     }
 }

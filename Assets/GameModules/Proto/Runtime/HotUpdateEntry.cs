@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework;
 using GameMain.Runtime;
 using GameProto.Runtime.Config;
 using JetBrains.Annotations;
@@ -22,7 +23,8 @@ namespace GameProto.Runtime
 
         private static UniTask LoadTableAsync(Tables.DataTableInfo dataTableInfo)
         {
-            return GameEntry.DataTable.LoadDataTableAsync(dataTableInfo.DataRowType, dataTableInfo.OutputDataFile);
+            return GameEntry.DataTable.LoadDataTableAsync(dataTableInfo.DataRowType,
+                Utility.Text.Format(GameConfigAsset.Instance.ConfigAssetName, dataTableInfo.DataTableName));
         }
     }
 }
