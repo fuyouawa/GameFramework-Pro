@@ -1,4 +1,5 @@
-﻿using GameFramework.Procedure;
+﻿using Cysharp.Threading.Tasks;
+using GameFramework.Procedure;
 using UnityEngine;
 using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
@@ -9,16 +10,26 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureSplash : ProcedureBase
     {
+        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        {
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesCount, 8);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, -1);
+
+            await GameEntry.UI.BeginSpinnerBoxAsync("开始加载流程", 0);
+            ChangeState<ProcedureInitPackage>(procedureOwner);
+        }
+
         protected override void OnUpdate(ProcedureOwner procedureOwner, float elapseSeconds, float realElapseSeconds)
         {
             base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
-            //播放 Splash 动画
-            //热更新阶段文本初始化
-            // LoadText.Instance.InitConfigData(null);
-            // //热更新UI初始化
-            // UILoadMgr.Initialize();
-            //初始化资源包
-            ChangeState<ProcedureInitPackage>(procedureOwner);
+
+            // The standard game start phases count is 8.
+            // ProcedureInitPackage => ProcedureUpdateVersion => ProcedureUpdateManifest => ProcedureCreateDownloader =>
+            // ProcedureDownloadFiles => ProcedureDownloadOver => ProcedurePreload => ProcedureLoadAssembly =>
+            // ProcedureStartGame
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesCount, 8);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, 0);
+
         }
     }
 }

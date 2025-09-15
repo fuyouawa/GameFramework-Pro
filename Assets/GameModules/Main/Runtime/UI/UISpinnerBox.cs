@@ -1,4 +1,5 @@
 ﻿using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -10,15 +11,17 @@ namespace GameMain.Runtime
         [SerializeField] private TextMeshProUGUI _percentageText;
         [SerializeField] private TextMeshProUGUI _descriptionText;
 
-        private int _percentage;
+        private float _percentage;
+        private float _destinationPercentage;
+        private Tweener _destinationPercentageTweener;
 
-        public int Percentage
+        public float Percentage
         {
             get => _percentage;
             set
             {
                 _percentage = value;
-                _percentageText.text = $"{_percentage}%";
+                _percentageText.text = $"{(int)(_percentage * 100f)}%";
             }
         }
 
@@ -29,7 +32,21 @@ namespace GameMain.Runtime
         }
 
         public Func<string> DescriptionGetter;
-        public Func<int> PercentageGetter;
+
+        public void SetDestinationPercentage(float percentage, float duration, Action arrived)
+        {
+            if (_destinationPercentageTweener != null)
+            {
+                _destinationPercentageTweener.Kill();
+                _destinationPercentageTweener = null;
+            }
+
+            _destinationPercentageTweener = DOTween.To(
+                () => Percentage,
+                value => Percentage = value,
+                percentage, duration)
+                .OnKill(() => arrived?.Invoke());
+        }
 
         protected override void OnInit(object userData)
         {
@@ -46,11 +63,6 @@ namespace GameMain.Runtime
             if (DescriptionGetter != null)
             {
                 Description = DescriptionGetter();
-            }
-
-            if (PercentageGetter != null)
-            {
-                Percentage = PercentageGetter();
             }
         }
     }

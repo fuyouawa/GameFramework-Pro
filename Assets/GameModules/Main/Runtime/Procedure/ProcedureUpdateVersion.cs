@@ -34,6 +34,12 @@ namespace GameMain.Runtime
             }
 
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+            GameEntry.UI.UpdateSpinnerBoxAsync($"请求资源包“{packageName}”版本......", phaseIndex / (float)phaseCount).Forget();
+
             var packageVersion = await RequestPackageVersionWithRetryAsync(packageName);
             if (string.IsNullOrEmpty(packageVersion))
             {
@@ -42,6 +48,8 @@ namespace GameMain.Runtime
             }
 
             GameEntry.Setting.SetString(Utility.Text.Format(Constant.Setting.PackageVersion, packageName), packageVersion);
+
+            await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
             ChangeState<ProcedureUpdateManifest>(procedureOwner);
         }
 
@@ -63,7 +71,7 @@ namespace GameMain.Runtime
                 {
                     if (retryCount >= GameEntry.Resource.FailedTryAgain)
                     {
-                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Error);
+                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Fatal);
                         return null;
                     }
 

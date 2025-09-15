@@ -82,7 +82,7 @@ namespace GameMain.Runtime
                 case UIAnimation.FadeIn:
                     _canvasGroup.alpha = 0f;
                     _canvasGroup.blocksRaycasts = false;
-                    _previousTweener = _canvasGroup.DOFade(1f, duration).OnComplete(() =>
+                    _previousTweener = _canvasGroup.DOFade(1f, duration).OnKill(() =>
                     {
                         _canvasGroup.blocksRaycasts = true;
                         completed?.Invoke();
@@ -91,7 +91,7 @@ namespace GameMain.Runtime
                 case UIAnimation.FadeOut:
                     _canvasGroup.alpha = 1f;
                     _canvasGroup.blocksRaycasts = false;
-                    _previousTweener = _canvasGroup.DOFade(0f, duration).OnComplete(() => completed?.Invoke());
+                    _previousTweener = _canvasGroup.DOFade(0f, duration).OnKill(() => completed?.Invoke());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(uiAnimation), uiAnimation, null);

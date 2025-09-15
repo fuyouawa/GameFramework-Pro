@@ -22,6 +22,16 @@ namespace GameMain.Runtime
             return defaultValue;
         }
 
+        public bool Contains(string key)
+        {
+            return _contextByKey.ContainsKey(key);
+        }
+
+        public void Remove(string key)
+        {
+            _contextByKey.Remove(key);
+        }
+
         public void Set(string key, object value)
         {
             _contextByKey[key] = value;

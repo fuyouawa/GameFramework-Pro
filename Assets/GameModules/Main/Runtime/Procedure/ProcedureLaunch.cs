@@ -27,8 +27,7 @@ namespace GameMain.Runtime
         {
             base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
 
-            // 运行一帧即切换到 Splash 展示流程
-            ChangeState<ProcedureSplash>(procedureOwner);
+            ChangeState<ProcedureInitBuiltinPackage>(procedureOwner);
         }
 
         private void InitLanguageSettings()

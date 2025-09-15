@@ -21,6 +21,7 @@ namespace GameMain.Runtime
         [SerializeField] private string _tipTitle = "提示";
         [SerializeField] private string _warnTitle = "警告";
         [SerializeField] private string _errorTitle = "错误";
+        [SerializeField] private string _fatalTitle = "严重错误";
 
         [Title("UIMessageBoxButtons文本")]
         [LabelText("OK")]
@@ -51,6 +52,7 @@ namespace GameMain.Runtime
         public string TipTitle => _tipTitle;
         public string WarnTitle => _warnTitle;
         public string ErrorTitle => _errorTitle;
+        public string FatalTitle => _fatalTitle;
 
         public IReadOnlyList<string> OkTexts => _okTexts;
         public IReadOnlyList<string> OkCancelTexts => _okCancelTexts;

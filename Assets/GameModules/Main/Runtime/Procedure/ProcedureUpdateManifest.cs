@@ -17,8 +17,15 @@ namespace GameMain.Runtime
         protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+            GameEntry.UI.UpdateSpinnerBoxAsync($"更新资源包“{packageName}”清单......", phaseIndex / (float)phaseCount).Forget();
+
             if (await UpdatePackageManifestWithRetryAsync(packageName))
             {
+                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                 ChangeState<ProcedureCreateDownloader>(procedureOwner);
             }
             else
@@ -45,7 +52,7 @@ namespace GameMain.Runtime
                 {
                     if (retryCount >= GameEntry.Resource.FailedTryAgain)
                     {
-                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Error);
+                        await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数，游戏即将退出。", UIMessageBoxType.Fatal);
                         return false;
                     }
 

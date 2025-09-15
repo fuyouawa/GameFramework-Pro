@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-#if ENABLE_HYBRIDCLR
-using HybridCLR;
-#endif
 using UnityEngine;
 using System.Reflection;
+using Cysharp.Threading.Tasks;
 using GameFramework;
 using GameFramework.Fsm;
 using GameFramework.Procedure;
-using GameFramework.Resource;
-using HybridCLR;
 using UnityGameFramework.Runtime;
-using YooAsset;
 using PlayMode = GameFramework.Resource.PlayMode;
 
 namespace GameMain.Runtime
@@ -23,30 +17,18 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureLoadAssembly : ProcedureBase
     {
-        private int m_LoadAssetCount;
-        private int m_LoadMetadataAssetCount;
-        private int m_FailureAssetCount;
-        private int m_FailureMetadataAssetCount;
-        private bool m_LoadAssemblyComplete;
-        private bool m_LoadMetadataAssemblyComplete;
-        private bool m_LoadAssemblyWait;
-        private bool m_LoadMetadataAssemblyWait;
-        private List<Assembly> _hotUpdateAssemblys;
-        private IFsm<IProcedureManager> m_ProcedureOwner;
+        private readonly List<Assembly> _hotUpdateAssemblies = new List<Assembly>();
+        private bool _isRetrying = false;
+        private IFsm<IProcedureManager> _procedureOwner;
 
-        protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
-            base.OnEnter(procedureOwner);
-            m_ProcedureOwner = procedureOwner;
-            m_LoadAssemblyComplete = false;
-            _hotUpdateAssemblys = new List<Assembly>();
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+            GameEntry.UI.UpdateSpinnerBoxAsync(GetDescription, phaseIndex / (float)phaseCount).Forget();
 
-#if !UNITY_EDITOR
-            m_LoadMetadataAssemblyComplete = false;
-            LoadMetadataForAOTAssembly();
-#else
-            m_LoadMetadataAssemblyComplete = true;
-#endif
+            _procedureOwner = procedureOwner;
 
             if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
             {
@@ -56,11 +38,11 @@ namespace GameMain.Runtime
                     {
                         if (hotUpdateAssemblyName == $"{assembly.GetName().Name}")
                         {
-                            _hotUpdateAssemblys.Add(assembly);
+                            _hotUpdateAssemblies.Add(assembly);
                         }
                     }
 
-                    if (_hotUpdateAssemblys.Count == GameConfigAsset.Instance.HotUpdateAssemblyNames.Count)
+                    if (_hotUpdateAssemblies.Count == GameConfigAsset.Instance.HotUpdateAssemblyNames.Count)
                     {
                         break;
                     }
@@ -68,84 +50,99 @@ namespace GameMain.Runtime
             }
             else
             {
-                var callbacks = new LoadAssetCallbacks(OnLoadAssemblyAssetSuccess, OnLoadAssemblyAssetFailure);
-                foreach (string hotUpdateAssemblyName in GameConfigAsset.Instance.HotUpdateAssemblyNames)
+                try
                 {
-                    m_LoadAssetCount++;
-                    GameEntry.Resource.LoadAsset(hotUpdateAssemblyName, callbacks, assetType:typeof(TextAsset));
+                    var tasks = GameConfigAsset.Instance.HotUpdateAssemblyNames.Select(LoadAssemblyByNameAsync);
+                    await UniTask.WhenAll(tasks);
                 }
-
-                m_LoadAssemblyWait = true;
+                catch (Exception e)
+                {
+                    Log.Error($"Load assemblies failed: {e}");
+                    ChangeState<ProcedureFatalError>(procedureOwner);
+                    return;
+                }
             }
 
-            if (m_LoadAssetCount == 0)
+            _hotUpdateAssemblies.Sort(GameConfigAsset.Instance.HotUpdateAssemblyComparison);
+            foreach (var assembly in _hotUpdateAssemblies)
             {
-                m_LoadAssemblyComplete = true;
+                EntryAssembly(assembly);
             }
+
+            Log.Info("Load assemblies complete.");
+            ChangeState<ProcedureStartGame>(procedureOwner);
+
         }
 
-        private void OnLoadAssemblyAssetSuccess(string assetName, object asset, float duration, object userdata)
+        private string GetDescription()
         {
-            var textAsset = asset as TextAsset;
+            return $"加载程序集（{_hotUpdateAssemblies.Count}/{GameConfigAsset.Instance.HotUpdateAssemblyNames.Count}）";
+        }
 
-            m_LoadAssetCount--;
-
-            if (textAsset == null)
-            {
-                Log.Warning($"Load Assembly failed.");
-                return;
-            }
-
-            Log.Debug($"LoadAssetSuccess, assetName: [ {assetName} ]");
+        private async UniTask LoadAssemblyByNameAsync(string assemblyName)
+        {
+            var textAsset = await LoadAssemblyTextAssetByNameWithRetryAsync(assemblyName);
+            _isRetrying = false;
 
             try
             {
                 var assembly = Assembly.Load(textAsset.bytes);
-                _hotUpdateAssemblys.Add(assembly);
-                Log.Debug($"Assembly [ {assembly.GetName().Name} ] loaded");
+                _hotUpdateAssemblies.Add(assembly);
+                Log.Debug($"Assembly '{assembly.GetName().Name}' loaded");
             }
             catch (Exception e)
             {
-                m_FailureAssetCount++;
-                Log.Fatal(e);
+                Log.Error($"Load assembly '{assemblyName}' failed: {e}");
                 throw;
             }
-            finally
-            {
-                m_LoadAssemblyComplete = m_LoadAssemblyWait && 0 == m_LoadAssetCount;
-            }
         }
 
-        private void OnLoadAssemblyAssetFailure(string assetName, LoadResourceStatus status, string error, object userdata)
+        private async UniTask<TextAsset> LoadAssemblyTextAssetByNameWithRetryAsync(string assemblyName, int retryCount = 0)
         {
-            throw new NotImplementedException();
-        }
-
-        protected override void OnUpdate(IFsm<IProcedureManager> procedureOwner, float elapseSeconds, float realElapseSeconds)
-        {
-            base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
-            if (!m_LoadAssemblyComplete)
+            TextAsset textAsset;
+            try
             {
-                return;
+                textAsset = await GameEntry.Resource.LoadAssetAsync<TextAsset>(
+                    Utility.Text.Format(GameConfigAsset.Instance.AssemblyAssetName, assemblyName),
+                    GameConfigAsset.Instance.AssemblyPackageName);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Load assembly '{assemblyName}' text asset failed: {e}");
+
+                // wait for another retry finish.
+                if (retryCount == 0)
+                {
+                    while (_isRetrying)
+                    {
+                        await UniTask.Delay(500);
+                    }
+                }
+
+                _isRetrying = true;
+                if (retryCount >= GameEntry.Resource.FailedTryAgain)
+                {
+                    await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数。", UIMessageBoxType.Fatal);
+                }
+                else
+                {
+                    var index = await GameEntry.UI.ShowMessageBoxAsync($"加载程序集“{assemblyName}”资源失败，是否尝试重新加载？",
+                        UIMessageBoxType.Error, UIMessageBoxButtons.YesNo);
+
+                    if (index == 0)
+                    {
+                        textAsset = await LoadAssemblyTextAssetByNameWithRetryAsync(assemblyName, retryCount + 1);
+                        if (textAsset != null)
+                        {
+                            return textAsset;
+                        }
+                    }
+                }
+
+                throw;
             }
 
-            if (!m_LoadMetadataAssemblyComplete)
-            {
-                return;
-            }
-
-            AllAssemblyLoadComplete();
-        }
-
-        private void AllAssemblyLoadComplete()
-        {
-            _hotUpdateAssemblys.Sort(GameConfigAsset.Instance.HotUpdateAssemblyComparison);
-            foreach (var assembly in _hotUpdateAssemblys)
-            {
-                EntryAssembly(assembly);
-            }
-            Log.Info("Load assemblies complete.");
-            ChangeState<ProcedureStartGame>(m_ProcedureOwner);
+            return textAsset;
         }
 
         private void EntryAssembly(Assembly assembly)
@@ -159,77 +156,69 @@ namespace GameMain.Runtime
             }
         }
 
-        /// <summary>
-        /// 加载代码资源成功回调。
-        /// </summary>
-        /// <param name="textAsset">资源操作句柄。</param>
-        private void LoadAssetSuccess(TextAsset textAsset)
-        {
-        }
-
-        /// <summary>
-        /// 为Aot Assembly加载原始metadata， 这个代码放Aot或者热更新都行。
-        /// 一旦加载后，如果AOT泛型函数对应native实现不存在，则自动替换为解释模式执行。
-        /// </summary>
-        public void LoadMetadataForAOTAssembly()
-        {
-            // 可以加载任意aot assembly的对应的dll。但要求dll必须与unity build过程中生成的裁剪后的dll一致，而不能直接使用原始dll。
-            // 我们在BuildProcessor_xxx里添加了处理代码，这些裁剪后的dll在打包时自动被复制到 {项目目录}/HybridCLRData/AssembliesPostIl2CppStrip/{Target} 目录。
-
-            // 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
-            // 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
-            if (GameConfigAsset.Instance.AOTMetaAssemblyNames.Count == 0)
-            {
-                m_LoadMetadataAssemblyComplete = true;
-                return;
-            }
-
-            foreach (string aotDllName in GameConfigAsset.Instance.AOTMetaAssemblyNames)
-            {
-                var assetLocation = aotDllName;
-                Log.Debug($"LoadMetadataAsset: [ {assetLocation} ]");
-                m_LoadMetadataAssetCount++;
-                // GameModule.Resource.LoadAsset<TextAsset>(assetLocation, LoadMetadataAssetSuccess);
-            }
-
-            m_LoadMetadataAssemblyWait = true;
-        }
-
-        /// <summary>
-        /// 加载元数据资源成功回调。
-        /// </summary>
-        /// <param name="textAsset">资源操作句柄。</param>
-        private void LoadMetadataAssetSuccess(TextAsset textAsset)
-        {
-            m_LoadMetadataAssetCount--;
-
-            if (null == textAsset)
-            {
-                Log.Debug($"LoadMetadataAssetSuccess:Load Metadata failed.");
-                return;
-            }
-
-            string assetName = textAsset.name;
-            Log.Debug($"LoadMetadataAssetSuccess, assetName: [ {assetName} ]");
-
-            try
-            {
-                byte[] dllBytes = textAsset.bytes;
-                // 加载assembly对应的dll，会自动为它hook。一旦Aot泛型函数的native函数不存在，用解释器版本代码
-                HomologousImageMode mode = HomologousImageMode.SuperSet;
-                LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes,mode);
-                Log.Warning($"LoadMetadataForAOTAssembly:{assetName}. mode:{mode} ret:{err}");
-            }
-            catch (Exception e)
-            {
-                m_FailureMetadataAssetCount++;
-                Log.Fatal(e.Message);
-                throw;
-            }
-            finally
-            {
-                m_LoadMetadataAssemblyComplete = m_LoadMetadataAssemblyWait && 0 == m_LoadMetadataAssetCount;
-            }
-        }
+        // /// <summary>
+        // /// 为Aot Assembly加载原始metadata， 这个代码放Aot或者热更新都行。
+        // /// 一旦加载后，如果AOT泛型函数对应native实现不存在，则自动替换为解释模式执行。
+        // /// </summary>
+        // public void LoadMetadataForAOTAssembly()
+        // {
+        //     // 可以加载任意aot assembly的对应的dll。但要求dll必须与unity build过程中生成的裁剪后的dll一致，而不能直接使用原始dll。
+        //     // 我们在BuildProcessor_xxx里添加了处理代码，这些裁剪后的dll在打包时自动被复制到 {项目目录}/HybridCLRData/AssembliesPostIl2CppStrip/{Target} 目录。
+        //
+        //     // 注意，补充元数据是给AOT dll补充元数据，而不是给热更新dll补充元数据。
+        //     // 热更新dll不缺元数据，不需要补充，如果调用LoadMetadataForAOTAssembly会返回错误
+        //     if (GameConfigAsset.Instance.AOTMetaAssemblyNames.Count == 0)
+        //     {
+        //         m_LoadMetadataAssemblyComplete = true;
+        //         return;
+        //     }
+        //
+        //     foreach (string aotDllName in GameConfigAsset.Instance.AOTMetaAssemblyNames)
+        //     {
+        //         var assetLocation = aotDllName;
+        //         Log.Debug($"LoadMetadataAsset: [ {assetLocation} ]");
+        //         m_LoadMetadataAssetCount++;
+        //         // GameModule.Resource.LoadAsset<TextAsset>(assetLocation, LoadMetadataAssetSuccess);
+        //     }
+        //
+        //     m_LoadMetadataAssemblyWait = true;
+        // }
+        //
+        // /// <summary>
+        // /// 加载元数据资源成功回调。
+        // /// </summary>
+        // /// <param name="textAsset">资源操作句柄。</param>
+        // private void LoadMetadataAssetSuccess(TextAsset textAsset)
+        // {
+        //     m_LoadMetadataAssetCount--;
+        //
+        //     if (null == textAsset)
+        //     {
+        //         Log.Debug($"LoadMetadataAssetSuccess:Load Metadata failed.");
+        //         return;
+        //     }
+        //
+        //     string assetName = textAsset.name;
+        //     Log.Debug($"LoadMetadataAssetSuccess, assetName: [ {assetName} ]");
+        //
+        //     try
+        //     {
+        //         byte[] dllBytes = textAsset.bytes;
+        //         // 加载assembly对应的dll，会自动为它hook。一旦Aot泛型函数的native函数不存在，用解释器版本代码
+        //         HomologousImageMode mode = HomologousImageMode.SuperSet;
+        //         LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, mode);
+        //         Log.Warning($"LoadMetadataForAOTAssembly:{assetName}. mode:{mode} ret:{err}");
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         m_FailureMetadataAssetCount++;
+        //         Log.Fatal(e.Message);
+        //         throw;
+        //     }
+        //     finally
+        //     {
+        //         m_LoadMetadataAssemblyComplete = m_LoadMetadataAssemblyWait && 0 == m_LoadMetadataAssetCount;
+        //     }
+        // }
     }
 }

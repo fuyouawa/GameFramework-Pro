@@ -24,37 +24,22 @@ namespace GameMain.Runtime
 
         protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            YooAssets.Initialize();
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
 
-            if (YooAssets.TryGetPackage(Constant.Package.Builtin) != null)
-            {
-                var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
-                await InitializePackageWithRetryAsync(packageName);
-                return;
-            }
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+            GameEntry.UI.UpdateSpinnerBoxAsync($"初始化资源包“{packageName}”......", phaseIndex / (float)phaseCount).Forget();
 
-            try
+            GameEntry.Context.Set(Constant.Context.InitializePackageName, packageName);
+            if (await InitializePackageWithRetryAsync(packageName))
             {
-                GameEntry.Context.Set(Constant.Context.InitializePackageName, Constant.Package.Builtin);
+                if (packageName == GameEntry.Resource.DefaultPackageName)
+                {
+                    YooAssets.SetDefaultPackage(YooAssets.GetPackage(GameEntry.Resource.DefaultPackageName));
+                }
 
-                await InitializePackageAsync(Constant.Package.Builtin,
-                    GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode
-                        ? PlayMode.EditorSimulateMode
-                        : PlayMode.OfflinePlayMode);
-                Log.Debug($"Initialize builtin package success.");
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Initialize builtin package failed: {e}");
-                SafeErrorBox.Show("初始化内置资源包失败，游戏即将退出。");
-                ChangeState<ProcedureEndGame>(_procedureOwner);
-                return;
-            }
-
-            GameEntry.Context.Set(Constant.Context.InitializePackageName, GameEntry.Resource.DefaultPackageName);
-            if (await InitializePackageWithRetryAsync(GameEntry.Resource.DefaultPackageName))
-            {
-                YooAssets.SetDefaultPackage(YooAssets.GetPackage(GameEntry.Resource.DefaultPackageName));
+                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                 ChangeState<ProcedureUpdateVersion>(_procedureOwner);
             }
             else
@@ -96,7 +81,7 @@ namespace GameMain.Runtime
             }
         }
 
-        private static async UniTask InitializePackageAsync(string packageName, PlayMode playMode)
+        public static async UniTask InitializePackageAsync(string packageName, PlayMode playMode)
         {
             var package = YooAssets.TryGetPackage(packageName);
             if (package is { InitializeStatus: EOperationStatus.Succeed })

@@ -6,6 +6,9 @@
         {
             public const string InitializePackageName = "Context.InitializePackageName";
             public const string PackageDownloader = "Context.PackageDownloader";
+
+            public const string LoadingPhasesCount = "Context.LoadingPhasesCount";
+            public const string LoadingPhasesIndex = "Context.LoadingPhasesIndex";
         }
     }
 }

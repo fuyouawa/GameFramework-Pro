@@ -15,6 +15,10 @@ namespace GameMain.Runtime
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
             Log.Debug($"Create downloader for package '{packageName}'");
 
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+
             var package = YooAssets.GetPackage(packageName);
             var downloader = package.CreateResourceDownloader(
                 GameEntry.Resource.DownloadingMaxNum,
@@ -24,7 +28,8 @@ namespace GameMain.Runtime
             if (downloader.TotalDownloadCount == 0)
             {
                 Log.Debug("Not found any download files !");
-                ChangeState<ProcedureDownloadOver>(procedureOwner);
+                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
+                ChangeState<ProcedureDownloadFiles>(procedureOwner);
             }
             else
             {
@@ -39,6 +44,7 @@ namespace GameMain.Runtime
 
                 if (index == 0)
                 {
+                    await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                     ChangeState<ProcedureDownloadFiles>(procedureOwner);
                 }
                 else

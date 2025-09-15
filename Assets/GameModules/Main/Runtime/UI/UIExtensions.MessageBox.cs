@@ -18,7 +18,8 @@ namespace GameMain.Runtime
     {
         Tip,
         Warn,
-        Error
+        Error,
+        Fatal
     }
 
     public enum UIMessageBoxStyle
@@ -136,6 +137,8 @@ namespace GameMain.Runtime
                     return config.WarnTitle;
                 case UIMessageBoxType.Error:
                     return config.ErrorTitle;
+                case UIMessageBoxType.Fatal:
+                    return config.FatalTitle;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

@@ -14,22 +14,33 @@ namespace GameMain.Runtime
         private ProcedureOwner _procedureOwner;
         private ResourceDownloaderOperation _downloader;
 
-        private float _lastUpdateDownloadedSize;
+        private long _lastUpdateDownloadedSize;
 
-        private float CurrentSpeed
+        private long CurrentSpeedBytes
         {
             get
             {
-                float interval = Time.deltaTime;
                 var sizeDiff = _downloader.CurrentDownloadBytes - _lastUpdateDownloadedSize;
                 _lastUpdateDownloadedSize = _downloader.CurrentDownloadBytes;
-                var speed = (float)Math.Floor(sizeDiff / interval);
-                return speed;
+                var speed = sizeDiff / (double)Time.deltaTime;
+                return (long)speed;
             }
         }
 
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+            GameEntry.UI.UpdateSpinnerBoxAsync(GetDescription, phaseIndex / (float)phaseCount).Forget();
+
+            if (_downloader.TotalDownloadCount == 0)
+            {
+                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
+                ChangeState<ProcedureDownloadOver>(procedureOwner);
+                return;
+            }
+
             _procedureOwner = procedureOwner;
             _downloader = GameEntry.Context.Get<ResourceDownloaderOperation>(Constant.Context.PackageDownloader);
 
@@ -42,34 +53,26 @@ namespace GameMain.Runtime
 
         private void OnDownloadFinish(DownloaderFinishData data)
         {
-            ChangeState<ProcedureDownloadOver>(_procedureOwner);
+            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
+            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
+            GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex / (float)phaseCount)
+                .ContinueWith(() => ChangeState<ProcedureDownloadOver>(_procedureOwner))
+                .Forget();
+        }
+
+        private string GetDescription()
+        {
+            return $"下载资源包“{_downloader.PackageName}”......\n进度：{BytesToMb(_downloader.CurrentDownloadBytes)}/{BytesToMb(_downloader.TotalDownloadCount)}mb\n速度：{BytesToMb(CurrentSpeedBytes)}mb/s";
+
+            string BytesToMb(long bytes)
+            {
+                var mb = Mathf.Clamp(bytes / 1024f / 1024f, 0.01f, float.MaxValue);
+                return mb.ToString("F");
+            }
         }
 
         private void OnDownloadUpdate(DownloadUpdateData data)
         {
-            // string currentSizeMb = (currentDownloadBytes / 1048576f).ToString("f1");
-            // string totalSizeMb = (totalDownloadBytes / 1048576f).ToString("f1");
-            // // UILoadMgr.Show(UIDefine.UILoadUpdate,$"{currentDownloadCount}/{totalDownloadCount} {currentSizeMb}MB/{totalSizeMb}MB");
-            // string descriptionText = Utility.Text.Format("正在更新，已更新{0}，总更新{1}，已更新大小{2}，总更新大小{3}，更新进度{4}，当前网速{5}/s",
-            //     currentDownloadCount.ToString(),
-            //     totalDownloadCount.ToString(),
-            //     Utility.File.GetByteLengthString(currentDownloadBytes),
-            //     Utility.File.GetByteLengthString(totalDownloadBytes),
-            //     GameModule.Resource.Downloader.Progress,
-            //     Utility.File.GetLengthString((int)CurrentSpeed));
-            // GameEvent.Send(StringId.StringToHash("DownProgress"), GameModule.Resource.Downloader.Progress);
-            // UILoadMgr.Show(UIDefine.UILoadUpdate,descriptionText);
-            //
-            // int needTime = 0;
-            // if (CurrentSpeed > 0)
-            // {
-            //     needTime = (int)((totalDownloadBytes - currentDownloadBytes) / CurrentSpeed);
-            // }
-            //
-            // TimeSpan ts = new TimeSpan(0, 0, needTime);
-            // string timeStr = ts.ToString(@"mm\:ss");
-            // string updateProgress = Utility.Text.Format("剩余时间 {0}({1}/s)", timeStr, Utility.File.GetLengthString((int)CurrentSpeed));
-            // Log.Info(updateProgress);
         }
 
         private void OnDownloadError(DownloadErrorData data)

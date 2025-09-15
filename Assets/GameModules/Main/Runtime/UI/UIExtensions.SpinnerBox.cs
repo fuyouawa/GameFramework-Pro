@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using UnityGameFramework.Runtime;
 
 namespace GameMain.Runtime
@@ -8,9 +9,24 @@ namespace GameMain.Runtime
     {
         private static UIForm s_lastSpinnerBox;
 
+        public static UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
+            string descriptionGetter,
+            int initialPercentage)
+        {
+            return BeginSpinnerBoxAsync(uiComponent, () => descriptionGetter, initialPercentage);
+        }
+
+        public static UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
+            Func<string> descriptionGetter,
+            int initialPercentage)
+        {
+            return BeginSpinnerBoxAsync(uiComponent, descriptionGetter, initialPercentage,
+                UISpinnerBoxConfigAsset.Instance.DefaultGroupName);
+        }
+
         public static async UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
             Func<string> descriptionGetter,
-            Func<int> percentageGetter,
+            int initialPercentage,
             string groupName)
         {
             if (s_lastSpinnerBox != null)
@@ -29,12 +45,28 @@ namespace GameMain.Runtime
 
             s_lastSpinnerBox = form;
             spinnerBox.DescriptionGetter = descriptionGetter;
-            spinnerBox.PercentageGetter = percentageGetter;
+            spinnerBox.Percentage = initialPercentage;
         }
 
-        public static void UpdateSpinnerBox(this UIComponent uiComponent,
-            Func<string> descriptionGetter,
-            Func<int> percentageGetter)
+        public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
+            string descriptionGetter,
+            float destinationPercentage,
+            float duration = 0.2f)
+        {
+            return UpdateSpinnerBoxAsync(uiComponent, () => descriptionGetter, destinationPercentage, duration);
+        }
+
+        public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
+            float destinationPercentage,
+            float duration = 0.2f)
+        {
+            return UpdateSpinnerBoxAsync(uiComponent, (Func<string>)null, destinationPercentage, duration);
+        }
+
+        public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
+            [CanBeNull] Func<string> descriptionGetter,
+            float destinationPercentage,
+            float duration = 0.2f)
         {
             if (s_lastSpinnerBox == null)
             {
@@ -47,8 +79,15 @@ namespace GameMain.Runtime
                     $"UI form logic type '{s_lastSpinnerBox.Logic.GetType()}' is not '{typeof(UISpinnerBox)}'.");
             }
 
-            spinnerBox.DescriptionGetter = descriptionGetter;
-            spinnerBox.PercentageGetter = percentageGetter;
+            if (descriptionGetter != null)
+            {
+                spinnerBox.DescriptionGetter = descriptionGetter;
+            }
+
+            var arrivedTcs = new UniTaskCompletionSource();
+            spinnerBox.SetDestinationPercentage(destinationPercentage, duration, () => { arrivedTcs.TrySetResult(); });
+
+            return arrivedTcs.Task;
         }
 
         public static async UniTask EndSpinnerBoxAsync(this UIComponent uiComponent)
