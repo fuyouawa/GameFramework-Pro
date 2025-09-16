@@ -7,7 +7,6 @@ namespace GameMain.Runtime
 {
     public class UISpinnerBox : UIPanel
     {
-        [SerializeField] private RectTransform _circlesGroup;
         [SerializeField] private TextMeshProUGUI _percentageText;
         [SerializeField] private TextMeshProUGUI _descriptionText;
 

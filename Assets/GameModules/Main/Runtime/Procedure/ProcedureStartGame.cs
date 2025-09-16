@@ -7,9 +7,14 @@ namespace GameMain.Runtime
 {
     public class ProcedureStartGame : ProcedureBase
     {
-        protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
+        protected override UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
-            base.OnEnter(procedureOwner);
+            return base.OnEnterAsync(procedureOwner);
+        }
+
+        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
+        {
+            return "加载开始界面......";
         }
     }
 }

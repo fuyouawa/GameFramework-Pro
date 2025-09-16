@@ -1,29 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using EasyToolKit.Core;
 using EasyToolKit.Inspector;
 using UnityEngine;
 
 namespace GameMain.Runtime
 {
+    [ExecuteAlways]
     [EasyInspector]
     [AddComponentMenu("Layout/Content Size Adapter")]
     public class ContentSizeAdapter : MonoBehaviour
     {
+        enum MatchModes
+        {
+            [LabelText("宽度")]
+            Width,
+            [LabelText("高度")]
+            Height
+        }
+
         [Serializable]
         [HideLabel]
         class BindingItem
         {
+            [Required]
             [LabelText("绑定对象")]
             public RectTransform Target;
             [Range(0f, 2f)]
             [LabelText("系数")]
             public float Coefficient = 1f;
-            [LabelText("匹配宽度or高度")]
-            public bool MatchWidthOrHeight;
+            [LabelText("匹配模式")]
+            public MatchModes MatchMode = MatchModes.Width;
 
-            [NonSerialized] public Vector2 OriginSize;
+            [LabelText("原大小")]
+            [ReadOnly]
+            public Vector2 OriginSize;
         }
 
+        [Required]
         [LabelText("目标对象")]
         [SerializeField] private RectTransform _target;
 
@@ -33,27 +47,48 @@ namespace GameMain.Runtime
 
         private Vector2 _originSize;
 
-        private void Awake()
-        {
-            foreach (var item in _bindingItems)
-            {
-                item.OriginSize = item.Target.sizeDelta;
-            }
 
+        private void Start()
+        {
             _originSize = _target.sizeDelta;
         }
 
         private void Update()
         {
-            Vector2 totalDifferentSize = Vector2.zero;
-            foreach (var item in _bindingItems)
+            if (!Application.isPlaying)
             {
-                var differentSize = item.Target.sizeDelta - item.OriginSize;
-                differentSize *= item.Coefficient;
-                totalDifferentSize += item.MatchWidthOrHeight ? new Vector2(differentSize.x, 0) : new Vector2(0, differentSize.y);
-            }
+                foreach (var item in _bindingItems)
+                {
+                    if (item.Target == null)
+                        continue;
 
-            _target.sizeDelta = _originSize + totalDifferentSize;
+                    var size = new Vector2(
+                        item.Target.sizeDelta.x.IsApproximatelyOf(0f) ? item.OriginSize.x : item.Target.sizeDelta.x,
+                        item.Target.sizeDelta.y.IsApproximatelyOf(0f) ? item.OriginSize.y : item.Target.sizeDelta.y);
+
+                    if (size != item.OriginSize)
+                    {
+                        item.OriginSize = size;
+#if UNITY_EDITOR
+                        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+                    }
+                }
+            }
+            else
+            {
+                Vector2 totalDifferentSize = Vector2.zero;
+                foreach (var item in _bindingItems)
+                {
+                    var differentSize = item.Target.sizeDelta - item.OriginSize;
+                    differentSize *= item.Coefficient;
+                    totalDifferentSize += item.MatchMode == MatchModes.Width
+                        ? new Vector2(differentSize.x, 0)
+                        : new Vector2(0, differentSize.y);
+                }
+
+                _target.sizeDelta = _originSize + totalDifferentSize;
+            }
         }
     }
 }

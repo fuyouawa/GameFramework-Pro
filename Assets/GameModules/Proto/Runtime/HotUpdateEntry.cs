@@ -22,7 +22,7 @@ namespace GameProto.Runtime
         private static UniTask LoadTableAsync(Tables.DataTableInfo dataTableInfo)
         {
             return GameEntry.DataTable.LoadDataTableAsync(dataTableInfo.DataRowType,
-                Utility.Text.Format(GameConfigAsset.Instance.ConfigAssetName, dataTableInfo.DataTableName),
+                Utility.Text.Format(GameConfigAsset.Instance.ConfigAssetName, dataTableInfo.OutputDataFile),
                 customPackageName: GameConfigAsset.Instance.ConfigPackageName);
         }
     }

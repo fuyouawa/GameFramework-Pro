@@ -30,6 +30,8 @@ namespace GameMain.Runtime
             }
         }
 
+        protected override bool EnableAutoUpdateLoadingUISpinnerBox => Downloader.TotalDownloadCount > 0;
+
         protected override UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
             if (Downloader.TotalDownloadCount == 0)

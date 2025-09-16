@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 6191319348686647923}
   - component: {fileID: 3681701315841295958}
   - component: {fileID: -1254274956437304640}
-  - component: {fileID: 5779124289965723995}
   m_Layer: 0
   m_Name: MessageBox
   m_TagString: Untagged
@@ -96,23 +95,7 @@ MonoBehaviour:
   _buttonAsset:
     _packageName: Builtin
     _assetName: UI_Button
---- !u!114 &5779124289965723995
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 578024423764666284}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bcc7112805d4d5c9cf242f58208821e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _target: {fileID: 7623437106856802442}
-  _bindingItems:
-  - Target: {fileID: 3396267772426959732}
-    Coefficient: 1
-    MatchWidthOrHeight: 1
+  _buttonSize: {x: 200, y: 60}
 --- !u!1 &1283486168975071358
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,6 +108,7 @@ GameObject:
   - component: {fileID: 2906834469001837264}
   - component: {fileID: 8629270754225271687}
   - component: {fileID: 7579990578251714313}
+  - component: {fileID: 469402889943931367}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -209,6 +193,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
+--- !u!114 &469402889943931367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283486168975071358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bcc7112805d4d5c9cf242f58208821e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 2645684370025284764}
+  _bindingItems:
+  - Target: {fileID: 3396267772426959732}
+    Coefficient: 1
+    MatchMode: 1
+    OriginSize: {x: 1.9209, y: 82.81}
 --- !u!1 &2187028871647996084
 GameObject:
   m_ObjectHideFlags: 0
