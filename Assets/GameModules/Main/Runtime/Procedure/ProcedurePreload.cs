@@ -26,19 +26,11 @@ namespace GameMain.Runtime
 
         protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            base.OnEnter(procedureOwner);
-
-            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
-            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
-
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
-            GameEntry.UI.UpdateSpinnerBoxAsync($"预加载资源包“{packageName}”......", phaseIndex / (float)phaseCount).Forget();
-
             Log.Debug("Preload assets");
             if (GameConfigAsset.Instance.PreloadAssetTags.Count != 0)
             {
-                var package = YooAssets.GetPackage(packageName);
+                var package = YooAssetsHelper.GetPackage(packageName);
                 var assetInfos = package.GetAssetInfos(GameConfigAsset.Instance.PreloadAssetTags.ToArray());
 
                 if (assetInfos.Length > 0)
@@ -58,8 +50,19 @@ namespace GameMain.Runtime
             }
 
             Log.Info("Preload complete");
-            await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
+            if (GameEntry.Context.TryGet(Constant.Context.HookPackageLoadCompleted, out Action<ProcedureOwner> hook))
+            {
+                hook(procedureOwner);
+                return;
+            }
+
             ChangeState<ProcedureLoadAssembly>(_procedureOwner);
+        }
+
+        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
+        {
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+            return $"预加载资源包“{packageName}”......";
         }
 
         private async UniTask<UnityEngine.Object> LoadAssetWithRetryAsync(YooAsset.AssetInfo assetInfo, int retryCount = 0)

@@ -48,6 +48,11 @@ namespace GameMain.Runtime
             spinnerBox.Percentage = initialPercentage;
         }
 
+        public static bool IsSpinnerBoxShowing(this UIComponent uiComponent)
+        {
+            return s_lastSpinnerBox != null;
+        }
+
         public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
             string descriptionGetter,
             float destinationPercentage,

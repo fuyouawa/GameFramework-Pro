@@ -26,26 +26,26 @@ namespace GameMain.Runtime
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
 
-            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
-            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
-            GameEntry.UI.UpdateSpinnerBoxAsync($"初始化资源包“{packageName}”......", phaseIndex / (float)phaseCount).Forget();
-
             GameEntry.Context.Set(Constant.Context.InitializePackageName, packageName);
             if (await InitializePackageWithRetryAsync(packageName))
             {
                 if (packageName == GameEntry.Resource.DefaultPackageName)
                 {
-                    YooAssets.SetDefaultPackage(YooAssets.GetPackage(GameEntry.Resource.DefaultPackageName));
+                    YooAssets.SetDefaultPackage(YooAssetsHelper.GetPackage(GameEntry.Resource.DefaultPackageName));
                 }
 
-                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                 ChangeState<ProcedureUpdateVersion>(_procedureOwner);
             }
             else
             {
                 ChangeState<ProcedureEndGame>(_procedureOwner);
             }
+        }
+
+        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
+        {
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+            return $"初始化资源包“{packageName}”......";
         }
 
         private async UniTask<bool> InitializePackageWithRetryAsync(string packageName, int retryCount = 0)

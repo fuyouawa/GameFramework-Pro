@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _preloadAssetTags:
   - Preload
+  _configPackageName: Common
+  _configAssetName: Config_{0}
+  _assemblyPackageName: Common
+  _assemblyAssetName: DLL_{0}
   _hotUpdateAssemblyNames:
   - GameLogic.Runtime
   - GameProto.Runtime
   _aotMetaAssemblyNames: []
-  _hotUpdateEntryAssemblyName: GameLogic.Runtime

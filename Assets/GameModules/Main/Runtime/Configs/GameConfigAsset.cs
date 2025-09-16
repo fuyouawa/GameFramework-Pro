@@ -16,7 +16,7 @@ namespace GameMain.Runtime
         [SerializeField] private List<string> _preloadAssetTags;
 
         [Title("Proto")]
-        [SerializeField] private string _configPackageName = "Proto";
+        [SerializeField] private string _configPackageName = "Common";
         [SerializeField] private string _configAssetName = "Config_{0}";
 
         [Title("HybridCLR")]
@@ -39,12 +39,5 @@ namespace GameMain.Runtime
 
         public IReadOnlyList<string> HotUpdateAssemblyNames => _hotUpdateAssemblyNames;
         public IReadOnlyList<string> AOTMetaAssemblyNames => _aotMetaAssemblyNames;
-
-        public Comparison<Assembly> HotUpdateAssemblyComparison => (x, y) =>
-        {
-            var i = _hotUpdateAssemblyNames.IndexOf(x.GetName().Name);
-            var j = _hotUpdateAssemblyNames.IndexOf(y.GetName().Name);
-            return i.CompareTo(j);
-        };
     }
 }

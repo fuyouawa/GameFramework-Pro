@@ -13,12 +13,10 @@ namespace GameProto.Runtime
     class HotUpdateEntry
     {
         [HotUpdateEntry, UsedImplicitly]
-        public static void Initialize()
+        public static async UniTask InitializeAsync()
         {
-            UniTask.WhenAll(Tables.DataTableInfos.Select(LoadTableAsync)).ContinueWith(() =>
-            {
-                Log.Info("Load tables success.");
-            }).Forget();
+            await UniTask.WhenAll(Tables.DataTableInfos.Select(LoadTableAsync));
+            Log.Info("Load tables complete.");
         }
 
         private static UniTask LoadTableAsync(Tables.DataTableInfo dataTableInfo)

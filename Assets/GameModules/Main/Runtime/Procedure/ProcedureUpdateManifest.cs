@@ -18,20 +18,20 @@ namespace GameMain.Runtime
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
 
-            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
-            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
-            GameEntry.UI.UpdateSpinnerBoxAsync($"更新资源包“{packageName}”清单......", phaseIndex / (float)phaseCount).Forget();
-
             if (await UpdatePackageManifestWithRetryAsync(packageName))
             {
-                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                 ChangeState<ProcedureCreateDownloader>(procedureOwner);
             }
             else
             {
                 ChangeState<ProcedureEndGame>(procedureOwner);
             }
+        }
+
+        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
+        {
+            var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
+            return $"更新资源包“{packageName}”清单......";
         }
 
         private async UniTask<bool> UpdatePackageManifestWithRetryAsync(string packageName, int retryCount = 0)
@@ -67,7 +67,7 @@ namespace GameMain.Runtime
 
         private async UniTask UpdatePackageManifestAsync(string packageName)
         {
-            var package = YooAssets.GetPackage(packageName);
+            var package = YooAssetsHelper.GetPackage(packageName);
 
             var packageVersion = GameEntry.Setting.GetString(Utility.Text.Format(Constant.Setting.PackageVersion, packageName));
             var operation = package.UpdatePackageManifestAsync(packageVersion);

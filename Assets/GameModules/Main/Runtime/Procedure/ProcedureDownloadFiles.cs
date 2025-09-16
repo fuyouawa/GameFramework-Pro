@@ -16,39 +16,36 @@ namespace GameMain.Runtime
 
         private long _lastUpdateDownloadedSize;
 
+        private ResourceDownloaderOperation Downloader => _downloader ??=
+            GameEntry.Context.Get<ResourceDownloaderOperation>(Constant.Context.PackageDownloader);
+
         private long CurrentSpeedBytes
         {
             get
             {
-                var sizeDiff = _downloader.CurrentDownloadBytes - _lastUpdateDownloadedSize;
-                _lastUpdateDownloadedSize = _downloader.CurrentDownloadBytes;
+                var sizeDiff = Downloader.CurrentDownloadBytes - _lastUpdateDownloadedSize;
+                _lastUpdateDownloadedSize = Downloader.CurrentDownloadBytes;
                 var speed = sizeDiff / (double)Time.deltaTime;
                 return (long)speed;
             }
         }
 
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
-            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
-            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
-            GameEntry.UI.UpdateSpinnerBoxAsync(GetDescription, phaseIndex / (float)phaseCount).Forget();
-
-            if (_downloader.TotalDownloadCount == 0)
+            if (Downloader.TotalDownloadCount == 0)
             {
-                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                 ChangeState<ProcedureDownloadOver>(procedureOwner);
-                return;
+                return UniTask.CompletedTask;
             }
 
             _procedureOwner = procedureOwner;
-            _downloader = GameEntry.Context.Get<ResourceDownloaderOperation>(Constant.Context.PackageDownloader);
 
-            _downloader.DownloadFinishCallback += OnDownloadFinish;
-            _downloader.DownloadErrorCallback += OnDownloadError;
-            _downloader.DownloadUpdateCallback += OnDownloadUpdate;
+            Downloader.DownloadFinishCallback += OnDownloadFinish;
+            Downloader.DownloadErrorCallback += OnDownloadError;
+            Downloader.DownloadUpdateCallback += OnDownloadUpdate;
 
-            _downloader.BeginDownload();
+            Downloader.BeginDownload();
+            return UniTask.CompletedTask;
         }
 
         private void OnDownloadFinish(DownloaderFinishData data)
@@ -60,9 +57,11 @@ namespace GameMain.Runtime
                 .Forget();
         }
 
-        private string GetDescription()
+        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
         {
-            return $"下载资源包“{_downloader.PackageName}”......\n进度：{BytesToMb(_downloader.CurrentDownloadBytes)}/{BytesToMb(_downloader.TotalDownloadCount)}mb\n速度：{BytesToMb(CurrentSpeedBytes)}mb/s";
+            return $"下载资源包“{Downloader.PackageName}”......\n" +
+                   $"进度：{BytesToMb(Downloader.CurrentDownloadBytes)}/{BytesToMb(Downloader.TotalDownloadCount)}mb\n" +
+                   $"速度：{BytesToMb(CurrentSpeedBytes)}mb/s";
 
             string BytesToMb(long bytes)
             {

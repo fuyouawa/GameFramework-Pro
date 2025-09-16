@@ -13,7 +13,8 @@ namespace GameMain.Runtime
 
         public override void LoadAsset(string packageName, string assetName, Type assetType, bool isScene)
         {
-            var package = YooAssets.GetPackage(packageName);
+            var package = YooAssetsHelper.GetPackage(packageName);
+
             var assetHandle = assetType == null
                 ? package.LoadAssetAsync(assetName)
                 : package.LoadAssetAsync(assetName, assetType);

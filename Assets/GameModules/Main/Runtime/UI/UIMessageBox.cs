@@ -15,6 +15,8 @@ namespace GameMain.Runtime
 
         [SerializeField] private AssetReference _buttonAsset;
 
+        [SerializeField] private Vector2 _buttonSize = new Vector2(200, 60);
+
         private GameObject _buttonPrefab;
         private readonly Queue<(string text, Action<Button> onClick)> _addButtonsQueue = new Queue<(string text, Action<Button> onClick)>();
 
@@ -68,6 +70,7 @@ namespace GameMain.Runtime
                 {
                     var (text, onClick) = _addButtonsQueue.Dequeue();
                     var instantiate = Instantiate(_buttonPrefab, _buttonGroup);
+                    instantiate.GetComponent<RectTransform>().sizeDelta = _buttonSize;
                     instantiate.GetComponentInChildren<TextMeshProUGUI>().text = text;
 
                     var button = instantiate.GetComponent<Button>();

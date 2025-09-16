@@ -91,11 +91,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _titleText: {fileID: 6650729920889219507}
-  _messageText: {fileID: 0}
+  _messageText: {fileID: 5899066270725170896}
   _buttonGroup: {fileID: 4170632830870014534}
   _buttonAsset:
-    _packageName: Common
-    _assetName: Config_actor_tbplayer
+    _packageName: Builtin
+    _assetName: UI_Button
 --- !u!114 &5779124289965723995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -807,7 +807,7 @@ GameObject:
   - component: {fileID: 5899066270725170896}
   - component: {fileID: 942192181105010312}
   m_Layer: 0
-  m_Name: Content
+  m_Name: Message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1206,7 +1206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: 1f82dd17791f845a5b7273aa631dbf90, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 64.596
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: 1f82dd17791f845a5b7273aa631dbf90, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1312,7 +1312,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: 1f82dd17791f845a5b7273aa631dbf90, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 64.596
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: 1f82dd17791f845a5b7273aa631dbf90, type: 3}
       propertyPath: m_LocalPosition.x

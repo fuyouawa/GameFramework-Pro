@@ -22,6 +22,22 @@ namespace GameMain.Runtime
             return defaultValue;
         }
 
+        public bool TryGet<T>(string key, out T value)
+        {
+            if (TryGet(key, out object obj))
+            {
+                value = (T)obj;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGet(string key, out object value)
+        {
+            return _contextByKey.TryGetValue(key, out value);
+        }
+
         public bool Contains(string key)
         {
             return _contextByKey.ContainsKey(key);

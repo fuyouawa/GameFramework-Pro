@@ -10,16 +10,15 @@ namespace GameMain.Runtime
 {
     public class ProcedureCreateDownloader : ProcedureBase
     {
+        protected override Func<int, int, string> LoadingSpinnerDescriptionGetter => null;
+
         protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
             Log.Debug($"Create downloader for package '{packageName}'");
 
-            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
-            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
+            var package = YooAssetsHelper.GetPackage(packageName);
 
-            var package = YooAssets.GetPackage(packageName);
             var downloader = package.CreateResourceDownloader(
                 GameEntry.Resource.DownloadingMaxNum,
                 GameEntry.Resource.FailedTryAgain);
@@ -28,7 +27,6 @@ namespace GameMain.Runtime
             if (downloader.TotalDownloadCount == 0)
             {
                 Log.Debug("Not found any download files !");
-                await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                 ChangeState<ProcedureDownloadFiles>(procedureOwner);
             }
             else
@@ -44,7 +42,6 @@ namespace GameMain.Runtime
 
                 if (index == 0)
                 {
-                    await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex + 1 / (float)phaseCount);
                     ChangeState<ProcedureDownloadFiles>(procedureOwner);
                 }
                 else

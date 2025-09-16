@@ -54,26 +54,26 @@ namespace GameMain.Runtime
 
         public override bool CheckAssetNameValid(string packageName, string assetName)
         {
-            var package = YooAssets.GetPackage(packageName);
+            var package = YooAssetsHelper.GetPackage(packageName);
             return package.CheckLocationValid(assetName);
         }
 
         public override bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
         {
-            var package = YooAssets.GetPackage(assetInfo.PackageName);
+            var package = YooAssetsHelper.GetPackage(assetInfo.PackageName);
             return package.IsNeedDownloadFromRemote(assetInfo.UserData as YooAsset.AssetInfo);
         }
 
         public override AssetInfo GetAssetInfo(string packageName, string assetName)
         {
-            var package = YooAssets.GetPackage(packageName);
+            var package = YooAssetsHelper.GetPackage(packageName);
             var assetInfo = package.GetAssetInfo(assetName);
             return new AssetInfo(assetInfo.PackageName, assetInfo.AssetType, assetName, assetInfo.Error, assetInfo);
         }
 
         public override AssetInfo[] GetAssetInfos(string packageName, string[] tags)
         {
-            var package = YooAssets.GetPackage(packageName);
+            var package = YooAssetsHelper.GetPackage(packageName);
             var assetInfos = package.GetAssetInfos(tags);
             return assetInfos.Select(assetInfo => new AssetInfo(assetInfo.PackageName, assetInfo.AssetType,
                 assetInfo.Address, assetInfo.Error, assetInfo)).ToArray();

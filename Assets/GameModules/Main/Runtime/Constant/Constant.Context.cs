@@ -9,6 +9,8 @@
 
             public const string LoadingPhasesCount = "Context.LoadingPhasesCount";
             public const string LoadingPhasesIndex = "Context.LoadingPhasesIndex";
+
+            public const string HookPackageLoadCompleted = "Context.HookPackageLoadCompleted";
         }
     }
 }

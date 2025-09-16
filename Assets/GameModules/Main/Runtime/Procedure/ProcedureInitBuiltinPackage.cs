@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework;
 using GameFramework.Fsm;
 using GameFramework.Procedure;
 using GameFramework.Resource;
@@ -10,6 +11,9 @@ namespace GameMain.Runtime
 {
     public class ProcedureInitBuiltinPackage : ProcedureBase
     {
+        protected override bool EnableAutoUpdateLoadingPhasesContext => false;
+        protected override bool EnableAutoUpdateLoadingUISpinnerBox => false;
+
         protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             YooAssets.Initialize();
@@ -23,7 +27,20 @@ namespace GameMain.Runtime
 #else
                 await ProcedureInitPackage.InitializePackageAsync(Constant.Package.Builtin, PlayMode.OfflinePlayMode);
 #endif
+
+                var package = YooAssetsHelper.GetPackage(Constant.Package.Builtin);
+
+                var packageVersionOperation = package.RequestPackageVersionAsync();
+                await packageVersionOperation.ToUniTask();
+                var packageVersion = packageVersionOperation.PackageVersion;
+
+                GameEntry.Setting.SetString(Utility.Text.Format(Constant.Setting.PackageVersion, Constant.Package.Builtin), packageVersion);
+
+                var packageManifestOperation = package.UpdatePackageManifestAsync(packageVersion);
+                await packageManifestOperation.ToUniTask();
+
                 Log.Debug($"Initialize builtin package success.");
+
                 ChangeState<ProcedureSplash>(procedureOwner);
             }
             catch (Exception e)

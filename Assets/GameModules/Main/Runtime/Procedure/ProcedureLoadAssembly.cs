@@ -21,13 +21,11 @@ namespace GameMain.Runtime
         private bool _isRetrying = false;
         private IFsm<IProcedureManager> _procedureOwner;
 
+        private bool _isEntryingAssemblies = false;
+        private int _entryedAssemblyCount = 0;
+
         protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
-            var phaseCount = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesCount);
-            var phaseIndex = GameEntry.Context.Get<int>(Constant.Context.LoadingPhasesIndex);
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, phaseIndex + 1);
-            GameEntry.UI.UpdateSpinnerBoxAsync(GetDescription, phaseIndex / (float)phaseCount).Forget();
-
             _procedureOwner = procedureOwner;
 
             if (GameEntry.Resource.PlayMode == PlayMode.EditorSimulateMode)
@@ -63,20 +61,53 @@ namespace GameMain.Runtime
                 }
             }
 
-            _hotUpdateAssemblies.Sort(GameConfigAsset.Instance.HotUpdateAssemblyComparison);
-            foreach (var assembly in _hotUpdateAssemblies)
-            {
-                EntryAssembly(assembly);
-            }
-
             Log.Info("Load assemblies complete.");
-            ChangeState<ProcedureStartGame>(procedureOwner);
 
+            _isEntryingAssemblies = true;
+            try
+            {
+                await EntryAssembliesAsync();
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Entry assemblies failed: {e}");
+                ChangeState<ProcedureFatalError>(procedureOwner);
+                return;
+            }
+            _isEntryingAssemblies = false;
+
+            Log.Info("Entry assemblies complete.");
+
+            ChangeState<ProcedureStartGame>(procedureOwner);
         }
 
-        private string GetDescription()
+        private async UniTask EntryAssembliesAsync()
         {
-            return $"加载程序集（{_hotUpdateAssemblies.Count}/{GameConfigAsset.Instance.HotUpdateAssemblyNames.Count}）";
+            var entries = _hotUpdateAssemblies.SelectMany(assembly => assembly.GetTypes())
+                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                .Where(method => method.IsDefined(typeof(HotUpdateEntryAttribute)))
+                .OrderByDescending(method => method.GetCustomAttribute<HotUpdateEntryAttribute>().Priority);
+
+            foreach (var entry in entries)
+            {
+                var result = entry.Invoke(null, null);
+                if (result is UniTask task)
+                {
+                    await task;
+                }
+
+                await UniTask.Delay(100);
+                _entryedAssemblyCount++;
+            }
+        }
+
+        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
+        {
+            if (_isEntryingAssemblies)
+            {
+                return $"初始化程序集......\n{_entryedAssemblyCount}/{_hotUpdateAssemblies.Count}";
+            }
+            return $"加载程序集......\n{_hotUpdateAssemblies.Count}/{GameConfigAsset.Instance.HotUpdateAssemblyNames.Count}";
         }
 
         private async UniTask LoadAssemblyByNameAsync(string assemblyName)
@@ -143,17 +174,6 @@ namespace GameMain.Runtime
             }
 
             return textAsset;
-        }
-
-        private void EntryAssembly(Assembly assembly)
-        {
-            var entries = assembly.GetTypes()
-                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                .Where(method => method.IsDefined(typeof(HotUpdateEntryAttribute)));
-            foreach (var entry in entries)
-            {
-                entry.Invoke(null, null);
-            }
         }
 
         // /// <summary>

@@ -10,7 +10,7 @@ namespace GameMain.Runtime
     {
         [Title("资源")]
         [LabelText("资源引用")]
-        [SerializeField] private AssetReference _assetReference = new AssetReference(Constant.Package.Builtin, "UI_MessageBox");
+        [SerializeField] private AssetReference _assetReference = new AssetReference(Constant.Package.Builtin, "UI_SpinnerBox");
 
         [Title("默认值")]
         [LabelText("分组名")]

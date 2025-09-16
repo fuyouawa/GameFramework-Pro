@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using UnityGameFramework.Runtime;
 
@@ -21,7 +22,17 @@ namespace GameMain.Runtime
 
         public static int GetEventId(Type eventType)
         {
-            return EventIdByType.GetOrAdd(eventType, _ => Interlocked.Increment(ref s_nextEventId));
+            return EventIdByType.GetOrAdd(eventType, _ =>
+            {
+                // compatible with old events
+                var eventIdField = eventType.GetField("EventId", BindingFlags.Static | BindingFlags.Public);
+                if (eventIdField != null)
+                {
+                    return (int)eventIdField.GetValue(null);
+                }
+
+                return Interlocked.Increment(ref s_nextEventId);
+            });
         }
 
         public static IUnsubscribe Subscribe<T>(this EventComponent eventComponent, EventHandler<T> onEvent)

@@ -12,6 +12,9 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureLaunch : ProcedureBase
     {
+        protected override bool EnableAutoUpdateLoadingPhasesContext => false;
+        protected override bool EnableAutoUpdateLoadingUISpinnerBox => false;
+
         protected override void OnEnter(ProcedureOwner procedureOwner)
         {
             base.OnEnter(procedureOwner);
