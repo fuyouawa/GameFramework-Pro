@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using GameFramework.Resource;
-using UnityEngine;
+using GameFramework.Fsm;
+using GameFramework.Procedure;
 using UnityGameFramework.Runtime;
-using YooAsset;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -14,17 +12,17 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedurePreload : ProcedureBase
     {
-        private ProcedureOwner _procedureOwner;
+        private IFsm<IProcedureManager> _procedureOwner;
         private bool _isRetrying;
 
-        protected override void OnInit(ProcedureOwner procedureOwner)
+        protected override void OnInit(IFsm<IProcedureManager> procedureOwner)
         {
             base.OnInit(procedureOwner);
             _procedureOwner = procedureOwner;
         }
 
 
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
             Log.Debug("Preload assets");
@@ -50,7 +48,7 @@ namespace GameMain.Runtime
             }
 
             Log.Info("Preload complete");
-            if (GameEntry.Context.TryGet(Constant.Context.HookPackageLoadCompleted, out Action<ProcedureOwner> hook))
+            if (GameEntry.Context.TryGet(Constant.Context.HookPackageLoadCompleted, out Action<IFsm<IProcedureManager>> hook))
             {
                 hook(procedureOwner);
                 return;

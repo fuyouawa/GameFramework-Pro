@@ -1,10 +1,10 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityGameFramework.Runtime;
 using YooAsset;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -13,16 +13,16 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureInitPackage : ProcedureBase
     {
-        private ProcedureOwner _procedureOwner;
+        private IFsm<IProcedureManager> _procedureOwner;
 
-        protected override void OnInit(ProcedureOwner procedureOwner)
+        protected override void OnInit(IFsm<IProcedureManager> procedureOwner)
         {
             base.OnInit(procedureOwner);
 
             _procedureOwner = procedureOwner;
         }
 
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
 

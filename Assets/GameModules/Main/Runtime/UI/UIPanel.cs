@@ -16,6 +16,7 @@ namespace GameMain.Runtime
     {
         private CanvasGroup _canvasGroup;
         private RectTransform _rectTransform;
+        private Tweener _previousTweener;
 
         public event Action OpenCompleted;
         public event Action CloseCompleted;
@@ -28,8 +29,6 @@ namespace GameMain.Runtime
 
         protected virtual float OpenDuration => 0.3f;
         protected virtual float CloseDuration => 0.3f;
-
-        private Tweener _previousTweener;
 
         protected override void OnInit(object userData)
         {

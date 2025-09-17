@@ -1,12 +1,12 @@
-﻿using GameFramework.Procedure;
+﻿using GameFramework.Fsm;
+using GameFramework.Procedure;
 using UnityEngine;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
     public class ProcedureEndGame : ProcedureBase
     {
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
         {
             base.OnEnter(procedureOwner);
 

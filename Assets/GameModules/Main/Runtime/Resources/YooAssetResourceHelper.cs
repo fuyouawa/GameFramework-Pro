@@ -79,10 +79,14 @@ namespace GameMain.Runtime
                 assetInfo.Address, assetInfo.Error, assetInfo)).ToArray();
         }
 
-        public override void UnloadScene(string sceneAssetName, object sceneAsset,
+        public override void UnloadScene(string sceneAssetName, AssetObject sceneAssetObject,
             UnloadSceneCallbacks unloadSceneCallbacks, object userData)
         {
-            var sceneHandle = sceneAsset as YooAsset.SceneHandle;
+            if (sceneAssetObject.UserData is not SceneHandle sceneHandle)
+            {
+                throw new ArgumentException("SceneHandle is invalid.", nameof(sceneHandle));
+            }
+
             var unloadOperation = sceneHandle.UnloadAsync();
             unloadOperation.Completed += op =>
             {
@@ -97,6 +101,15 @@ namespace GameMain.Runtime
                     unloadSceneCallbacks.UnloadSceneFailureCallback?.Invoke(sceneAssetName, op.Error);
                 }
             };
+        }
+
+        public override void UnloadAsset(AssetObject assetObject)
+        {
+            if (assetObject.UserData is not AssetHandle assetHandle)
+            {
+                throw new ArgumentException("assetObject.UserData is invalid.", nameof(assetObject));
+            }
+            assetHandle.Release();
         }
     }
 }

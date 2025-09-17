@@ -17,27 +17,22 @@ namespace GameFramework.Resource
         /// </summary>
         public LoadResourceAgentHelperLoadCompleteEventArgs()
         {
-            Asset = null;
         }
 
         /// <summary>
         /// 获取加载的资源。
         /// </summary>
-        public object Asset
-        {
-            get;
-            private set;
-        }
+        public AssetObject AssetObject { get; private set; }
 
         /// <summary>
         /// 创建加载资源代理辅助器异步加载资源完成事件。
         /// </summary>
         /// <param name="asset">加载的资源。</param>
         /// <returns>创建的加载资源代理辅助器异步加载资源完成事件。</returns>
-        public static LoadResourceAgentHelperLoadCompleteEventArgs Create(object asset)
+        public static LoadResourceAgentHelperLoadCompleteEventArgs Create(AssetObject assetObject)
         {
             LoadResourceAgentHelperLoadCompleteEventArgs loadResourceAgentHelperLoadCompleteEventArgs = ReferencePool.Acquire<LoadResourceAgentHelperLoadCompleteEventArgs>();
-            loadResourceAgentHelperLoadCompleteEventArgs.Asset = asset;
+            loadResourceAgentHelperLoadCompleteEventArgs.AssetObject = assetObject;
             return loadResourceAgentHelperLoadCompleteEventArgs;
         }
 
@@ -46,7 +41,7 @@ namespace GameFramework.Resource
         /// </summary>
         public override void Clear()
         {
-            Asset = null;
+            AssetObject = null;
         }
     }
 }

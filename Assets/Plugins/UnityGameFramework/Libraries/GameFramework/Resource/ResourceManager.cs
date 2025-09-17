@@ -297,7 +297,7 @@ namespace GameFramework.Resource
                 throw new GameFrameworkException("Unload scene callbacks is invalid.");
             }
 
-            m_ResourceLoader.UnloadScene(sceneAssetName, unloadSceneCallbacks, userData);
+            m_ResourceLoader.UnloadScene(CurrentPackageName, sceneAssetName, unloadSceneCallbacks, userData);
         }
 
         // public void ClearAllCacheFiles(

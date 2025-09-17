@@ -21,7 +21,7 @@ namespace GameFramework.Resource
             public abstract bool IsScene { get; }
 
 
-            public virtual void OnLoadAssetSuccess(LoadResourceAgent agent, object asset, float duration)
+            public virtual void OnLoadAssetSuccess(LoadResourceAgent agent, AssetObject assetObject, float duration)
             {
             }
 

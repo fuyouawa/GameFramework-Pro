@@ -82,7 +82,9 @@ namespace GameFramework.Resource
                 string key = $"{m_Task.PackageName}/{m_Task.AssetName}";
                 s_LoadingAssetNames.Remove(key);
                 m_LoadResourceAgentHelper.Reset();
-                m_Task.OnLoadAssetSuccess(this, e.Asset, (float)(DateTime.UtcNow - m_Task.StartTime).TotalSeconds);
+
+                m_ResourceLoader.RegisterAsset(m_Task.PackageName, m_Task.AssetName, e.AssetObject);
+                m_Task.OnLoadAssetSuccess(this, e.AssetObject, (float)(DateTime.UtcNow - m_Task.StartTime).TotalSeconds);
                 m_Task.Done = true;
             }
         }

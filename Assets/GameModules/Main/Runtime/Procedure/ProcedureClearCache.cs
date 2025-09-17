@@ -1,10 +1,10 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityGameFramework.Runtime;
 using YooAsset;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -13,9 +13,9 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureClearCache : ProcedureBase
     {
-        private ProcedureOwner _procedureOwner;
+        private IFsm<IProcedureManager> _procedureOwner;
 
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
         {
             _procedureOwner = procedureOwner;
             Log.Debug("清理未使用的缓存文件！");
@@ -28,7 +28,7 @@ namespace GameMain.Runtime
 
         }
 
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             var tasks = YooAssets.GetAllPackages()
                 .Select(package => ClearCacheFilesAsync(package, EFileClearMode.ClearUnusedBundleFiles));

@@ -15,21 +15,28 @@ namespace GameMain.Runtime
         {
             var package = YooAssetsHelper.GetPackage(packageName);
 
-            var assetHandle = assetType == null
-                ? package.LoadAssetAsync(assetName)
-                : package.LoadAssetAsync(assetName, assetType);
-
-            assetHandle.Completed += handle =>
+            if (isScene)
             {
-                if (handle.Status == EOperationStatus.Succeed)
+                
+            }
+            else
+            {
+                var assetHandle = assetType == null
+                    ? package.LoadAssetAsync(assetName)
+                    : package.LoadAssetAsync(assetName, assetType);
+
+                assetHandle.Completed += handle =>
                 {
-                    LoadComplete?.Invoke(this, LoadResourceAgentHelperLoadCompleteEventArgs.Create(handle.AssetObject));
-                }
-                else
-                {
-                    Error?.Invoke(this, LoadResourceAgentHelperErrorEventArgs.Create(LoadResourceStatus.AssetError, handle.LastError));
-                }
-            };
+                    if (handle.Status == EOperationStatus.Succeed)
+                    {
+                        LoadComplete?.Invoke(this, LoadResourceAgentHelperLoadCompleteEventArgs.Create(AssetObject.Create(handle.AssetObject, false, handle)));
+                    }
+                    else
+                    {
+                        Error?.Invoke(this, LoadResourceAgentHelperErrorEventArgs.Create(LoadResourceStatus.AssetError, handle.LastError));
+                    }
+                };
+            }
         }
 
         public override void Reset()

@@ -1,9 +1,9 @@
 ﻿using GameFramework.Localization;
 using System;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using UnityEngine;
 using UnityGameFramework.Runtime;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -15,7 +15,7 @@ namespace GameMain.Runtime
         protected override bool EnableAutoUpdateLoadingPhasesContext => false;
         protected override bool EnableAutoUpdateLoadingUISpinnerBox => false;
 
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
         {
             base.OnEnter(procedureOwner);
 
@@ -26,7 +26,7 @@ namespace GameMain.Runtime
             InitSoundSettings();
         }
 
-        protected override void OnUpdate(ProcedureOwner procedureOwner, float elapseSeconds, float realElapseSeconds)
+        protected override void OnUpdate(IFsm<IProcedureManager> procedureOwner, float elapseSeconds, float realElapseSeconds)
         {
             base.OnUpdate(procedureOwner, elapseSeconds, realElapseSeconds);
 

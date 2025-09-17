@@ -1,17 +1,17 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityEngine;
 using UnityGameFramework.Runtime;
 using YooAsset;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
     public class ProcedureDownloadFiles : ProcedureBase
     {
-        private ProcedureOwner _procedureOwner;
+        private IFsm<IProcedureManager> _procedureOwner;
         private ResourceDownloaderOperation _downloader;
 
         private long _lastUpdateDownloadedSize;
@@ -32,7 +32,7 @@ namespace GameMain.Runtime
 
         protected override bool EnableAutoUpdateLoadingUISpinnerBox => Downloader.TotalDownloadCount > 0;
 
-        protected override UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             if (Downloader.TotalDownloadCount == 0)
             {

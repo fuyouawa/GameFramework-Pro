@@ -269,17 +269,8 @@ namespace UnityGameFramework.Runtime
             m_ResourceManager.LoadAsset(assetName, loadAssetCallbacks, assetType, priority, userData);
         }
 
-        /// <summary>
-        /// 卸载资源。
-        /// </summary>
-        /// <param name="asset">要卸载的资源。</param>
         public void UnloadAsset(object asset)
         {
-            if (asset == null)
-            {
-                return;
-            }
-
             m_ResourceManager.UnloadAsset(asset);
         }
 

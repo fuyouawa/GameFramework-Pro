@@ -10,11 +10,11 @@ namespace GameFramework.Resource
 
             public override bool IsScene => false;
 
-            public override void OnLoadAssetSuccess(LoadResourceAgent agent, object asset, float duration)
+            public override void OnLoadAssetSuccess(LoadResourceAgent agent, AssetObject assetObject, float duration)
             {
                 if (m_LoadAssetCallbacks.LoadAssetSuccessCallback != null)
                 {
-                    m_LoadAssetCallbacks.LoadAssetSuccessCallback(AssetName, asset, duration, UserData);
+                    m_LoadAssetCallbacks.LoadAssetSuccessCallback(AssetName, assetObject.Asset, duration, UserData);
                 }
             }
 

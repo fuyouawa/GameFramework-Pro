@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using UnityEngine;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -13,7 +13,7 @@ namespace GameMain.Runtime
         protected override bool EnableAutoUpdateLoadingPhasesContext => false;
         protected override bool EnableAutoUpdateLoadingUISpinnerBox => false;
 
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             // The standard game start phases count is 9.
             // ProcedureInitPackage => ProcedureUpdateVersion => ProcedureUpdateManifest => ProcedureCreateDownloader =>

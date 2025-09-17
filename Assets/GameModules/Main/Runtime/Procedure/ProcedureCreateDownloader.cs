@@ -1,10 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using UnityEngine;
 using UnityGameFramework.Runtime;
-using YooAsset;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -12,7 +11,7 @@ namespace GameMain.Runtime
     {
         protected override Func<int, int, string> LoadingSpinnerDescriptionGetter => null;
 
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
             Log.Debug($"Create downloader for package '{packageName}'");

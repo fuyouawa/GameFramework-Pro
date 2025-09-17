@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameFramework.ObjectPool;
 
 namespace GameFramework.Resource
@@ -10,15 +11,13 @@ namespace GameFramework.Resource
         {
             private readonly ResourceManager m_ResourceManager;
             private readonly TaskPool<LoadResourceTaskBase> m_TaskPool;
-            private readonly Dictionary<string, object> m_SceneNameToAssetMap;
-            private readonly Dictionary<string, object> m_AssetPathToAssetMap;
+            private readonly Dictionary<string, AssetObject> m_AssetPathToAssetMap;
 
             public ResourceLoader(ResourceManager resourceManager)
             {
                 m_ResourceManager = resourceManager;
                 m_TaskPool = new TaskPool<LoadResourceTaskBase>();
-                m_SceneNameToAssetMap = new Dictionary<string, object>();
-                m_AssetPathToAssetMap = new Dictionary<string, object>();
+                m_AssetPathToAssetMap = new Dictionary<string, AssetObject>();
             }
 
             public void Update(float elapseSeconds, float realElapseSeconds)
@@ -35,6 +34,43 @@ namespace GameFramework.Resource
             {
             }
 
+            public void RegisterAsset(string packageName, string assetName, AssetObject assetObject)
+            {
+                var key = $"{packageName}/{assetName}";
+                if (!m_AssetPathToAssetMap.TryAdd(key, assetObject))
+                {
+                    throw new GameFrameworkException($"Asset '{key}' has been registered.");
+                }
+            }
+
+            public AssetObject GetAssetObject(string packageName, string assetName)
+            {
+                var key = $"{packageName}/{assetName}";
+                if (m_AssetPathToAssetMap.TryGetValue(key, out AssetObject assetObject))
+                {
+                    return assetObject;
+                }
+                throw new GameFrameworkException($"Asset '{key}' is not loaded.");
+            }
+
+            public AssetObject GetAssetObject(object asset)
+            {
+                if (asset == null)
+                {
+                    throw new GameFrameworkException("Asset is invalid.");
+                }
+
+                foreach (var assetObject in m_AssetPathToAssetMap.Values)
+                {
+                    if (assetObject.Asset == asset)
+                    {
+                        return assetObject;
+                    }
+                }
+
+                throw new GameFrameworkException($"Asset '{asset}' is not loaded.");
+            }
+
 
             /// <summary>
             /// 增加加载资源代理辅助器。
@@ -45,8 +81,7 @@ namespace GameFramework.Resource
             public void AddLoadResourceAgentHelper(ILoadResourceAgentHelper loadResourceAgentHelper,
                 string readOnlyPath, string readWritePath)
             {
-                LoadResourceAgent agent =
-                    new LoadResourceAgent(loadResourceAgentHelper, this, readOnlyPath, readWritePath);
+                LoadResourceAgent agent = new LoadResourceAgent(loadResourceAgentHelper, this, readOnlyPath, readWritePath);
                 m_TaskPool.AddAgent(agent);
             }
 
@@ -64,25 +99,56 @@ namespace GameFramework.Resource
                 object userData)
             {
                 var key = $"{packageName}/{assetName}";
-                if (m_AssetPathToAssetMap.TryGetValue(key, out object asset))
+                if (m_AssetPathToAssetMap.TryGetValue(key, out AssetObject assetObject))
                 {
-                    loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(assetName, asset, 0, userData);
+                    if (assetObject.IsScene)
+                    {
+                        throw new GameFrameworkException($"Asset '{key}' is a scene asset, use LoadScene instead.");
+                    }
+
+                    loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(assetName, assetObject.Asset, 0, userData);
                     return;
                 }
 
                 LoadAssetTask loadAssetTask = LoadAssetTask.Create(packageName, assetName, assetType, priority,
-                    new LoadAssetCallbacks((name, o, duration, data) =>
-                    {
-                        m_AssetPathToAssetMap[key] = o;
-                        loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(name, o, duration, data);
-                    }, loadAssetCallbacks.LoadAssetFailureCallback), userData);
+                    loadAssetCallbacks, userData);
 
                 m_TaskPool.AddTask(loadAssetTask);
             }
 
             public void UnloadAsset(object asset)
             {
-                //TODO UnloadAsset
+                var pair = m_AssetPathToAssetMap.FirstOrDefault(pair => pair.Value.Asset == asset);
+                if (pair.Value == null)
+                {
+                    return;
+                }
+
+                if (pair.Value.IsScene)
+                {
+                    throw new GameFrameworkException($"Asset '{pair.Key}' is a scene asset, use UnloadScene instead.");
+                }
+
+                m_ResourceManager.m_ResourceHelper.UnloadAsset(pair.Value);
+                m_AssetPathToAssetMap.Remove(pair.Key);
+                ReferencePool.Release(pair.Value);
+            }
+
+            public void UnloadAsset(string packageName, string assetName)
+            {
+                var key = $"{packageName}/{assetName}";
+
+                if (m_AssetPathToAssetMap.TryGetValue(key, out AssetObject assetObject))
+                {
+                    if (assetObject.IsScene)
+                    {
+                        throw new GameFrameworkException($"Asset '{key}' is a scene asset, use UnloadScene instead.");
+                    }
+
+                    m_ResourceManager.m_ResourceHelper.UnloadAsset(assetObject);
+                    m_AssetPathToAssetMap.Remove(key);
+                    ReferencePool.Release(assetObject);
+                }
             }
 
             /// <summary>
@@ -97,15 +163,8 @@ namespace GameFramework.Resource
                 LoadSceneCallbacks loadSceneCallbacks,
                 object userData)
             {
-                var callbacks = new LoadSceneCallbacks(
-                    (name, asset, duration, data) =>
-                    {
-                        m_SceneNameToAssetMap[name] = asset;
-                        loadSceneCallbacks.LoadSceneSuccessCallback?.Invoke(sceneAssetName, asset, duration, data);
-                    }, loadSceneCallbacks.LoadSceneFailureCallback);
-
-                LoadSceneTask loadSceneTask =
-                    LoadSceneTask.Create(packageName, sceneAssetName, priority, callbacks, userData);
+                LoadSceneTask loadSceneTask = LoadSceneTask.Create(packageName, sceneAssetName, priority,
+                    loadSceneCallbacks, userData);
                 m_TaskPool.AddTask(loadSceneTask);
             }
 
@@ -115,17 +174,25 @@ namespace GameFramework.Resource
             /// <param name="sceneAssetName">要卸载场景资源的名称。</param>
             /// <param name="unloadSceneCallbacks">卸载场景回调函数集。</param>
             /// <param name="userData">用户自定义数据。</param>
-            public void UnloadScene(string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
+            public void UnloadScene(string packageName, string sceneAssetName, UnloadSceneCallbacks unloadSceneCallbacks, object userData)
             {
                 if (m_ResourceManager.m_ResourceHelper == null)
                 {
                     throw new GameFrameworkException("You must set resource helper first.");
                 }
 
-                if (m_SceneNameToAssetMap.TryGetValue(sceneAssetName, out object asset))
+                var key = $"{packageName}/{sceneAssetName}";
+                if (m_AssetPathToAssetMap.TryGetValue(key, out AssetObject assetObject))
                 {
-                    m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, asset, unloadSceneCallbacks,
+                    if (!assetObject.IsScene)
+                    {
+                        throw new GameFrameworkException($"Asset '{key}' is not a scene asset, use UnloadAsset instead.");
+                    }
+                    m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, assetObject, unloadSceneCallbacks,
                         userData);
+
+                    m_AssetPathToAssetMap.Remove(key);
+                    ReferencePool.Release(assetObject);
                 }
                 else
                 {

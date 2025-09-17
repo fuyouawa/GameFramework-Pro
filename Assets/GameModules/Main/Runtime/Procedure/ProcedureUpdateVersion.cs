@@ -1,13 +1,13 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using GameFramework;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityEngine;
 using UnityGameFramework.Runtime;
 using YooAsset;
 using PlayMode = GameFramework.Resource.PlayMode;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -16,7 +16,7 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureUpdateVersion : ProcedureBase
     {
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             if (GameEntry.Resource.PlayMode is not (PlayMode.EditorSimulateMode or PlayMode.OfflinePlayMode))
             {

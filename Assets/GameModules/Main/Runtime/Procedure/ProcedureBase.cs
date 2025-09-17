@@ -10,6 +10,8 @@ namespace GameMain.Runtime
         protected virtual bool EnableAutoUpdateLoadingPhasesContext => true;
         protected virtual bool EnableAutoUpdateLoadingUISpinnerBox => true;
 
+        protected virtual Func<int, int, string> LoadingSpinnerDescriptionGetter => GetLoadingSpinnerDescription;
+
         protected override void OnEnter(IFsm<IProcedureManager> procedureOwner)
         {
             base.OnEnter(procedureOwner);
@@ -46,30 +48,12 @@ namespace GameMain.Runtime
             await OnEnterAsync(procedureOwner);
         }
 
-        protected virtual Func<int, int, string> LoadingSpinnerDescriptionGetter => GetLoadingSpinnerDescription;
-
         protected virtual string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
         {
             return null;
         }
 
         protected virtual UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
-        {
-            return UniTask.CompletedTask;
-        }
-
-        protected override void OnLeave(IFsm<IProcedureManager> procedureOwner, bool isShutdown)
-        {
-            base.OnLeave(procedureOwner, isShutdown);
-            LeaveAsync(procedureOwner, isShutdown).Forget();
-        }
-
-        private async UniTask LeaveAsync(IFsm<IProcedureManager> procedureOwner, bool isShutdown)
-        {
-            await OnLeaveAsync(procedureOwner, isShutdown);
-        }
-
-        protected virtual UniTask OnLeaveAsync(IFsm<IProcedureManager> procedureOwner, bool isShutdown)
         {
             return UniTask.CompletedTask;
         }

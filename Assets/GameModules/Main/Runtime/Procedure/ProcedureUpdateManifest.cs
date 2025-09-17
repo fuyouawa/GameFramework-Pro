@@ -1,11 +1,11 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using GameFramework;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using GameFramework.Resource;
 using UnityGameFramework.Runtime;
 using YooAsset;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -14,7 +14,7 @@ namespace GameMain.Runtime
     /// </summary>
     public class ProcedureUpdateManifest : ProcedureBase
     {
-        protected override async UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             var packageName = GameEntry.Context.Get<string>(Constant.Context.InitializePackageName);
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using GameFramework.Fsm;
 using GameFramework.Procedure;
 using UnityGameFramework.Runtime;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace GameMain.Runtime
 {
@@ -12,14 +12,14 @@ namespace GameMain.Runtime
 
         protected override Func<int, int, string> LoadingSpinnerDescriptionGetter => null;
 
-        protected override UniTask OnEnterAsync(ProcedureOwner procedureOwner)
+        protected override UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             Log.Debug("DownloadOver");
             ChangeState<ProcedurePreload>(procedureOwner);
             return UniTask.CompletedTask;
         }
 
-        protected override void OnUpdate(ProcedureOwner procedureOwner, float elapseSeconds, float realElapseSeconds)
+        protected override void OnUpdate(IFsm<IProcedureManager> procedureOwner, float elapseSeconds, float realElapseSeconds)
         {
         }
     }

@@ -22,11 +22,11 @@
                 m_LoadSceneCallbacks = null;
             }
 
-            public override void OnLoadAssetSuccess(LoadResourceAgent agent, object asset, float duration)
+            public override void OnLoadAssetSuccess(LoadResourceAgent agent, AssetObject assetObject, float duration)
             {
                 if (m_LoadSceneCallbacks.LoadSceneSuccessCallback != null)
                 {
-                    m_LoadSceneCallbacks.LoadSceneSuccessCallback(AssetName, asset, duration, UserData);
+                    m_LoadSceneCallbacks.LoadSceneSuccessCallback(AssetName, assetObject.Asset, duration, UserData);
                 }
             }
 
