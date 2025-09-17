@@ -17,8 +17,18 @@ namespace GameFramework.Scene
         /// </summary>
         public UnloadSceneSuccessEventArgs()
         {
+            PackageName = null;
             SceneAssetName = null;
             UserData = null;
+        }
+
+        /// <summary>
+        /// 获取资源包名称。
+        /// </summary>
+        public string PackageName
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -42,12 +52,14 @@ namespace GameFramework.Scene
         /// <summary>
         /// 创建卸载场景成功事件。
         /// </summary>
+        /// <param name="packageName">资源包名称。</param>
         /// <param name="sceneAssetName">场景资源名称。</param>
         /// <param name="userData">用户自定义数据。</param>
         /// <returns>创建的卸载场景成功事件。</returns>
-        public static UnloadSceneSuccessEventArgs Create(string sceneAssetName, object userData)
+        public static UnloadSceneSuccessEventArgs Create(string packageName, string sceneAssetName, object userData)
         {
             UnloadSceneSuccessEventArgs unloadSceneSuccessEventArgs = ReferencePool.Acquire<UnloadSceneSuccessEventArgs>();
+            unloadSceneSuccessEventArgs.PackageName = packageName;
             unloadSceneSuccessEventArgs.SceneAssetName = sceneAssetName;
             unloadSceneSuccessEventArgs.UserData = userData;
             return unloadSceneSuccessEventArgs;
@@ -58,6 +70,7 @@ namespace GameFramework.Scene
         /// </summary>
         public override void Clear()
         {
+            PackageName = null;
             SceneAssetName = null;
             UserData = null;
         }

@@ -1,12 +1,15 @@
 ﻿using System;
 using DG.Tweening;
+using EasyToolKit.Core;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameMain.Runtime
 {
     public class UISpinnerBox : UIPanel
     {
+        [SerializeField] private Image _backgroundImage;
         [SerializeField] private TextMeshProUGUI _percentageText;
         [SerializeField] private TextMeshProUGUI _descriptionText;
 
@@ -28,6 +31,12 @@ namespace GameMain.Runtime
         {
             get => _descriptionText.text;
             set => _descriptionText.text = value;
+        }
+
+        public float BackgroundAlpha
+        {
+            get => _backgroundImage.color.a;
+            set => _backgroundImage.color = _backgroundImage.color.SetA(value);
         }
 
         public Func<string> DescriptionGetter;

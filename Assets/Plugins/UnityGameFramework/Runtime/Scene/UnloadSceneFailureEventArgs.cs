@@ -25,6 +25,7 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public UnloadSceneFailureEventArgs()
         {
+            PackageName = null;
             SceneAssetName = null;
             UserData = null;
         }
@@ -38,6 +39,15 @@ namespace UnityGameFramework.Runtime
             {
                 return EventId;
             }
+        }
+
+        /// <summary>
+        /// 获取资源包名称。
+        /// </summary>
+        public string PackageName
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -66,6 +76,7 @@ namespace UnityGameFramework.Runtime
         public static UnloadSceneFailureEventArgs Create(GameFramework.Scene.UnloadSceneFailureEventArgs e)
         {
             UnloadSceneFailureEventArgs unloadSceneFailureEventArgs = ReferencePool.Acquire<UnloadSceneFailureEventArgs>();
+            unloadSceneFailureEventArgs.PackageName = e.PackageName;
             unloadSceneFailureEventArgs.SceneAssetName = e.SceneAssetName;
             unloadSceneFailureEventArgs.UserData = e.UserData;
             return unloadSceneFailureEventArgs;
@@ -76,6 +87,7 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public override void Clear()
         {
+            PackageName = null;
             SceneAssetName = null;
             UserData = null;
         }

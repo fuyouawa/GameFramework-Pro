@@ -387,24 +387,24 @@ namespace GameFramework.Scene
             throw new GameFrameworkException(appendErrorMessage);
         }
 
-        private void UnloadSceneSuccessCallback(string sceneAssetName, object userData)
+        private void UnloadSceneSuccessCallback(string packageName, string sceneAssetName, object userData)
         {
             m_UnloadingSceneAssetNames.Remove(sceneAssetName);
             m_LoadedSceneAssetNames.Remove(sceneAssetName);
             if (m_UnloadSceneSuccessEventHandler != null)
             {
-                UnloadSceneSuccessEventArgs unloadSceneSuccessEventArgs = UnloadSceneSuccessEventArgs.Create(sceneAssetName, userData);
+                UnloadSceneSuccessEventArgs unloadSceneSuccessEventArgs = UnloadSceneSuccessEventArgs.Create(packageName, sceneAssetName, userData);
                 m_UnloadSceneSuccessEventHandler(this, unloadSceneSuccessEventArgs);
                 ReferencePool.Release(unloadSceneSuccessEventArgs);
             }
         }
 
-        private void UnloadSceneFailureCallback(string sceneAssetName, object userData)
+        private void UnloadSceneFailureCallback(string packageName, string sceneAssetName, object userData)
         {
             m_UnloadingSceneAssetNames.Remove(sceneAssetName);
             if (m_UnloadSceneFailureEventHandler != null)
             {
-                UnloadSceneFailureEventArgs unloadSceneFailureEventArgs = UnloadSceneFailureEventArgs.Create(sceneAssetName, userData);
+                UnloadSceneFailureEventArgs unloadSceneFailureEventArgs = UnloadSceneFailureEventArgs.Create(packageName, sceneAssetName, userData);
                 m_UnloadSceneFailureEventHandler(this, unloadSceneFailureEventArgs);
                 ReferencePool.Release(unloadSceneFailureEventArgs);
                 return;

@@ -79,7 +79,7 @@ namespace GameMain.Runtime
                 assetInfo.Address, assetInfo.Error, assetInfo)).ToArray();
         }
 
-        public override void UnloadScene(string sceneAssetName, AssetObject sceneAssetObject,
+        public override void UnloadScene(string packageName, string sceneAssetName, AssetObject sceneAssetObject,
             UnloadSceneCallbacks unloadSceneCallbacks, object userData)
         {
             if (sceneAssetObject.UserData is not SceneHandle sceneHandle)
@@ -93,12 +93,12 @@ namespace GameMain.Runtime
                 if (op.Status == EOperationStatus.Succeed)
                 {
                     Log.Debug($"Unload scene '{sceneAssetName}' succeed.");
-                    unloadSceneCallbacks.UnloadSceneSuccessCallback?.Invoke(sceneAssetName, userData);
+                    unloadSceneCallbacks.UnloadSceneSuccessCallback?.Invoke(packageName, sceneAssetName, userData);
                 }
                 else
                 {
                     Log.Error($"Unload scene '{sceneAssetName}' failure: {op.Error}.");
-                    unloadSceneCallbacks.UnloadSceneFailureCallback?.Invoke(sceneAssetName, op.Error);
+                    unloadSceneCallbacks.UnloadSceneFailureCallback?.Invoke(packageName, sceneAssetName, unloadOperation);
                 }
             };
         }

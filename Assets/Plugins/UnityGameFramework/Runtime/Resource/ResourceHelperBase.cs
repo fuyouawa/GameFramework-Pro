@@ -22,7 +22,7 @@ namespace UnityGameFramework.Runtime
         public abstract AssetInfo GetAssetInfo(string packageName, string assetName);
         public abstract AssetInfo[] GetAssetInfos(string packageName, string[] tags);
 
-        public abstract void UnloadScene(string sceneAssetName, AssetObject sceneAssetObject,
+        public abstract void UnloadScene(string packageName, string sceneAssetName, AssetObject sceneAssetObject,
             UnloadSceneCallbacks unloadSceneCallbacks, object userData);
 
         public abstract void UnloadAsset(AssetObject assetObject);

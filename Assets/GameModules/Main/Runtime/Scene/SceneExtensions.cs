@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using UnityGameFramework.Runtime;
+using YooAsset;
 
 namespace GameMain.Runtime
 {
@@ -11,16 +12,20 @@ namespace GameMain.Runtime
         private static readonly Dictionary<string, UniTaskCompletionSource<Scene>> SceneLoadCompletedTcsByAssetPath =
             new Dictionary<string, UniTaskCompletionSource<Scene>>();
 
+        private static readonly Dictionary<string, UniTaskCompletionSource> SceneUnloadCompletedTcsByAssetPath =
+            new Dictionary<string, UniTaskCompletionSource>();
+
         static SceneExtensions()
         {
             GameEntry.Event.Subscribe<LoadSceneSuccessEventArgs>(OnEvent);
             GameEntry.Event.Subscribe<LoadSceneFailureEventArgs>(OnEvent);
+            GameEntry.Event.Subscribe<UnloadSceneSuccessEventArgs>(OnEvent);
+            GameEntry.Event.Subscribe<UnloadSceneFailureEventArgs>(OnEvent);
         }
 
         public static UniTask LoadSceneAsync(this SceneComponent sceneComponent,
             string sceneAssetName,
             string customPackageName = "",
-            int? priority = null,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
             LocalPhysicsMode physicsMode = LocalPhysicsMode.None)
         {
@@ -37,14 +42,32 @@ namespace GameMain.Runtime
 
             tcs = new UniTaskCompletionSource<Scene>();
             SceneLoadCompletedTcsByAssetPath[key] = tcs;
-            
-            sceneComponent.LoadScene(sceneAssetName, customPackageName, priority,
+
+            sceneComponent.LoadScene(sceneAssetName, customPackageName, Constant.AssetPriority.SceneAsset,
                 new LoadSceneParameters()
                 {
                     SceneMode = sceneMode,
                     PhysicsMode = physicsMode
                 });
 
+            return tcs.Task;
+        }
+
+        public static UniTask UnloadSceneAsync(this SceneComponent sceneComponent,
+            string sceneAssetName,
+            string customPackageName = "")
+        {
+            var packageName = string.IsNullOrEmpty(customPackageName)
+                ? sceneComponent.CurrentPackageName
+                : customPackageName;
+            var key = $"{packageName}/{sceneAssetName}";
+            if (SceneUnloadCompletedTcsByAssetPath.TryGetValue(key, out var tcs))
+            {
+                return tcs.Task;
+            }
+            tcs = new UniTaskCompletionSource();
+            SceneUnloadCompletedTcsByAssetPath[key] = tcs;
+            sceneComponent.UnloadScene(sceneAssetName, customPackageName);
             return tcs.Task;
         }
 
@@ -70,5 +93,25 @@ namespace GameMain.Runtime
             SceneLoadCompletedTcsByAssetPath.Remove(path);
         }
 
+        private static void OnEvent(object sender, UnloadSceneSuccessEventArgs e)
+        {
+            var path = $"{e.PackageName}/{e.SceneAssetName}";
+            var tcs = SceneUnloadCompletedTcsByAssetPath[path];
+            tcs.TrySetResult();
+            SceneUnloadCompletedTcsByAssetPath.Remove(path);
+        }
+
+        private static void OnEvent(object sender, UnloadSceneFailureEventArgs e)
+        {
+            var path = $"{e.PackageName}/{e.SceneAssetName}";
+            var tcs = SceneUnloadCompletedTcsByAssetPath[path];
+
+            if (e.UserData is not UnloadSceneOperation operation)
+            {
+                throw new Exception("e.UserData is not UnloadSceneOperation.");
+            }
+            tcs.TrySetException(new Exception(operation.Error));
+            SceneUnloadCompletedTcsByAssetPath.Remove(path);
+        }
     }
 }

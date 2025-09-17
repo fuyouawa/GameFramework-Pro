@@ -26,6 +26,7 @@ namespace UnityGameFramework.Runtime
         private ISceneManager m_SceneManager = null;
         private EventComponent m_EventComponent = null;
         private IResourceManager m_ResourceManager = null;
+        private readonly Dictionary<string, string> m_SceneAssetNameToSceneName = new Dictionary<string, string>(StringComparer.Ordinal);
         private readonly SortedDictionary<string, int> m_SceneOrder = new SortedDictionary<string, int>(StringComparer.Ordinal);
         private Camera m_MainCamera = null;
         private Scene m_GameFrameworkScene = default(Scene);
@@ -335,6 +336,7 @@ namespace UnityGameFramework.Runtime
                 int maxSceneOrder = 0;
                 foreach (KeyValuePair<string, int> sceneOrder in m_SceneOrder)
                 {
+                    var sceneName = m_SceneAssetNameToSceneName[sceneOrder.Key];
                     if (SceneIsLoading(sceneOrder.Key))
                     {
                         continue;
@@ -342,14 +344,14 @@ namespace UnityGameFramework.Runtime
 
                     if (maxSceneName == null)
                     {
-                        maxSceneName = sceneOrder.Key;
+                        maxSceneName = sceneName;
                         maxSceneOrder = sceneOrder.Value;
                         continue;
                     }
 
                     if (sceneOrder.Value > maxSceneOrder)
                     {
-                        maxSceneName = sceneOrder.Key;
+                        maxSceneName = sceneName;
                         maxSceneOrder = sceneOrder.Value;
                     }
                 }
@@ -389,6 +391,7 @@ namespace UnityGameFramework.Runtime
 
         private void OnLoadSceneSuccess(object sender, GameFramework.Scene.LoadSceneSuccessEventArgs e)
         {
+            m_SceneAssetNameToSceneName[e.SceneAssetName] = ((Scene)e.SceneAsset).name;
             if (!m_SceneOrder.ContainsKey(e.SceneAssetName))
             {
                 m_SceneOrder.Add(e.SceneAssetName, 0);
@@ -406,6 +409,7 @@ namespace UnityGameFramework.Runtime
 
         private void OnUnloadSceneSuccess(object sender, GameFramework.Scene.UnloadSceneSuccessEventArgs e)
         {
+            m_SceneAssetNameToSceneName.Remove(e.SceneAssetName);
             m_EventComponent.Fire(this, UnloadSceneSuccessEventArgs.Create(e));
             m_SceneOrder.Remove(e.SceneAssetName);
             RefreshSceneOrder();

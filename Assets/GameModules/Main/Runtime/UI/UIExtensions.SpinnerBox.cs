@@ -11,22 +11,28 @@ namespace GameMain.Runtime
 
         public static UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
             string descriptionGetter,
-            int initialPercentage)
+            int initialPercentage,
+            float backgroundAlpha = 0.2f)
         {
-            return BeginSpinnerBoxAsync(uiComponent, () => descriptionGetter, initialPercentage);
+            return BeginSpinnerBoxAsync(uiComponent, () => descriptionGetter, initialPercentage,
+                backgroundAlpha,
+                UISpinnerBoxConfigAsset.Instance.DefaultGroupName);
         }
 
         public static UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
             Func<string> descriptionGetter,
-            int initialPercentage)
+            int initialPercentage,
+            float backgroundAlpha = 0.2f)
         {
             return BeginSpinnerBoxAsync(uiComponent, descriptionGetter, initialPercentage,
+                backgroundAlpha,
                 UISpinnerBoxConfigAsset.Instance.DefaultGroupName);
         }
 
         public static async UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
             Func<string> descriptionGetter,
             int initialPercentage,
+            float backgroundAlpha,
             string groupName)
         {
             if (s_lastSpinnerBox != null)
@@ -46,6 +52,7 @@ namespace GameMain.Runtime
             s_lastSpinnerBox = form;
             spinnerBox.DescriptionGetter = descriptionGetter;
             spinnerBox.Percentage = initialPercentage;
+            spinnerBox.BackgroundAlpha = backgroundAlpha;
         }
 
         public static bool IsSpinnerBoxShowing(this UIComponent uiComponent)
@@ -56,22 +63,27 @@ namespace GameMain.Runtime
         public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
             string descriptionGetter,
             float destinationPercentage,
-            float duration = 0.2f)
+            float duration = 0.2f,
+            float? backgroundAlpha = null)
         {
-            return UpdateSpinnerBoxAsync(uiComponent, () => descriptionGetter, destinationPercentage, duration);
+            return UpdateSpinnerBoxAsync(uiComponent, () => descriptionGetter, destinationPercentage, duration,
+                backgroundAlpha);
         }
 
         public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
             float destinationPercentage,
-            float duration = 0.2f)
+            float duration = 0.2f,
+            float? backgroundAlpha = null)
         {
-            return UpdateSpinnerBoxAsync(uiComponent, (Func<string>)null, destinationPercentage, duration);
+            return UpdateSpinnerBoxAsync(uiComponent, (Func<string>)null, destinationPercentage, duration,
+                backgroundAlpha);
         }
 
         public static UniTask UpdateSpinnerBoxAsync(this UIComponent uiComponent,
             [CanBeNull] Func<string> descriptionGetter,
             float destinationPercentage,
-            float duration = 0.2f)
+            float duration = 0.2f,
+            float? backgroundAlpha = null)
         {
             if (s_lastSpinnerBox == null)
             {
@@ -87,6 +99,11 @@ namespace GameMain.Runtime
             if (descriptionGetter != null)
             {
                 spinnerBox.DescriptionGetter = descriptionGetter;
+            }
+
+            if (backgroundAlpha != null)
+            {
+                spinnerBox.BackgroundAlpha = backgroundAlpha.Value;
             }
 
             var arrivedTcs = new UniTaskCompletionSource();

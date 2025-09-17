@@ -188,7 +188,7 @@ namespace GameFramework.Resource
                     {
                         throw new GameFrameworkException($"Asset '{key}' is not a scene asset, use UnloadAsset instead.");
                     }
-                    m_ResourceManager.m_ResourceHelper.UnloadScene(sceneAssetName, assetObject, unloadSceneCallbacks,
+                    m_ResourceManager.m_ResourceHelper.UnloadScene(packageName, sceneAssetName, assetObject, unloadSceneCallbacks,
                         userData);
 
                     m_AssetPathToAssetMap.Remove(key);

@@ -15,6 +15,8 @@ namespace GameMain.Runtime
         [ListDrawerSettings(ShowIndexLabel = false)]
         [SerializeField] private List<string> _preloadAssetTags;
 
+        [SerializeField] private AssetReference _startSceneAssetReference = new AssetReference(Constant.Package.Common, "Scene_Start");
+
         [Title("Proto")]
         [SerializeField] private string _configPackageName = "Common";
         [SerializeField] private string _configAssetName = "Config_{0}";
@@ -39,5 +41,7 @@ namespace GameMain.Runtime
 
         public IReadOnlyList<string> HotUpdateAssemblyNames => _hotUpdateAssemblyNames;
         public IReadOnlyList<string> AOTMetaAssemblyNames => _aotMetaAssemblyNames;
+
+        public AssetReference StartSceneAssetReference => _startSceneAssetReference;
     }
 }

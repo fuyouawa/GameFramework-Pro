@@ -22,7 +22,7 @@ namespace GameMain.Runtime
             GameEntry.Context.Set(Constant.Context.LoadingPhasesCount, 9);
             GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, 0);
 
-            await GameEntry.UI.BeginSpinnerBoxAsync("开始加载流程", 0);
+            await GameEntry.UI.BeginSpinnerBoxAsync("开始加载流程", 0, 1f);
 
             GameEntry.Context.Set(Constant.Context.InitializePackageName, GameEntry.Resource.DefaultPackageName);
             ChangeState<ProcedureInitPackage>(procedureOwner);
