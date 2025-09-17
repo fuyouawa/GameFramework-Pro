@@ -321,7 +321,7 @@ namespace GameFramework
             m_DataProviderHelper = dataProviderHelper;
         }
 
-        private void LoadAssetSuccessCallback(string dataAssetName, object dataAsset, float duration, object userData)
+        private void LoadAssetSuccessCallback(string packageName, string dataAssetName, object dataAsset, float duration, object userData)
         {
             try
             {
@@ -355,7 +355,7 @@ namespace GameFramework
             }
         }
 
-        private void LoadAssetOrBinaryFailureCallback(string dataAssetName, LoadResourceStatus status, string errorMessage, object userData)
+        private void LoadAssetOrBinaryFailureCallback(string packageName, string dataAssetName, LoadResourceStatus status, string errorMessage, object userData)
         {
             string appendErrorMessage = Utility.Text.Format("Load data failure, data asset name '{0}', status '{1}', error message '{2}'.", dataAssetName, status, errorMessage);
             if (m_ReadDataFailureEventHandler != null)

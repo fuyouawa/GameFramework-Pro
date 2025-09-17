@@ -1,10 +1,11 @@
 {
-  "dependencies": {    
+  "dependencies": {
     "com.code-philosophy.hybridclr": "8.5.1",
+    "com.code-philosophy.luban": "1.1.1",
     "com.cysharp.unitask": "2.5.10",
     "com.github-glitchenzo.nugetforunity": "4.5.0",
     "com.tuyoogame.yooasset": "2.3.14",
-    "com.code-philosophy.luban": "1.1.1",
+    "com.unity.ide.cursor": "2.0.23",
     "com.unity.collab-proxy": "2.9.3",
     "com.unity.feature.development": "1.0.1",
     "com.unity.textmeshpro": "3.0.7",
@@ -52,7 +53,8 @@
         "com.code-philosophy.hybridclr",
         "com.tuyoogame.yooasset",
         "com.github-glitchenzo.nugetforunity",
-        "com.code-philosophy.luban"
+        "com.code-philosophy.luban",
+        "com.unity.ide.cursor"
       ]
     }
   ]

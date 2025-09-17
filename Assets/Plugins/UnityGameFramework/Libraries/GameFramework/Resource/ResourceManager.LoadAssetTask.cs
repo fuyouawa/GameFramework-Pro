@@ -14,7 +14,7 @@ namespace GameFramework.Resource
             {
                 if (m_LoadAssetCallbacks.LoadAssetSuccessCallback != null)
                 {
-                    m_LoadAssetCallbacks.LoadAssetSuccessCallback(AssetName, assetObject.Asset, duration, UserData);
+                    m_LoadAssetCallbacks.LoadAssetSuccessCallback(PackageName, AssetName, assetObject.Asset, duration, UserData);
                 }
             }
 
@@ -22,7 +22,7 @@ namespace GameFramework.Resource
             {
                 if (m_LoadAssetCallbacks.LoadAssetFailureCallback != null)
                 {
-                    m_LoadAssetCallbacks.LoadAssetFailureCallback(AssetName, status, errorMessage, UserData);
+                    m_LoadAssetCallbacks.LoadAssetFailureCallback(PackageName, AssetName, status, errorMessage, UserData);
                 }
             }
 

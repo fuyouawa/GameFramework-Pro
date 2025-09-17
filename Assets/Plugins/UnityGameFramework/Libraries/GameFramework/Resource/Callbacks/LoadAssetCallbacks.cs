@@ -14,14 +14,13 @@ namespace GameFramework.Resource
     {
         private readonly LoadAssetSuccessCallback m_LoadAssetSuccessCallback;
         private readonly LoadAssetFailureCallback m_LoadAssetFailureCallback;
-        private readonly LoadAssetUpdateCallback m_LoadAssetUpdateCallback;
 
         /// <summary>
         /// 初始化加载资源回调函数集的新实例。
         /// </summary>
         /// <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
         public LoadAssetCallbacks(LoadAssetSuccessCallback loadAssetSuccessCallback)
-            : this(loadAssetSuccessCallback, null, null)
+            : this(loadAssetSuccessCallback, null)
         {
         }
 
@@ -31,17 +30,6 @@ namespace GameFramework.Resource
         /// <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
         /// <param name="loadAssetFailureCallback">加载资源失败回调函数。</param>
         public LoadAssetCallbacks(LoadAssetSuccessCallback loadAssetSuccessCallback, LoadAssetFailureCallback loadAssetFailureCallback)
-            : this(loadAssetSuccessCallback, loadAssetFailureCallback, null)
-        {
-        }
-
-        /// <summary>
-        /// 初始化加载资源回调函数集的新实例。
-        /// </summary>
-        /// <param name="loadAssetSuccessCallback">加载资源成功回调函数。</param>
-        /// <param name="loadAssetFailureCallback">加载资源失败回调函数。</param>
-        /// <param name="loadAssetUpdateCallback">加载资源更新回调函数。</param>
-        public LoadAssetCallbacks(LoadAssetSuccessCallback loadAssetSuccessCallback, LoadAssetFailureCallback loadAssetFailureCallback, LoadAssetUpdateCallback loadAssetUpdateCallback)
         {
             if (loadAssetSuccessCallback == null)
             {
@@ -50,7 +38,6 @@ namespace GameFramework.Resource
 
             m_LoadAssetSuccessCallback = loadAssetSuccessCallback;
             m_LoadAssetFailureCallback = loadAssetFailureCallback;
-            m_LoadAssetUpdateCallback = loadAssetUpdateCallback;
         }
 
         /// <summary>
@@ -72,17 +59,6 @@ namespace GameFramework.Resource
             get
             {
                 return m_LoadAssetFailureCallback;
-            }
-        }
-
-        /// <summary>
-        /// 获取加载资源更新回调函数。
-        /// </summary>
-        public LoadAssetUpdateCallback LoadAssetUpdateCallback
-        {
-            get
-            {
-                return m_LoadAssetUpdateCallback;
             }
         }
     }

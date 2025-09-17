@@ -491,7 +491,7 @@ namespace GameFramework.Sound
             throw new GameFrameworkException(Utility.Text.Format("Can not find sound '{0}'.", serialId));
         }
 
-        private void LoadAssetSuccessCallback(string soundAssetName, object soundAsset, float duration, object userData)
+        private void LoadAssetSuccessCallback(string packageName, string soundAssetName, object soundAsset, float duration, object userData)
         {
             PlaySoundInfo playSoundInfo = (PlaySoundInfo)userData;
             if (playSoundInfo == null)
@@ -561,7 +561,7 @@ namespace GameFramework.Sound
             throw new GameFrameworkException(errorMessage);
         }
 
-        private void LoadAssetFailureCallback(string soundAssetName, LoadResourceStatus status, string errorMessage, object userData)
+        private void LoadAssetFailureCallback(string packageName, string soundAssetName, LoadResourceStatus status, string errorMessage, object userData)
         {
             PlaySoundInfo playSoundInfo = (PlaySoundInfo)userData;
             if (playSoundInfo == null)

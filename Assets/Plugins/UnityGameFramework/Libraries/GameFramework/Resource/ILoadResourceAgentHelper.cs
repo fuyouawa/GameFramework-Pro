@@ -32,7 +32,7 @@ namespace GameFramework.Resource
         /// <param name="assetName">要加载的资源名称。</param>
         /// <param name="assetType">要加载资源的类型。</param>
         /// <param name="isScene">要加载的资源是否是场景。</param>
-        void LoadAsset(string packageName, string assetName, Type assetType, bool isScene);
+        void LoadAsset(string packageName, string assetName, Type assetType, bool isScene, object userData);
 
         /// <summary>
         /// 重置加载资源代理辅助器。

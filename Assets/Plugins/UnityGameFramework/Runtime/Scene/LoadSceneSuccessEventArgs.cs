@@ -25,7 +25,9 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public LoadSceneSuccessEventArgs()
         {
+            PackageName = null;
             SceneAssetName = null;
+            SceneAsset = null;
             Duration = 0f;
             UserData = null;
         }
@@ -42,9 +44,27 @@ namespace UnityGameFramework.Runtime
         }
 
         /// <summary>
+        /// 获取资源包名称。
+        /// </summary>
+        public string PackageName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// 获取场景资源名称。
         /// </summary>
         public string SceneAssetName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 获取场景资源。
+        /// </summary>
+        public object SceneAsset
         {
             get;
             private set;
@@ -76,7 +96,9 @@ namespace UnityGameFramework.Runtime
         public static LoadSceneSuccessEventArgs Create(GameFramework.Scene.LoadSceneSuccessEventArgs e)
         {
             LoadSceneSuccessEventArgs loadSceneSuccessEventArgs = ReferencePool.Acquire<LoadSceneSuccessEventArgs>();
+            loadSceneSuccessEventArgs.PackageName = e.PackageName;
             loadSceneSuccessEventArgs.SceneAssetName = e.SceneAssetName;
+            loadSceneSuccessEventArgs.SceneAsset = e.SceneAsset;
             loadSceneSuccessEventArgs.Duration = e.Duration;
             loadSceneSuccessEventArgs.UserData = e.UserData;
             return loadSceneSuccessEventArgs;
@@ -87,7 +109,9 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         public override void Clear()
         {
+            PackageName = null;
             SceneAssetName = null;
+            SceneAsset = null;
             Duration = 0f;
             UserData = null;
         }

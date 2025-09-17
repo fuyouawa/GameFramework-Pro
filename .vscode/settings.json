@@ -1,0 +1,43 @@
+{
+    "files.exclude": {
+        "**/*.meta": true,
+        "**/Library": true,
+        "**/Temp": true,
+        "**/obj": true,
+        "**/Logs": true,
+        "**/Build": true,
+        "**/bin": true,
+        "**/.vs": true
+    },
+    "search.exclude": {
+        "**/*.meta": true,
+        "**/*.csproj": true,
+        "**/*.sln": true,
+        "**/Library": true,
+        "**/Temp": true,
+        "**/obj": true,
+        "**/Logs": true,
+        "**/Build": true,
+        "**/.vs": true
+    },
+    "files.watcherExclude": {
+        "**/Library/**": true,
+        "**/Temp/**": true,
+        "**/obj/**": true,
+        "**/Logs/**": true,
+        "**/Build/**": true
+    },
+    "dotrush.roslyn.projectOrSolutionFiles": [
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameFramework-Pro.sln",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameFramework.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameLogic.Editor.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameLogic.Runtime.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameMain.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameMain.Editor.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameMain.Runtime.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\GameProto.Runtime.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\UnityGameFramework.Editor.csproj",
+        "e:\\Code\\Unity\\GameFramework-Pro\\UnityGameFramework.Runtime.csproj"
+    ],
+    "dotnet.defaultSolution": "GameFramework-Pro.sln"
+}

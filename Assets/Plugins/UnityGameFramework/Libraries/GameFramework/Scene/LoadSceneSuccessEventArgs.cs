@@ -17,15 +17,29 @@ namespace GameFramework.Scene
         /// </summary>
         public LoadSceneSuccessEventArgs()
         {
+            PackageName = null;
             SceneAssetName = null;
+            SceneAsset = null;
             Duration = 0f;
             UserData = null;
+        }
+
+        public string PackageName
+        {
+            get;
+            private set;
         }
 
         /// <summary>
         /// 获取场景资源名称。
         /// </summary>
         public string SceneAssetName
+        {
+            get;
+            private set;
+        }
+
+        public object SceneAsset
         {
             get;
             private set;
@@ -56,10 +70,12 @@ namespace GameFramework.Scene
         /// <param name="duration">加载持续时间。</param>
         /// <param name="userData">用户自定义数据。</param>
         /// <returns>创建的加载场景成功事件。</returns>
-        public static LoadSceneSuccessEventArgs Create(string sceneAssetName, float duration, object userData)
+        public static LoadSceneSuccessEventArgs Create(string packageName, string sceneAssetName, object sceneAsset, float duration, object userData)
         {
             LoadSceneSuccessEventArgs loadSceneSuccessEventArgs = ReferencePool.Acquire<LoadSceneSuccessEventArgs>();
+            loadSceneSuccessEventArgs.PackageName = packageName;
             loadSceneSuccessEventArgs.SceneAssetName = sceneAssetName;
+            loadSceneSuccessEventArgs.SceneAsset = sceneAsset;
             loadSceneSuccessEventArgs.Duration = duration;
             loadSceneSuccessEventArgs.UserData = userData;
             return loadSceneSuccessEventArgs;
@@ -70,7 +86,9 @@ namespace GameFramework.Scene
         /// </summary>
         public override void Clear()
         {
+            PackageName = null;
             SceneAssetName = null;
+            SceneAsset = null;
             Duration = 0f;
             UserData = null;
         }

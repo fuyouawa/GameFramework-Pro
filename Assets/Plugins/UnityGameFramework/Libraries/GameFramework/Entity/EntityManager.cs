@@ -1172,7 +1172,7 @@ namespace GameFramework.Entity
             m_RecycleQueue.Enqueue(entityInfo);
         }
 
-        private void LoadAssetSuccessCallback(string entityAssetName, object entityAsset, float duration, object userData)
+        private void LoadAssetSuccessCallback(string packageName, string entityAssetName, object entityAsset, float duration, object userData)
         {
             ShowEntityInfo showEntityInfo = (ShowEntityInfo)userData;
             if (showEntityInfo == null)
@@ -1196,7 +1196,7 @@ namespace GameFramework.Entity
             ReferencePool.Release(showEntityInfo);
         }
 
-        private void LoadAssetFailureCallback(string entityAssetName, LoadResourceStatus status, string errorMessage, object userData)
+        private void LoadAssetFailureCallback(string packageName, string entityAssetName, LoadResourceStatus status, string errorMessage, object userData)
         {
             ShowEntityInfo showEntityInfo = (ShowEntityInfo)userData;
             if (showEntityInfo == null)

@@ -11,7 +11,7 @@ namespace GameMain.Runtime
     {
         private static readonly LoadAssetCallbacks LoadAssetCallbacks = new LoadAssetCallbacks(OnLoadAssetSuccess, OnLoadAssetFailure);
 
-        private static readonly Dictionary<string, UniTaskCompletionSource<UnityEngine.Object>> AssetLoadCompletedTcsByName =
+        private static readonly Dictionary<string, UniTaskCompletionSource<UnityEngine.Object>> AssetLoadCompletedTcsByPath =
             new Dictionary<string, UniTaskCompletionSource<UnityEngine.Object>>();
 
         public static async UniTask<T> LoadAssetAsync<T>(this ResourceComponent resourceComponent, string assetName,
@@ -30,29 +30,36 @@ namespace GameMain.Runtime
             int? priority = null,
             object userData = null)
         {
-            if (AssetLoadCompletedTcsByName.TryGetValue(assetName, out var tcs))
+            var packageName = string.IsNullOrEmpty(customPackageName)
+                ? resourceComponent.CurrentPackageName
+                : customPackageName;
+
+            var path = $"{packageName}/{assetName}";
+            if (AssetLoadCompletedTcsByPath.TryGetValue(path, out var tcs))
             {
                 return tcs.Task;
             }
 
             tcs = new UniTaskCompletionSource<UnityEngine.Object>();
-            AssetLoadCompletedTcsByName[assetName] = tcs;
+            AssetLoadCompletedTcsByPath[path] = tcs;
             resourceComponent.LoadAsset(assetName, LoadAssetCallbacks, customPackageName, assetType, priority, userData);
             return tcs.Task;
         }
 
-        private static void OnLoadAssetSuccess(string assetName, object asset, float duration, object userData)
+        private static void OnLoadAssetSuccess(string packageName, string assetName, object asset, float duration, object userData)
         {
-            var tcs = AssetLoadCompletedTcsByName[assetName];
+            var path = $"{packageName}/{assetName}";
+            var tcs = AssetLoadCompletedTcsByPath[path];
             tcs.TrySetResult((UnityEngine.Object)asset);
-            AssetLoadCompletedTcsByName.Remove(assetName);
+            AssetLoadCompletedTcsByPath.Remove(path);
         }
 
-        private static void OnLoadAssetFailure(string assetName, LoadResourceStatus status, string error, object userData)
+        private static void OnLoadAssetFailure(string packageName, string assetName, LoadResourceStatus status, string error, object userData)
         {
-            var tcs = AssetLoadCompletedTcsByName[assetName];
+            var path = $"{packageName}/{assetName}";
+            var tcs = AssetLoadCompletedTcsByPath[path];
             tcs.TrySetException(new Exception(error));
-            AssetLoadCompletedTcsByName.Remove(assetName);
+            AssetLoadCompletedTcsByPath.Remove(path);
         }
     }
 }

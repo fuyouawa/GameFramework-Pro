@@ -41,6 +41,14 @@ namespace UnityGameFramework.Runtime
             }
         }
 
+        public string CurrentPackageName
+        {
+            get
+            {
+                return m_ResourceManager.CurrentPackageName;
+            }
+        }
+
         /// <summary>
         /// 游戏框架组件初始化。
         /// </summary>

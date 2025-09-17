@@ -360,25 +360,25 @@ namespace GameFramework.Scene
             m_ResourceManager.UnloadScene(sceneAssetName, m_UnloadSceneCallbacks, userData);
         }
 
-        private void LoadSceneSuccessCallback(string sceneAssetName, object sceneAsset, float duration, object userData)
+        private void LoadSceneSuccessCallback(string packageName, string sceneAssetName, object sceneAsset, float duration, object userData)
         {
             m_LoadingSceneAssetNames.Remove(sceneAssetName);
             m_LoadedSceneAssetNames.Add(sceneAssetName);
             if (m_LoadSceneSuccessEventHandler != null)
             {
-                LoadSceneSuccessEventArgs loadSceneSuccessEventArgs = LoadSceneSuccessEventArgs.Create(sceneAssetName, duration, userData);
+                LoadSceneSuccessEventArgs loadSceneSuccessEventArgs = LoadSceneSuccessEventArgs.Create(packageName, sceneAssetName, sceneAsset, duration, userData);
                 m_LoadSceneSuccessEventHandler(this, loadSceneSuccessEventArgs);
                 ReferencePool.Release(loadSceneSuccessEventArgs);
             }
         }
 
-        private void LoadSceneFailureCallback(string sceneAssetName, LoadResourceStatus status, string errorMessage, object userData)
+        private void LoadSceneFailureCallback(string packageName, string sceneAssetName, LoadResourceStatus status, string errorMessage, object userData)
         {
             m_LoadingSceneAssetNames.Remove(sceneAssetName);
             string appendErrorMessage = Utility.Text.Format("Load scene failure, scene asset name '{0}', status '{1}', error message '{2}'.", sceneAssetName, status, errorMessage);
             if (m_LoadSceneFailureEventHandler != null)
             {
-                LoadSceneFailureEventArgs loadSceneFailureEventArgs = LoadSceneFailureEventArgs.Create(sceneAssetName, appendErrorMessage, userData);
+                LoadSceneFailureEventArgs loadSceneFailureEventArgs = LoadSceneFailureEventArgs.Create(packageName, sceneAssetName, appendErrorMessage, userData);
                 m_LoadSceneFailureEventHandler(this, loadSceneFailureEventArgs);
                 ReferencePool.Release(loadSceneFailureEventArgs);
                 return;

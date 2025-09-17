@@ -58,7 +58,7 @@ namespace GameFramework.Resource
                 m_Task = task;
                 m_Task.StartTime = DateTime.UtcNow;
 
-                m_LoadResourceAgentHelper.LoadAsset(task.PackageName, task.AssetName, task.AssetType, task.IsScene);
+                m_LoadResourceAgentHelper.LoadAsset(task.PackageName, task.AssetName, task.AssetType, task.IsScene, task.UserData);
                 return StartTaskStatus.CanResume;
             }
 

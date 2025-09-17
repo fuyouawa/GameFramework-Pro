@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Unity",
+            "type": "unity",
+            "userAssemblies": [
+                "${workspaceFolder}/Library/ScriptAssemblies/Assembly-CSharp.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/Assembly-CSharp-firstpass.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameMain.Runtime.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameMain.Editor.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameLogic.Runtime.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameLogic.Editor.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameProto.Runtime.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameProto.Editor.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/UnityGameFramework.Runtime.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/UnityGameFramework.Editor.dll",
+                "${workspaceFolder}/Library/ScriptAssemblies/GameFramework.dll"
+            ],
+            "request": "attach"
+        },
+        {
+            "name": "Attach to Unity",
+            "type": "vstuc",
+            "request": "attach"
+        }
+    ]
+}

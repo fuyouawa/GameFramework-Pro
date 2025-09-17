@@ -20,7 +20,7 @@ namespace UnityGameFramework.Runtime
         public abstract event EventHandler<LoadResourceAgentHelperLoadCompleteEventArgs> LoadComplete;
         public abstract event EventHandler<LoadResourceAgentHelperErrorEventArgs> Error;
 
-        public abstract void LoadAsset(string packageName, string assetName, Type assetType, bool isScene);
+        public abstract void LoadAsset(string packageName, string assetName, Type assetType, bool isScene, object userData);
 
         public abstract void Reset();
     }

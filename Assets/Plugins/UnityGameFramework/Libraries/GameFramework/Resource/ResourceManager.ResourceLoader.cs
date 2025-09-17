@@ -106,7 +106,7 @@ namespace GameFramework.Resource
                         throw new GameFrameworkException($"Asset '{key}' is a scene asset, use LoadScene instead.");
                     }
 
-                    loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(assetName, assetObject.Asset, 0, userData);
+                    loadAssetCallbacks.LoadAssetSuccessCallback?.Invoke(packageName, assetName, assetObject.Asset, 0, userData);
                     return;
                 }
 

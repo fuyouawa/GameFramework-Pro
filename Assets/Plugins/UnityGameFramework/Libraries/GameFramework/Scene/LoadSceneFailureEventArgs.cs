@@ -17,9 +17,19 @@ namespace GameFramework.Scene
         /// </summary>
         public LoadSceneFailureEventArgs()
         {
+            PackageName = null;
             SceneAssetName = null;
             ErrorMessage = null;
             UserData = null;
+        }
+
+        /// <summary>
+        /// 获取资源包名称。
+        /// </summary>
+        public string PackageName
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -56,9 +66,10 @@ namespace GameFramework.Scene
         /// <param name="errorMessage">错误信息。</param>
         /// <param name="userData">用户自定义数据。</param>
         /// <returns>创建的加载场景失败事件。</returns>
-        public static LoadSceneFailureEventArgs Create(string sceneAssetName, string errorMessage, object userData)
+        public static LoadSceneFailureEventArgs Create(string packageName, string sceneAssetName, string errorMessage, object userData)
         {
             LoadSceneFailureEventArgs loadSceneFailureEventArgs = ReferencePool.Acquire<LoadSceneFailureEventArgs>();
+            loadSceneFailureEventArgs.PackageName = packageName;
             loadSceneFailureEventArgs.SceneAssetName = sceneAssetName;
             loadSceneFailureEventArgs.ErrorMessage = errorMessage;
             loadSceneFailureEventArgs.UserData = userData;
@@ -70,6 +81,7 @@ namespace GameFramework.Scene
         /// </summary>
         public override void Clear()
         {
+            PackageName = null;
             SceneAssetName = null;
             ErrorMessage = null;
             UserData = null;
