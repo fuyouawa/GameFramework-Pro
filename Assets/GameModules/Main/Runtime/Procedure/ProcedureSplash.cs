@@ -15,11 +15,11 @@ namespace GameMain.Runtime
 
         protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
-            // The standard game start phases count is 9.
+            // The standard game start phases count is 10.
             // ProcedureInitPackage => ProcedureUpdateVersion => ProcedureUpdateManifest => ProcedureCreateDownloader =>
             // ProcedureDownloadFiles => ProcedureDownloadOver => ProcedurePreload => ProcedureLoadAssembly =>
-            // ProcedureStartGame
-            GameEntry.Context.Set(Constant.Context.LoadingPhasesCount, 9);
+            // ProcedureStartGame => ProcedureLoadScene
+            GameEntry.Context.Set(Constant.Context.LoadingPhasesCount, 10);
             GameEntry.Context.Set(Constant.Context.LoadingPhasesIndex, 0);
 
             await GameEntry.UI.BeginSpinnerBoxAsync("开始加载流程", 0, 1f);

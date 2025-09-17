@@ -11,6 +11,8 @@
             public const string LoadingPhasesIndex = "Context.LoadingPhasesIndex";
 
             public const string HookPackageLoadCompleted = "Context.HookPackageLoadCompleted";
+
+            public const string LoadSceneAssetReference = "Context.LoadSceneAssetReference";
         }
     }
 }

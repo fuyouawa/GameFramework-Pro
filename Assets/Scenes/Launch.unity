@@ -398,7 +398,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.size
-      value: 16
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.data[5]
@@ -426,22 +426,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.data[11]
-      value: GameMain.Runtime.ProcedurePreload
+      value: GameMain.Runtime.ProcedureLoadScene
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.data[12]
-      value: GameMain.Runtime.ProcedureSplash
+      value: GameMain.Runtime.ProcedurePreload
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.data[13]
-      value: GameMain.Runtime.ProcedureStartGame
+      value: GameMain.Runtime.ProcedureSplash
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.data[14]
-      value: GameMain.Runtime.ProcedureUpdateManifest
+      value: GameMain.Runtime.ProcedureStartGame
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_AvailableProcedureTypeNames.Array.data[15]
+      value: GameMain.Runtime.ProcedureUpdateManifest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_AvailableProcedureTypeNames.Array.data[16]
       value: GameMain.Runtime.ProcedureUpdateVersion
       objectReference: {fileID: 0}
     - target: {fileID: 7510343117618053930, guid: dabf2c8308f02d44896605370aa169ed, type: 3}

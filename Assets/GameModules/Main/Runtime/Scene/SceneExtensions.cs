@@ -23,7 +23,7 @@ namespace GameMain.Runtime
             GameEntry.Event.Subscribe<UnloadSceneFailureEventArgs>(OnEvent);
         }
 
-        public static UniTask LoadSceneAsync(this SceneComponent sceneComponent,
+        public static UniTask<Scene> LoadSceneAsync(this SceneComponent sceneComponent,
             string sceneAssetName,
             string customPackageName = "",
             LoadSceneMode sceneMode = LoadSceneMode.Single,

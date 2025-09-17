@@ -9,17 +9,13 @@ namespace GameMain.Runtime
 {
     public class ProcedureStartGame : ProcedureBase
     {
+        protected override Func<int, int, string> LoadingSpinnerDescriptionGetter => null;
+
         protected override async UniTask OnEnterAsync(IFsm<IProcedureManager> procedureOwner)
         {
             var startSceneAssetReference = GameConfigAsset.Instance.StartSceneAssetReference;
-            await GameEntry.Scene.LoadSceneAsync(startSceneAssetReference.AssetName, startSceneAssetReference.PackageName, LoadSceneMode.Additive);
-            Log.Debug($"Load start scene success.");
-            ChangeState<ProcedureGameing>(procedureOwner);
-        }
-
-        protected override string GetLoadingSpinnerDescription(int phaseIndex, int phaseCount)
-        {
-            return "加载开始界面......";
+            GameEntry.Context.Set(Constant.Context.LoadSceneAssetReference, startSceneAssetReference);
+            ChangeState<ProcedureLoadScene>(procedureOwner);
         }
     }
 }
