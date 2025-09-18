@@ -66,7 +66,7 @@ namespace UnityGameFramework.Editor
                     sceneNameString += ", ";
                 }
 
-                sceneNameString += SceneComponent.GetSceneName(sceneAssetName);
+                sceneNameString += ((SceneComponent)target).GetSceneName(sceneAssetName);
             }
 
             return sceneNameString;

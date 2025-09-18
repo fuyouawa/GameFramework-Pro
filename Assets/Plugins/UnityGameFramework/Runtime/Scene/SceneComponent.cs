@@ -103,29 +103,36 @@ namespace UnityGameFramework.Runtime
         /// </summary>
         /// <param name="sceneAssetName">场景资源名称。</param>
         /// <returns>场景名称。</returns>
-        public static string GetSceneName(string sceneAssetName)
+        public string GetSceneName(string sceneAssetName)
         {
-            if (string.IsNullOrEmpty(sceneAssetName))
-            {
-                Log.Error("Scene asset name is invalid.");
-                return null;
-            }
+            // if (string.IsNullOrEmpty(sceneAssetName))
+            // {
+            //     Log.Error("Scene asset name is invalid.");
+            //     return null;
+            // }
+            //
+            // int sceneNamePosition = sceneAssetName.LastIndexOf('/');
+            // if (sceneNamePosition + 1 >= sceneAssetName.Length)
+            // {
+            //     Log.Error("Scene asset name '{0}' is invalid.", sceneAssetName);
+            //     return null;
+            // }
+            //
+            // string sceneName = sceneAssetName.Substring(sceneNamePosition + 1);
+            // sceneNamePosition = sceneName.LastIndexOf(".unity");
+            // if (sceneNamePosition > 0)
+            // {
+            //     sceneName = sceneName.Substring(0, sceneNamePosition);
+            // }
+            //
+            // return sceneName;
 
-            int sceneNamePosition = sceneAssetName.LastIndexOf('/');
-            if (sceneNamePosition + 1 >= sceneAssetName.Length)
+            if (m_SceneAssetNameToSceneName.TryGetValue(sceneAssetName, out var sceneName))
             {
-                Log.Error("Scene asset name '{0}' is invalid.", sceneAssetName);
-                return null;
+                return sceneName;
             }
-
-            string sceneName = sceneAssetName.Substring(sceneNamePosition + 1);
-            sceneNamePosition = sceneName.LastIndexOf(".unity");
-            if (sceneNamePosition > 0)
-            {
-                sceneName = sceneName.Substring(0, sceneNamePosition);
-            }
-
-            return sceneName;
+            Log.Error("Scene asset name '{0}' is not loaded.", sceneAssetName);
+            return null;
         }
 
         /// <summary>
@@ -336,7 +343,6 @@ namespace UnityGameFramework.Runtime
                 int maxSceneOrder = 0;
                 foreach (KeyValuePair<string, int> sceneOrder in m_SceneOrder)
                 {
-                    var sceneName = m_SceneAssetNameToSceneName[sceneOrder.Key];
                     if (SceneIsLoading(sceneOrder.Key))
                     {
                         continue;
@@ -344,14 +350,14 @@ namespace UnityGameFramework.Runtime
 
                     if (maxSceneName == null)
                     {
-                        maxSceneName = sceneName;
+                        maxSceneName = sceneOrder.Key;
                         maxSceneOrder = sceneOrder.Value;
                         continue;
                     }
 
                     if (sceneOrder.Value > maxSceneOrder)
                     {
-                        maxSceneName = sceneName;
+                        maxSceneName = sceneOrder.Key;
                         maxSceneOrder = sceneOrder.Value;
                     }
                 }
@@ -391,6 +397,7 @@ namespace UnityGameFramework.Runtime
 
         private void OnLoadSceneSuccess(object sender, GameFramework.Scene.LoadSceneSuccessEventArgs e)
         {
+            //TODO unite packageName and assetName
             m_SceneAssetNameToSceneName[e.SceneAssetName] = ((Scene)e.SceneAsset).name;
             if (!m_SceneOrder.ContainsKey(e.SceneAssetName))
             {

@@ -32,15 +32,16 @@ namespace GameMain.Runtime
 
                 if (EnableAutoUpdateLoadingUISpinnerBox && GameEntry.UI.IsSpinnerBoxShowing())
                 {
+                    float percentage = phaseIndex / (float)phaseCount;
                     // Ensure that the previous phase is update completely.
-                    await GameEntry.UI.UpdateSpinnerBoxAsync(phaseIndex / (float)phaseCount);
+                    await GameEntry.UI.UpdateSpinnerBoxAsync(percentage);
 
                     if (LoadingSpinnerDescriptionGetter != null)
                     {
                         // Update the description of the current phase.
                         GameEntry.UI.UpdateSpinnerBoxAsync(
                             () => LoadingSpinnerDescriptionGetter(phaseIndex, phaseCount),
-                            phaseIndex / (float)phaseCount).Forget();
+                            percentage).Forget();
                     }
                 }
             }

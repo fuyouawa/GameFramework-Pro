@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EasyToolKit.Core;
 using GameFramework.Fsm;
 using GameFramework.Procedure;
 using UnityEngine.SceneManagement;
@@ -13,6 +14,7 @@ namespace GameMain.Runtime
         enum LoadSceneState
         {
             LoadingNewScene,
+            InitializingNewScene,
             UnloadingPreviousScene,
             LoadingComplete,
         }
@@ -26,7 +28,15 @@ namespace GameMain.Runtime
 
             _loadSceneState = LoadSceneState.LoadingNewScene;
 
-            if (!await LoadSceneWithRetryAsync(loadSceneAssetReference))
+            var scene = await LoadSceneWithRetryAsync(loadSceneAssetReference);
+            if (!scene.IsValid())
+            {
+                ChangeState<ProcedureFatalError>(procedureOwner);
+                return;
+            }
+
+            _loadSceneState = LoadSceneState.InitializingNewScene;
+            if (!await InitializeSceneAsync(scene))
             {
                 ChangeState<ProcedureFatalError>(procedureOwner);
                 return;
@@ -46,14 +56,34 @@ namespace GameMain.Runtime
             ChangeState<ProcedureGameing>(procedureOwner);
         }
 
+        private async UniTask<bool> InitializeSceneAsync(Scene scene)
+        {
+            var sceneInitializer = scene.FindObjectsByType<SceneInitializer>();
+            if (sceneInitializer.Length == 0)
+            {
+                return true;
+            }
 
-        private async UniTask<bool> LoadSceneWithRetryAsync(AssetReference loadSceneAssetReference, int retryCount = 0)
+            try
+            {
+                await UniTask.WhenAll(sceneInitializer.Select(x => x.InitializeAsync()));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Initialize scene '{scene.name}' failed: {e}");
+                return false;
+            }
+            return true;
+        }
+
+
+        private async UniTask<Scene> LoadSceneWithRetryAsync(AssetReference loadSceneAssetReference, int retryCount = 0)
         {
             try
             {
                 var scene = await GameEntry.Scene.LoadSceneAsync(loadSceneAssetReference.AssetName, loadSceneAssetReference.PackageName, LoadSceneMode.Additive);
                 Log.Debug($"Load scene '{loadSceneAssetReference.AssetName}' success.");
-                return true;
+                return scene;
             }
             catch (Exception e)
             {
@@ -66,15 +96,16 @@ namespace GameMain.Runtime
                     if (retryCount >= GameEntry.Resource.FailedTryAgain)
                     {
                         await GameEntry.UI.ShowMessageBoxAsync($"已重试达到最大次数。", UIMessageBoxType.Fatal);
-                        return false;
+                        return new Scene();
                     }
 
-                    if (await LoadSceneWithRetryAsync(loadSceneAssetReference, retryCount + 1))
+                    var scene = await LoadSceneWithRetryAsync(loadSceneAssetReference, retryCount + 1);
+                    if (scene.IsValid())
                     {
-                        return true;
+                        return scene;
                     }
                 }
-                return false;
+                return new Scene();
             }
         }
 
@@ -112,6 +143,7 @@ namespace GameMain.Runtime
             return _loadSceneState switch
             {
                 LoadSceneState.LoadingNewScene => "加载新场景......",
+                LoadSceneState.InitializingNewScene => "初始化新场景......",
                 LoadSceneState.UnloadingPreviousScene => "卸载旧场景......",
                 _ => throw new Exception("Invalid load scene state."),
             };
