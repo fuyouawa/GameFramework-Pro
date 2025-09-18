@@ -16,7 +16,7 @@ namespace GameMain.Runtime
         {
             return BeginSpinnerBoxAsync(uiComponent, () => descriptionGetter, initialPercentage,
                 backgroundAlpha,
-                UISpinnerBoxConfigAsset.Instance.DefaultGroupName);
+                Constant.UIGroup.Popup);
         }
 
         public static UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,
@@ -26,7 +26,7 @@ namespace GameMain.Runtime
         {
             return BeginSpinnerBoxAsync(uiComponent, descriptionGetter, initialPercentage,
                 backgroundAlpha,
-                UISpinnerBoxConfigAsset.Instance.DefaultGroupName);
+                Constant.UIGroup.Popup);
         }
 
         public static async UniTask BeginSpinnerBoxAsync(this UIComponent uiComponent,

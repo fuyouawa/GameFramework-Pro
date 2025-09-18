@@ -76,12 +76,12 @@ namespace GameMain.Runtime
 
         private void InitSoundSettings()
         {
-            GameEntry.Sound.Mute("Music", GameEntry.Setting.GetBool(Constant.Setting.MusicMuted, false));
-            GameEntry.Sound.SetVolume("Music", GameEntry.Setting.GetFloat(Constant.Setting.MusicVolume, 0.5f));
-            GameEntry.Sound.Mute("Sound", GameEntry.Setting.GetBool(Constant.Setting.SoundMuted, false));
-            GameEntry.Sound.SetVolume("Sound", GameEntry.Setting.GetFloat(Constant.Setting.SoundVolume, 0.5f));
-            GameEntry.Sound.Mute("UISound", GameEntry.Setting.GetBool(Constant.Setting.UISoundMuted, false));
-            GameEntry.Sound.SetVolume("UISound", GameEntry.Setting.GetFloat(Constant.Setting.UISoundVolume, 0.5f));
+            GameEntry.Sound.Mute(Constant.SoundGroup.Music, GameEntry.Setting.GetBool(Constant.Setting.MusicMuted, false));
+            GameEntry.Sound.SetVolume(Constant.SoundGroup.Music, GameEntry.Setting.GetFloat(Constant.Setting.MusicVolume, 0.5f));
+            GameEntry.Sound.Mute(Constant.SoundGroup.Sound, GameEntry.Setting.GetBool(Constant.Setting.SoundMuted, false));
+            GameEntry.Sound.SetVolume(Constant.SoundGroup.Sound, GameEntry.Setting.GetFloat(Constant.Setting.SoundVolume, 0.5f));
+            GameEntry.Sound.Mute(Constant.SoundGroup.UISound, GameEntry.Setting.GetBool(Constant.Setting.UISoundMuted, false));
+            GameEntry.Sound.SetVolume(Constant.SoundGroup.UISound, GameEntry.Setting.GetFloat(Constant.Setting.UISoundVolume, 0.5f));
             Log.Debug("Init sound settings complete.");
         }
     }

@@ -41,7 +41,7 @@ namespace GameMain.Runtime
             UIMessageBoxType type,
             UIMessageBoxButtons buttons = UIMessageBoxButtons.Ok)
         {
-            return uiComponent.ShowMessageBoxAsync(message, UIMessageBoxConfigAsset.Instance.DefaultGroupName, type,
+            return uiComponent.ShowMessageBoxAsync(message, Constant.UIGroup.Popup, type,
                 buttons);
         }
 
@@ -69,8 +69,7 @@ namespace GameMain.Runtime
             UIMessageBoxType type,
             params string[] buttonTexts)
         {
-            return uiComponent.ShowMessageBoxAsync(message, title, UIMessageBoxConfigAsset.Instance.DefaultGroupName,
-                type, buttonTexts);
+            return uiComponent.ShowMessageBoxAsync(message, title, Constant.UIGroup.Popup, type, buttonTexts);
         }
 
         public static async UniTask<int> ShowMessageBoxAsync(this UIComponent uiComponent,

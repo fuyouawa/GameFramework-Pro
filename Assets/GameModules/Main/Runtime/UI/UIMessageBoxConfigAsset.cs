@@ -13,10 +13,6 @@ namespace GameMain.Runtime
         [LabelText("资源引用")]
         [SerializeField] private AssetReference _assetReference = new AssetReference(Constant.Package.Builtin, "UI_MessageBox");
 
-        [Title("默认值")]
-        [LabelText("分组名")]
-        [SerializeField] private string _defaultGroupName = "Popup";
-
         [Title("UIMessageType文本")]
         [SerializeField] private string _tipTitle = "提示";
         [SerializeField] private string _warnTitle = "警告";
@@ -46,8 +42,6 @@ namespace GameMain.Runtime
 
 
         public AssetReference AssetReference => _assetReference;
-
-        public string DefaultGroupName => _defaultGroupName;
 
         public string TipTitle => _tipTitle;
         public string WarnTitle => _warnTitle;

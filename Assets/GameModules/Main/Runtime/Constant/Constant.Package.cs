@@ -4,9 +4,9 @@
     {
         public static class Package
         {
-            public static string Builtin = "Builtin";
-            public static string Common = "Common";
-            public static string Proto = "Proto";
+            public static readonly string Builtin = "Builtin";
+            public static readonly string Common = "Common";
+            public static readonly string Proto = "Proto";
         }
     }
 }

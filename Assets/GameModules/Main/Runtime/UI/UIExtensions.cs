@@ -22,6 +22,22 @@ namespace GameMain.Runtime
         /// 异步打开界面。
         /// </summary>
         /// <param name="uiFormAssetName">界面资源名称。</param>
+        /// <param name="pauseCoveredUIForm">是否暂停被覆盖的界面。</param>
+        /// <param name="userData">用户自定义数据。</param>
+        /// <returns>界面。</returns>
+        public static UniTask<UIForm> OpenUIFormAsync(this UIComponent uiComponent,
+            string uiFormAssetName,
+            string customPackageName = "",
+            bool pauseCoveredUIForm = false,
+            object userData = null)
+        {
+            return OpenUIFormAsync(uiComponent, uiFormAssetName, Constant.UIGroup.Common, customPackageName, pauseCoveredUIForm, userData);
+        }
+
+        /// <summary>
+        /// 异步打开界面。
+        /// </summary>
+        /// <param name="uiFormAssetName">界面资源名称。</param>
         /// <param name="uiGroupName">界面组名称。</param>
         /// <param name="pauseCoveredUIForm">是否暂停被覆盖的界面。</param>
         /// <param name="userData">用户自定义数据。</param>

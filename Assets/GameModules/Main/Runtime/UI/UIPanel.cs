@@ -70,7 +70,7 @@ namespace GameMain.Runtime
 
         private void DoAnimation(UIAnimation uiAnimation, float duration, Action completed)
         {
-            if (_previousTweener != null && _previousTweener.IsPlaying())
+            if (_previousTweener != null)
             {
                 _previousTweener.Kill();
                 _previousTweener = null;

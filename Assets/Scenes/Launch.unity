@@ -390,10 +390,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2624401406792655903, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_UIGroups.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2624401406792655903, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
       propertyPath: m_UIGroups.Array.data[0].m_Name
+      value: Background
+      objectReference: {fileID: 0}
+    - target: {fileID: 2624401406792655903, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_UIGroups.Array.data[1].m_Name
+      value: Common
+      objectReference: {fileID: 0}
+    - target: {fileID: 2624401406792655903, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
+      propertyPath: m_UIGroups.Array.data[2].m_Name
       value: Popup
       objectReference: {fileID: 0}
     - target: {fileID: 6189030823185022994, guid: dabf2c8308f02d44896605370aa169ed, type: 3}
